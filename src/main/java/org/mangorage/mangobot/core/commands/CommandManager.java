@@ -1,15 +1,15 @@
-package org.mangorage.mangobot.core;
+package org.mangorage.mangobot.core.commands;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.commands.CommandResult;
+import org.mangorage.mangobot.commands.PingCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
 import org.mangorage.mangobot.commands.music.PlayCommand;
 import org.mangorage.mangobot.commands.music.StopCommand;
+import org.mangorage.mangobot.core.Constants;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 public class CommandManager {
     private static final CommandManager INSTANCE = new CommandManager();
@@ -18,11 +18,11 @@ public class CommandManager {
         return INSTANCE;
     }
 
-    private final HashMap<String, AbstractCommand> COMMANDS = new HashMap<>();
+    private final HashMap<String, CommandHolder<?>> COMMANDS = new HashMap<>();
 
     public void register() {
-        COMMANDS.put("speak", new ReplyCommand("I have spoken!"));
-        COMMANDS.put("paste", new ReplyCommand(
+        add("speak", new ReplyCommand("I have spoken!"));
+        add("paste", new ReplyCommand(
                 """
                         Please use a paste site for large blocks of code/logs, instead of dumping it in chat or taking a screenshot.
                                         
@@ -36,7 +36,7 @@ public class CommandManager {
                             https://mclo.gs/:                        [Free] 15MB
                         """
         ));
-        COMMANDS.put("sl", new ReplyCommand(
+        add("sl", new ReplyCommand(
                 """
                         # Forge Only Supports 1.19.x and 1.20.x
                         The Forge Discord only supports 1.19.x and 1.20.x
@@ -46,20 +46,34 @@ public class CommandManager {
                         All of the older versions work and there are some other communities that offer support for older versions.
                         """
         ));
-        COMMANDS.put("neoforge", new ReplyCommand(
+        add("neoforge", new ReplyCommand(
                 """
 You mentioned NeoForge. NeoForge is a fork of MinecraftForge by many former MC Forge staff and the old discord. We are not affiliated with NeoForge and to get support with NeoForge you should consider joining their discord if you are not already banned. https://discord.neoforged.net/
                         """
         ));
-        COMMANDS.put("notforge", new ReplyCommand(
+        add("notforge", new ReplyCommand(
                 """
                         We only support Minecraft Forge on this discord server, the attached info uses other modloaders. We do not support other modloaders such as Fabric, Quilt, FeatureCreep, LiteLoader, Rift, NeoForge, or any other modloaders mods out of the box. You should contact the developers or the modloader or abstraction layer of your issue.
                         """
         ));
+        CommandHolder<PingCommand> PING = add("ping", new PingCommand());
+        // Alias's
+        add("pingReplys", PING);
+
         if (Constants.USE_MUSIC) {
-            COMMANDS.put("play", new PlayCommand());
-            COMMANDS.put("stop", new StopCommand());
+            add("play", new PlayCommand());
+            add("stop", new StopCommand());
         }
+    }
+
+    private <T extends AbstractCommand> CommandHolder<T> add(String command, T value) {
+        CommandHolder<T> HOLDER = CommandHolder.create(value);
+        COMMANDS.put(command, HOLDER);
+        return HOLDER;
+    }
+
+    private <T extends AbstractCommand> void add(String command, CommandHolder<T> holder) {
+        COMMANDS.put(command, holder);
     }
 
     public String[] handleCommand(String command, String content) {
@@ -68,7 +82,7 @@ You mentioned NeoForge. NeoForge is a fork of MinecraftForge by many former MC F
     }
 
     public void handleCommand(String command, Message message) {
-        CommandResult result = COMMANDS.get(command).execute(message, handleCommand(command, message.getContentDisplay()));
+        CommandResult result = COMMANDS.get(command).get().execute(message, handleCommand(command, message.getContentDisplay()));
         if (result == CommandResult.FAIL)
             message.getChannel().sendMessage("Command failed");
     }

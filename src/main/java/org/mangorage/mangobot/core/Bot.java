@@ -6,10 +6,9 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.sharding.DefaultShardManager;
-import net.dv8tion.jda.api.utils.SessionController;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.mangobot.core.audio.Music;
+import org.mangorage.mangobot.core.commands.CommandManager;
 import org.mangorage.mangobot.core.events.EventListener;
 
 import java.util.EnumSet;
@@ -17,7 +16,6 @@ import java.util.EnumSet;
 import static org.mangorage.mangobot.core.Constants.STARTUP_MESSAGE;
 
 public class Bot {
-    private static boolean restarted = false;
     private static Bot INSTANCE = null;
 
     public static void init() {

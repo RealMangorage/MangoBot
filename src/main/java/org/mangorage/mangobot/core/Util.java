@@ -2,6 +2,7 @@ package org.mangorage.mangobot.core;
 
 
 import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobot.core.commands.CommandManager;
 
 import static org.mangorage.mangobot.core.Constants.COMMAND_PREFIX;
 
