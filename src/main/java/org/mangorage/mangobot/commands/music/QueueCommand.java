@@ -22,23 +22,49 @@
 
 package org.mangorage.mangobot.commands.music;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.commands.CommandResult;
-import org.mangorage.mangobot.core.audio.MusicUtil;
-import org.mangorage.mangobot.core.audio.old.Music;
+import org.mangorage.mangobot.core.audio.MusicPlayer;
 
 public class QueueCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, String[] args) {
-        MusicUtil.connectToAudioChannel(message.getMember());
         String URL = args[0];
         MessageChannelUnion channel = message.getChannel();
+        MusicPlayer player = MusicPlayer.getInstance();
 
         if (URL != null) {
-            Music.playOrQueue(URL, true, track -> {
-                channel.sendMessage("Queued: " + track.getInfo().title).queue();
+            player.load(URL, e -> {
+                /**
+                 MessageEmbed embed = new EmbedBuilder()
+                 .setTitle(track.getInfo().title, track.getInfo().uri)
+                 .build();
+                 channel.sendMessage("Playing: ").addEmbeds(embed).queue();
+
+
+                 channel.sendMessage("Queued: " + track.getInfo().title).queue();
+                 **/
+                switch (e.getReason()) {
+                    case SUCCESS -> {
+                        player.add(e.getTrack());
+                        MessageEmbed embed = new EmbedBuilder()
+                                .setTitle(e.getTrack().getInfo().title, e.getTrack().getInfo().uri)
+                                .build();
+                        channel.sendMessage("Added to Queue: ").addEmbeds(embed).queue();
+
+                    }
+                    case FAILED -> {
+                        channel.sendMessage("Failed").queue();
+                    }
+                    case NO_MATCHES -> {
+                        channel.sendMessage("No matches was found!").queue();
+                    }
+                }
+
             });
         }
         return CommandResult.PASS;

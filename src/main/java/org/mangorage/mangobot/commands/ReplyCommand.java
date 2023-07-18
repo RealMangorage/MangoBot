@@ -36,4 +36,12 @@ public class ReplyCommand extends AbstractCommand {
         message.reply(MESSAGE_RESPONSE).queue();
         return CommandResult.PASS;
     }
+
+    /**
+     * @return
+     */
+    @Override
+    public boolean isGuildOnly() {
+        return false;
+    }
 }

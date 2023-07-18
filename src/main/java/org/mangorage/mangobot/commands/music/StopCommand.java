@@ -35,10 +35,12 @@ public class StopCommand extends AbstractCommand {
         MessageChannelUnion channel = message.getChannel();
         if (MusicPlayer.getInstance().isPlaying()) {
             MusicPlayer.getInstance().stop();
-            channel.sendMessage("Stopped track!");
+            channel.sendMessage("Stopped playing!").queue();
+        } else {
+            channel.sendMessage("Nothing is playing!").queue();
         }
 
-        MusicUtil.leaveVoiceChannel(message.getMember());
+        MusicUtil.leaveVoiceChannel(message.getGuild());
 
         return CommandResult.PASS;
     }

@@ -22,7 +22,11 @@
 
 package org.mangorage.mangobot.commands.music;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.commands.CommandResult;
 import org.mangorage.mangobot.core.audio.MusicPlayer;
@@ -30,8 +34,18 @@ import org.mangorage.mangobot.core.audio.MusicPlayer;
 public class PauseCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, String[] args) {
-        if (MusicPlayer.getInstance().isPlaying())
+        MessageChannelUnion channel = message.getChannel();
+
+        if (MusicPlayer.getInstance().isPlaying()) {
             MusicPlayer.getInstance().pause();
+            AudioTrack track = MusicPlayer.getInstance().getPlaying();
+
+            MessageEmbed embed = new EmbedBuilder()
+                    .setTitle(track.getInfo().title, track.getInfo().uri)
+                    .build();
+            channel.sendMessage("Paused: ").addEmbeds(embed).queue();
+        } else
+            channel.sendMessage("Nothing is playing").queue();
         return CommandResult.PASS;
     }
 }

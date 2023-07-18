@@ -22,29 +22,27 @@
 
 package org.mangorage.mangobot.core.audio;
 
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.audio.SpeakingMode;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 public class MusicUtil {
-    public static void connectToAudioChannel(Member member) {
-        // Get an audio manager for this guild, this will be created upon first use for each guild
-        AudioManager audioManager = member.getGuild().getAudioManager();
+    public static void connectToAudioChannel(VoiceChannel channel) {
+        AudioManager audioManager = channel.getGuild().getAudioManager();
 
-
-        // Set the sending handler to our echo system
         audioManager.setSendingHandler(MusicPlayer.getInstance());
         audioManager.setSelfDeafened(true);
         audioManager.setSelfMuted(false);
+        audioManager.setAutoReconnect(true);
+        audioManager.setSpeakingMode(SpeakingMode.VOICE);
+        audioManager.setConnectTimeout(30_000);
 
         MusicPlayer.getInstance().setVolume(5); // Default volume so nobody gets there ears torn out by sound.
-
-        // Connect to the voice channel
-        if (member.getVoiceState().inAudioChannel())
-            audioManager.openAudioConnection(member.getVoiceState().getChannel());
+        audioManager.openAudioConnection(channel);
     }
 
-    public static void leaveVoiceChannel(Member member) {
-        AudioManager audioManager = member.getGuild().getAudioManager();
-        audioManager.closeAudioConnection();
+    public static void leaveVoiceChannel(Guild guild) {
+        guild.getAudioManager().closeAudioConnection();
     }
 }

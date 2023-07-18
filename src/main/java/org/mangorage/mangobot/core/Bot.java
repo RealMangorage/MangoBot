@@ -29,7 +29,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.mangorage.mangobot.core.audio.old.Music;
+import org.mangorage.mangobot.core.audio.MusicPlayer;
 import org.mangorage.mangobot.core.commands.CommandManager;
 import org.mangorage.mangobot.core.events.EventListener;
 
@@ -54,7 +54,7 @@ public class Bot {
         System.out.println(STARTUP_MESSAGE);
 
         CommandManager.getInstance().register(); // Register commands!
-        Music.init(); // Init Music!
+        MusicPlayer.getInstance();
 
         JDABuilder builder = JDABuilder.createDefault(Constants.dotEnv.get("DISCORD_TOKEN"));
 

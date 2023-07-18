@@ -107,9 +107,12 @@ You mentioned NeoForge. NeoForge is a fork of MinecraftForge by many former MC F
     }
 
     public void handleCommand(String command, Message message) {
-        CommandResult result = COMMANDS.get(command).get().execute(message, handleCommand(command, message.getContentDisplay()));
-        if (result == CommandResult.FAIL)
-            message.getChannel().sendMessage("Command failed");
+        AbstractCommand abstractCommand = COMMANDS.get(command).get();
+        if (abstractCommand.isGuildOnly() && message.isFromGuild()) {
+            CommandResult result = COMMANDS.get(command).get().execute(message, handleCommand(command, message.getContentDisplay()));
+            if (result == CommandResult.FAIL)
+                message.getChannel().sendMessage("Command failed");
+        }
     }
 
     public boolean isValid(String command) {

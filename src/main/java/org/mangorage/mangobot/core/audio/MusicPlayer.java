@@ -70,7 +70,13 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
     }
 
     public boolean isPlaying() {
+        if (audioPlayer.getPlayingTrack() == null)
+            return false;
         return audioPlayer.getPlayingTrack() != null;
+    }
+
+    public boolean isQueueEmpty() {
+        return TRACKS_QUEUE.isEmpty();
     }
 
     public void load(String URL, Consumer<AudioTrackEvent> eventConsumer) {

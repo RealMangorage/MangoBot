@@ -22,7 +22,11 @@
 
 package org.mangorage.mangobot.commands.music;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.commands.CommandResult;
@@ -35,35 +39,55 @@ public class PlayCommand extends AbstractCommand {
         String URL = args[0];
         MessageChannelUnion channel = message.getChannel();
         MusicPlayer player = MusicPlayer.getInstance();
+        GuildVoiceState voiceState = message.getMember().getVoiceState();
 
-        if (URL.length() > 0) {
-            if (!player.isPlaying()) {
-                player.load(URL, e -> {
-                    switch (e.getReason()) {
-                        case SUCCESS -> {
-                            MusicUtil.connectToAudioChannel(message.getMember());
-                            player.add(e.getTrack());
-                            player.play();
-                            channel.sendMessage("Started playing: " + e.getTrack().getInfo().title).queue();
+        if (voiceState.inAudioChannel()) {
+            if (URL.length() > 0) {
+                if (!player.isPlaying()) {
+                    player.load(URL, e -> {
+                        switch (e.getReason()) {
+                            case SUCCESS -> {
+                                MusicUtil.connectToAudioChannel(voiceState.getChannel().asVoiceChannel());
+                                player.add(e.getTrack());
+                                player.play();
+                                MessageEmbed embed = new EmbedBuilder()
+                                        .setTitle(e.getTrack().getInfo().title, e.getTrack().getInfo().uri)
+                                        .build();
+                                channel.sendMessage("Playing: ").addEmbeds(embed).queue();
+                            }
+                            case FAILED -> {
+                                channel.sendMessage("Failed").queue();
+                            }
+                            case NO_MATCHES -> {
+                                channel.sendMessage("No matches was found!").queue();
+                            }
                         }
-                        case FAILED -> {
-                            channel.sendMessage("Failed").queue();
-                        }
-                        case NO_MATCHES -> {
-                            channel.sendMessage("No matches was found!").queue();
-                        }
-                    }
-                });
-            } else
-                channel.sendMessage("Already playing!").queue();
-        } else {
-            if (player.isPlaying()) {
-                MusicPlayer.getInstance().resume();
-                channel.sendMessage("Resumed playing: " + MusicPlayer.getInstance().getPlaying().getInfo().title).queue();
+                    });
+                } else
+                    channel.sendMessage("Already playing!").queue();
             } else {
-                channel.sendMessage("Nothing is currently playing.").queue();
+                if (player.isPlaying()) {
+                    MusicPlayer.getInstance().resume();
+                    AudioTrack track = player.getPlaying();
+                    MessageEmbed embed = new EmbedBuilder()
+                            .setTitle(track.getInfo().title, track.getInfo().uri)
+                            .build();
+                    channel.sendMessage("Resumed playing: ").addEmbeds(embed).queue();
+                } else {
+                    if (!MusicPlayer.getInstance().isQueueEmpty()) {
+                        MusicUtil.connectToAudioChannel(voiceState.getChannel().asVoiceChannel());
+                        MusicPlayer.getInstance().play();
+                        AudioTrack track = MusicPlayer.getInstance().getPlaying();
+                        MessageEmbed embed = new EmbedBuilder()
+                                .setTitle(track.getInfo().title, track.getInfo().uri)
+                                .build();
+                        channel.sendMessage("Started playing: ").addEmbeds(embed).queue();
+                    } else
+                        channel.sendMessage("Nothing is currently playing.").queue();
+                }
             }
-        }
+        } else
+            channel.sendMessage("Must be in a voice channel!").queue();
 
         return CommandResult.PASS;
     }
