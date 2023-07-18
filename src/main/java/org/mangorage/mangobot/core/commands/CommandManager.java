@@ -5,8 +5,7 @@ import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.commands.CommandResult;
 import org.mangorage.mangobot.commands.PingCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
-import org.mangorage.mangobot.commands.music.PlayCommand;
-import org.mangorage.mangobot.commands.music.StopCommand;
+import org.mangorage.mangobot.commands.music.*;
 import org.mangorage.mangobot.core.Constants;
 
 import java.util.HashMap;
@@ -63,6 +62,9 @@ You mentioned NeoForge. NeoForge is a fork of MinecraftForge by many former MC F
         if (Constants.USE_MUSIC) {
             add("play", new PlayCommand());
             add("stop", new StopCommand());
+            add("queue", new QueueCommand());
+            add("pause", new PauseCommand());
+            add("setVolume", new VolumeCommand());
         }
     }
 

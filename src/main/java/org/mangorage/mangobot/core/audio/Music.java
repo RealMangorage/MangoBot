@@ -2,16 +2,12 @@ package org.mangorage.mangobot.core.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.*;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
-import net.dv8tion.jda.api.managers.AudioManager;
-import org.mangorage.mangobot.commands.music.AudioPlayerSendHandler;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Music {
@@ -25,20 +21,32 @@ public class Music {
         audioPlayer.addListener(trackScheduler);
     }
 
-    public static void playOrQueue(String URL, Consumer<AudioTrack> trackConsumer) {
+    public static void pause() {
+        audioPlayer.setPaused(true);
+    }
+
+    public static void resume() {
+        audioPlayer.setPaused(false);
+    }
+
+    public static boolean playOrQueue(String URL, boolean queue, Consumer<AudioTrack> trackConsumer) {
+        if (audioPlayer.isPaused()) {
+            resume();
+            return true;
+        }
+
+        AtomicBoolean loaded = new AtomicBoolean(false);
+
         manager.loadItem(URL, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 trackConsumer.accept(track);
-
-                switch (trackScheduler.getStatus()) {
-                    case STOPPED -> {
-                        trackScheduler.playTrack(track);
-                    }
-                    default -> {
-                        trackScheduler.queueTrack(track);
-                    }
+                if (queue) {
+                    trackScheduler.queueTrack(track);
+                } else {
+                    trackScheduler.playTrack(track);
                 }
+                loaded.set(true);
             }
 
             @Override
@@ -48,13 +56,16 @@ public class Music {
 
             @Override
             public void noMatches() {
-
+                trackConsumer.accept(null);
             }
 
             @Override
             public void loadFailed(FriendlyException exception) {
-
+                trackConsumer.accept(null);
             }
+
         });
+
+        return loaded.get();
     }
 }

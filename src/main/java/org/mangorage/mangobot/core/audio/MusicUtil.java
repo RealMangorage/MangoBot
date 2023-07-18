@@ -13,8 +13,19 @@ public class MusicUtil {
 
         // Set the sending handler to our echo system
         audioManager.setSendingHandler(handler);
+        audioManager.setSelfDeafened(true);
+        audioManager.setSelfMuted(false);
         // Connect to the voice channel
         if (member.getVoiceState().inAudioChannel())
             audioManager.openAudioConnection(member.getVoiceState().getChannel());
+    }
+
+    public static void leaveVoiceChannel(Member member) {
+        AudioManager audioManager = member.getGuild().getAudioManager();
+        audioManager.closeAudioConnection();
+    }
+
+    public static void setVolume(int volume) {
+        Music.audioPlayer.setVolume(volume);
     }
 }

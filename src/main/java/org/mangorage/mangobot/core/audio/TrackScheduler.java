@@ -43,6 +43,11 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void skipTrack() {
+        stopTrack();
+        playing = list.poll();
+    }
+
+    public void stopTrack() {
         player.stopTrack();
     }
 
