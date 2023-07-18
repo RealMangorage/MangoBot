@@ -65,6 +65,7 @@ You mentioned NeoForge. NeoForge is a fork of MinecraftForge by many former MC F
             add("queue", new QueueCommand());
             add("pause", new PauseCommand());
             add("setVolume", new VolumeCommand());
+            add("playing", new PlayingCommand());
         }
     }
 

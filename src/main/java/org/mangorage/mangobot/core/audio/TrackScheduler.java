@@ -5,15 +5,13 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import net.dv8tion.jda.api.entities.channel.Channel;
-import org.apache.commons.collections4.QueueUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
+
+@Deprecated
 public class TrackScheduler extends AudioEventAdapter {
-    private final Queue<AudioTrack> list = QueueUtils.emptyQueue();
+    private final Queue<AudioTrack> list = new ConcurrentLinkedQueue<>();
     private AudioTrack playing;
     private final AudioPlayer player;
     private Status status = Status.STOPPED;
@@ -26,6 +24,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public TrackScheduler(AudioPlayer player) {
         this.player = player;
+        player.addListener(this);
     }
 
     public Status getStatus() {
@@ -44,7 +43,6 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public void skipTrack() {
         stopTrack();
-        playing = list.poll();
     }
 
     public void stopTrack() {
@@ -52,8 +50,10 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void playTrack() {
-        if (playing != null)
+        if (playing != null) {
             player.playTrack(playing);
+            this.status = Status.PLAYING;
+        }
     }
 
     @Override
@@ -71,15 +71,17 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         // A track started playing
+        this.status = Status.PLAYING;
     }
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        this.status = Status.STOPPED;
+        this.playing = null;
+
         if (endReason.mayStartNext) {
-            playing = list.poll();
-            playTrack();
-        } else {
-            playing = null;
+            if (list.peek() != null)
+                playTrack(list.poll());
         }
     }
 
@@ -91,5 +93,10 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         // Audio track has been unable to provide us any audio, might want to just start a new track
+        stopTrack();
+        this.status = Status.STOPPED;
+        this.playing = null;
+        if (list.peek() != null)
+            playTrack(list.poll());
     }
 }

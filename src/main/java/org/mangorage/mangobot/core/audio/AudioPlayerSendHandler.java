@@ -1,14 +1,13 @@
-package org.mangorage.mangobot.commands.music;
+package org.mangorage.mangobot.core.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
-import org.mangorage.mangobot.core.audio.Music;
 
 import java.nio.ByteBuffer;
 
 public class AudioPlayerSendHandler implements AudioSendHandler {
-    public static final AudioPlayerSendHandler INSTANCE = new AudioPlayerSendHandler(Music.audioPlayer);
+    public static final AudioPlayerSendHandler INSTANCE = new AudioPlayerSendHandler(MusicPlayer.getInstance().getAudioPlayer());
     private final AudioPlayer audioPlayer;
     private AudioFrame lastFrame;
 
