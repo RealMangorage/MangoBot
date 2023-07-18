@@ -23,19 +23,21 @@
 package org.mangorage.mangobot.commands.music;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.commands.AbstractCommand;
-import org.mangorage.mangobot.commands.CommandResult;
-import org.mangorage.mangobot.core.audio.MusicPlayer;
+import org.mangorage.mangobot.commands.core.AbstractCommand;
+import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.core.music.MusicPlayer;
 
 public class QueueCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, String[] args) {
         String URL = args[0];
         MessageChannelUnion channel = message.getChannel();
-        MusicPlayer player = MusicPlayer.getInstance();
+        Guild guild = message.getGuild();
+        MusicPlayer player = MusicPlayer.getInstance(guild.getId());
 
         if (URL != null) {
             player.load(URL, e -> {

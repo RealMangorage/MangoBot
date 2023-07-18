@@ -20,29 +20,9 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.audio;
+package org.mangorage.mangobot.commands.core;
 
-import net.dv8tion.jda.api.audio.SpeakingMode;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import net.dv8tion.jda.api.managers.AudioManager;
-
-public class MusicUtil {
-    public static void connectToAudioChannel(VoiceChannel channel) {
-        AudioManager audioManager = channel.getGuild().getAudioManager();
-
-        audioManager.setSendingHandler(MusicPlayer.getInstance());
-        audioManager.setSelfDeafened(true);
-        audioManager.setSelfMuted(false);
-        audioManager.setAutoReconnect(true);
-        audioManager.setSpeakingMode(SpeakingMode.VOICE);
-        audioManager.setConnectTimeout(30_000);
-
-        MusicPlayer.getInstance().setVolume(5); // Default volume so nobody gets there ears torn out by sound.
-        audioManager.openAudioConnection(channel);
-    }
-
-    public static void leaveVoiceChannel(Guild guild) {
-        guild.getAudioManager().closeAudioConnection();
-    }
+public enum CommandResult {
+    PASS,
+    FAIL
 }

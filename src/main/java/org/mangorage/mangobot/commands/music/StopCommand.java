@@ -22,19 +22,22 @@
 
 package org.mangorage.mangobot.commands.music;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.commands.AbstractCommand;
-import org.mangorage.mangobot.commands.CommandResult;
-import org.mangorage.mangobot.core.audio.MusicPlayer;
-import org.mangorage.mangobot.core.audio.MusicUtil;
+import org.mangorage.mangobot.commands.core.AbstractCommand;
+import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.core.music.MusicPlayer;
+import org.mangorage.mangobot.core.music.MusicUtil;
 
 public class StopCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, String[] args) {
         MessageChannelUnion channel = message.getChannel();
-        if (MusicPlayer.getInstance().isPlaying()) {
-            MusicPlayer.getInstance().stop();
+        Guild guild = message.getGuild();
+
+        if (MusicPlayer.getInstance(guild.getId()).isPlaying()) {
+            MusicPlayer.getInstance(guild.getId()).stop();
             channel.sendMessage("Stopped playing!").queue();
         } else {
             channel.sendMessage("Nothing is playing!").queue();

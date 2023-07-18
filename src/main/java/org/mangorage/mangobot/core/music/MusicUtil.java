@@ -20,15 +20,30 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands;
+package org.mangorage.mangobot.core.music;
 
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.audio.SpeakingMode;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.managers.AudioManager;
 
-public abstract class AbstractCommand {
-    public abstract CommandResult execute(Message message, String[] args);
+public class MusicUtil {
+    public static void connectToAudioChannel(VoiceChannel channel) {
+        Guild guild = channel.getGuild();
+        AudioManager audioManager = guild.getAudioManager();
 
-    public boolean isGuildOnly() {
-        return true;
+        audioManager.setSendingHandler(MusicPlayer.getInstance(guild.getId()));
+        audioManager.setSelfDeafened(true);
+        audioManager.setSelfMuted(false);
+        audioManager.setAutoReconnect(true);
+        audioManager.setSpeakingMode(SpeakingMode.SOUNDSHARE);
+        audioManager.setConnectTimeout(30_000);
+
+        MusicPlayer.getInstance(guild.getId()).setVolume(5); // Default volume so nobody gets there ears torn out by sound.
+        audioManager.openAudioConnection(channel);
     }
 
+    public static void leaveVoiceChannel(Guild guild) {
+        guild.getAudioManager().closeAudioConnection();
+    }
 }

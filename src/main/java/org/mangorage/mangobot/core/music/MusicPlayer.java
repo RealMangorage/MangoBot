@@ -20,11 +20,11 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.audio;
+package org.mangorage.mangobot.core.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
@@ -38,24 +38,34 @@ import net.dv8tion.jda.api.audio.AudioSendHandler;
 import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.function.Consumer;
 
 public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
+    private static final HashMap<String, MusicPlayer> MUSIC_PLAYERS = new HashMap<>();
 
-    private static final MusicPlayer MUSIC_PLAYER = new MusicPlayer();
-
-    public static MusicPlayer getInstance() {
-        return MUSIC_PLAYER;
+    public static MusicPlayer getInstance(String guildID) {
+        if (!MUSIC_PLAYERS.containsKey(guildID)) {
+            MusicPlayer player = new MusicPlayer(guildID);
+            MUSIC_PLAYERS.put(guildID, player);
+            return player;
+        }
+        return MUSIC_PLAYERS.get(guildID);
     }
 
-    private final AudioPlayerManager manager = new DefaultAudioPlayerManager();
-    private final AudioPlayer audioPlayer = manager.createPlayer();
+    private final DefaultAudioPlayerManager manager;
+    private final DefaultAudioPlayer audioPlayer;
     private final Deque<AudioTrack> TRACKS_QUEUE = new ArrayDeque<>();
+    private final String guildID;
     private AudioStatus status = AudioStatus.STOPPED;
     private AudioFrame lastFrame;
 
 
-    private MusicPlayer() {
+    private MusicPlayer(String guildID) {
+        this.guildID = guildID;
+        this.manager = new DefaultAudioPlayerManager();
+        this.audioPlayer = new DefaultAudioPlayer(manager);
+
         AudioSourceManagers.registerLocalSource(manager);
         AudioSourceManagers.registerRemoteSources(manager);
         audioPlayer.addListener(this);

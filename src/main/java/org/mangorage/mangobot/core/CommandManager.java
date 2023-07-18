@@ -20,15 +20,15 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands;
+package org.mangorage.mangobot.core;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.commands.AbstractCommand;
-import org.mangorage.mangobot.commands.CommandResult;
 import org.mangorage.mangobot.commands.PingCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
+import org.mangorage.mangobot.commands.core.AbstractCommand;
+import org.mangorage.mangobot.commands.core.CommandHolder;
+import org.mangorage.mangobot.commands.core.CommandResult;
 import org.mangorage.mangobot.commands.music.*;
-import org.mangorage.mangobot.core.Constants;
 
 import java.util.HashMap;
 
@@ -108,11 +108,13 @@ You mentioned NeoForge. NeoForge is a fork of MinecraftForge by many former MC F
 
     public void handleCommand(String command, Message message) {
         AbstractCommand abstractCommand = COMMANDS.get(command).get();
-        if (abstractCommand.isGuildOnly() && message.isFromGuild()) {
-            CommandResult result = COMMANDS.get(command).get().execute(message, handleCommand(command, message.getContentDisplay()));
-            if (result == CommandResult.FAIL)
-                message.getChannel().sendMessage("Command failed");
-        }
+        if (!message.isFromGuild() && abstractCommand.isGuildOnly())
+            return;
+
+        CommandResult result = COMMANDS.get(command).get().execute(message, handleCommand(command, message.getContentDisplay()));
+        if (result == CommandResult.FAIL)
+            message.getChannel().sendMessage("Command failed");
+
     }
 
     public boolean isValid(String command) {

@@ -24,6 +24,8 @@ package org.mangorage.mangobot.commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobot.commands.core.AbstractEmbedCommand;
+import org.mangorage.mangobot.commands.core.CommandResult;
 
 import java.awt.*;
 

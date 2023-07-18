@@ -24,21 +24,23 @@ package org.mangorage.mangobot.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.commands.AbstractCommand;
-import org.mangorage.mangobot.commands.CommandResult;
-import org.mangorage.mangobot.core.audio.MusicPlayer;
-import org.mangorage.mangobot.core.audio.MusicUtil;
+import org.mangorage.mangobot.commands.core.AbstractCommand;
+import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.core.music.MusicPlayer;
+import org.mangorage.mangobot.core.music.MusicUtil;
 
 public class PlayCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, String[] args) {
         String URL = args[0];
         MessageChannelUnion channel = message.getChannel();
-        MusicPlayer player = MusicPlayer.getInstance();
+        Guild guild = message.getGuild();
+        MusicPlayer player = MusicPlayer.getInstance(guild.getId());
         GuildVoiceState voiceState = message.getMember().getVoiceState();
 
         if (voiceState.inAudioChannel()) {
@@ -67,17 +69,17 @@ public class PlayCommand extends AbstractCommand {
                     channel.sendMessage("Already playing!").queue();
             } else {
                 if (player.isPlaying()) {
-                    MusicPlayer.getInstance().resume();
+                    player.resume();
                     AudioTrack track = player.getPlaying();
                     MessageEmbed embed = new EmbedBuilder()
                             .setTitle(track.getInfo().title, track.getInfo().uri)
                             .build();
                     channel.sendMessage("Resumed playing: ").addEmbeds(embed).queue();
                 } else {
-                    if (!MusicPlayer.getInstance().isQueueEmpty()) {
+                    if (!player.isQueueEmpty()) {
                         MusicUtil.connectToAudioChannel(voiceState.getChannel().asVoiceChannel());
-                        MusicPlayer.getInstance().play();
-                        AudioTrack track = MusicPlayer.getInstance().getPlaying();
+                        player.play();
+                        AudioTrack track = player.getPlaying();
                         MessageEmbed embed = new EmbedBuilder()
                                 .setTitle(track.getInfo().title, track.getInfo().uri)
                                 .build();

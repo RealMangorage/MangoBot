@@ -24,20 +24,22 @@ package org.mangorage.mangobot.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.commands.AbstractCommand;
-import org.mangorage.mangobot.commands.CommandResult;
-import org.mangorage.mangobot.core.audio.MusicPlayer;
+import org.mangorage.mangobot.commands.core.AbstractCommand;
+import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.core.music.MusicPlayer;
 
 public class PlayingCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, String[] args) {
         MessageChannelUnion channel = message.getChannel();
+        Guild guild = message.getGuild();
 
-        if (MusicPlayer.getInstance().isPlaying()) {
-            AudioTrack track = MusicPlayer.getInstance().getPlaying();
+        if (MusicPlayer.getInstance(guild.getId()).isPlaying()) {
+            AudioTrack track = MusicPlayer.getInstance(guild.getId()).getPlaying();
 
 
             MessageEmbed embed = new EmbedBuilder()

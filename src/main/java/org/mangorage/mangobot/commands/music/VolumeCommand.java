@@ -22,24 +22,25 @@
 
 package org.mangorage.mangobot.commands.music;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.commands.AbstractCommand;
-import org.mangorage.mangobot.commands.CommandResult;
-import org.mangorage.mangobot.core.audio.MusicPlayer;
+import org.mangorage.mangobot.commands.core.AbstractCommand;
+import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.core.music.MusicPlayer;
 
 public class VolumeCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, String[] args) {
         String VOLUME = args[0];
         MessageChannelUnion channel = message.getChannel();
-
+        Guild guild = message.getGuild();
         CommandResult result = CommandResult.FAIL;
 
         try {
             int volume = Integer.valueOf(VOLUME);
             if (volume <= 30) {
-                MusicPlayer.getInstance().setVolume(volume);
+                MusicPlayer.getInstance(guild.getId()).setVolume(volume);
                 channel.sendMessage("Volume set to " + volume).queue();
             } else
                 channel.sendMessage("Max Volume allowed is 30").queue();
