@@ -1,4 +1,4 @@
-package org.mangorage.mangobot.core.audio;
+package org.mangorage.mangobot.core.audio.old;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;

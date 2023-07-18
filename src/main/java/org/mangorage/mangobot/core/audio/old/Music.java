@@ -1,10 +1,10 @@
-package org.mangorage.mangobot.core.audio;
+package org.mangorage.mangobot.core.audio.old;
 
 import com.sedmelluq.discord.lavaplayer.player.*;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+
 import java.util.function.Consumer;
 
 @Deprecated

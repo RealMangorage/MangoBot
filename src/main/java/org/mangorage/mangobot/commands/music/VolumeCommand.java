@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.commands.CommandResult;
-import org.mangorage.mangobot.core.audio.MusicUtil;
+import org.mangorage.mangobot.core.audio.MusicPlayer;
 
 public class VolumeCommand extends AbstractCommand {
     @Override
@@ -12,16 +12,21 @@ public class VolumeCommand extends AbstractCommand {
         String VOLUME = args[0];
         MessageChannelUnion channel = message.getChannel();
 
-        if (Integer.valueOf(VOLUME) != null) {
+        CommandResult result = CommandResult.FAIL;
+
+        try {
             int volume = Integer.valueOf(VOLUME);
             if (volume <= 30) {
-                MusicUtil.setVolume(volume);
+                MusicPlayer.getInstance().setVolume(volume);
                 channel.sendMessage("Volume set to " + volume).queue();
-            } else {
+            } else
                 channel.sendMessage("Max Volume allowed is 30").queue();
-            }
+
+            result = CommandResult.PASS;
+        } catch (NumberFormatException e) {
+            channel.sendMessage("Invalid arguments.").queue();
         }
 
-        return CommandResult.PASS;
+        return result;
     }
 }

@@ -12,12 +12,15 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
+import net.dv8tion.jda.api.audio.AudioSendHandler;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.function.Consumer;
 
-public class MusicPlayer extends AudioEventAdapter {
+public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
     private static final MusicPlayer MUSIC_PLAYER = new MusicPlayer();
 
@@ -29,6 +32,8 @@ public class MusicPlayer extends AudioEventAdapter {
     private final AudioPlayer audioPlayer = manager.createPlayer();
     private final Deque<AudioTrack> TRACKS_QUEUE = new ArrayDeque<>();
     private AudioStatus status = AudioStatus.STOPPED;
+    private AudioFrame lastFrame;
+
 
     private MusicPlayer() {
         AudioSourceManagers.registerLocalSource(manager);
@@ -36,10 +41,13 @@ public class MusicPlayer extends AudioEventAdapter {
         audioPlayer.addListener(this);
     }
 
-    public AudioPlayer getAudioPlayer() {
-        return audioPlayer;
+    public AudioTrack getPlaying() {
+        return audioPlayer.getPlayingTrack();
     }
 
+    public void setVolume(int volume) {
+        audioPlayer.setVolume(volume);
+    }
 
     public boolean isPlaying() {
         return audioPlayer.getPlayingTrack() != null;
@@ -92,7 +100,11 @@ public class MusicPlayer extends AudioEventAdapter {
     }
 
     public void resume() {
+        audioPlayer.setPaused(false);
+    }
 
+    public void stop() {
+        audioPlayer.stopTrack();
     }
 
 
@@ -110,7 +122,8 @@ public class MusicPlayer extends AudioEventAdapter {
 
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         this.status = AudioStatus.STOPPED;
-        playNext();
+        if (endReason.mayStartNext)
+            playNext();
     }
 
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
@@ -118,4 +131,19 @@ public class MusicPlayer extends AudioEventAdapter {
     }
 
 
+    @Override
+    public boolean canProvide() {
+        lastFrame = audioPlayer.provide();
+        return lastFrame != null;
+    }
+
+    @Override
+    public ByteBuffer provide20MsAudio() {
+        return ByteBuffer.wrap(lastFrame.getData());
+    }
+
+    @Override
+    public boolean isOpus() {
+       return true;
+    }
 }

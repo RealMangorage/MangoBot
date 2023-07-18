@@ -8,15 +8,13 @@ public class MusicUtil {
         // Get an audio manager for this guild, this will be created upon first use for each guild
         AudioManager audioManager = member.getGuild().getAudioManager();
 
-        // Create our Send handler for the audio connection
-        AudioPlayerSendHandler handler = AudioPlayerSendHandler.INSTANCE;
 
         // Set the sending handler to our echo system
-        audioManager.setSendingHandler(handler);
+        audioManager.setSendingHandler(MusicPlayer.getInstance());
         audioManager.setSelfDeafened(true);
         audioManager.setSelfMuted(false);
 
-        Music.audioPlayer.setVolume(5); // Default volume so nobody gets there ears torn out by sound.
+        MusicPlayer.getInstance().setVolume(5); // Default volume so nobody gets there ears torn out by sound.
 
         // Connect to the voice channel
         if (member.getVoiceState().inAudioChannel())
@@ -26,9 +24,5 @@ public class MusicUtil {
     public static void leaveVoiceChannel(Member member) {
         AudioManager audioManager = member.getGuild().getAudioManager();
         audioManager.closeAudioConnection();
-    }
-
-    public static void setVolume(int volume) {
-        Music.audioPlayer.setVolume(volume);
     }
 }

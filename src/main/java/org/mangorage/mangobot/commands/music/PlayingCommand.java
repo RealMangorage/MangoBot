@@ -5,16 +5,15 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.commands.CommandResult;
-import org.mangorage.mangobot.core.audio.Music;
-import org.mangorage.mangobot.core.audio.TrackScheduler;
+import org.mangorage.mangobot.core.audio.MusicPlayer;
 
 public class PlayingCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, String[] args) {
         MessageChannelUnion channel = message.getChannel();
 
-        if (Music.trackScheduler.getStatus() == TrackScheduler.Status.PLAYING) {
-            AudioTrack track = Music.audioPlayer.getPlayingTrack();
+        if (MusicPlayer.getInstance().isPlaying()) {
+            AudioTrack track = MusicPlayer.getInstance().getPlaying();
             channel.sendMessage("""
                     Playing: %p
                     %t / %b
@@ -24,7 +23,6 @@ public class PlayingCommand extends AbstractCommand {
                     .replaceFirst("%b", track.getDuration() + "")
             ).queue();
         }
-
 
         return CommandResult.PASS;
     }
