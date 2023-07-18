@@ -68,6 +68,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
         AudioSourceManagers.registerLocalSource(manager);
         AudioSourceManagers.registerRemoteSources(manager);
+
         audioPlayer.addListener(this);
     }
 
@@ -109,6 +110,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
             @Override
             public void loadFailed(FriendlyException exception) {
                 eventConsumer.accept(new AudioTrackEvent(null, AudioTrackEvent.Info.FAILED));
+                exception.printStackTrace();
             }
         });
     }
@@ -163,7 +165,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
     }
 
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-
+        exception.printStackTrace();
     }
 
 

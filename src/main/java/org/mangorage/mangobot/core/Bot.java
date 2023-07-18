@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.mangobot.core.events.EventListener;
+import org.mangorage.mangobot.core.settings.Settings;
 
 import java.util.EnumSet;
 
@@ -53,7 +54,7 @@ public class Bot {
 
         CommandManager.getInstance().register(); // Register commands!
 
-        JDABuilder builder = JDABuilder.createDefault(Constants.dotEnv.get("DISCORD_TOKEN"));
+        JDABuilder builder = JDABuilder.createDefault(Settings.BOT_TOKEN.get());
 
         builder.setActivity(Activity.of(Activity.ActivityType.PLAYING, "MinecraftForge: The Awakening of Herobrine Modpack"));
         builder.setStatus(OnlineStatus.ONLINE);

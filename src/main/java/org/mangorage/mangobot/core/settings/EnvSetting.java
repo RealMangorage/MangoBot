@@ -20,10 +20,40 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core;
+package org.mangorage.mangobot.core.settings;
 
-public class Constants {
-    public static final String COMMAND_PREFIX = "!";
-    public static final String STARTUP_MESSAGE = "Starting up bot!";
-    public static final boolean USE_MUSIC = true;
+import io.github.cdimascio.dotenv.Dotenv;
+
+public class EnvSetting extends Setting<String> {
+    public static final Dotenv DOTENV = Dotenv.load();
+    private final Dotenv env;
+    private final String id;
+    private final String defaultvalue;
+
+    public EnvSetting(Dotenv env, String ID, String defaultvalue) {
+        this.env = env;
+        this.id = ID;
+        this.defaultvalue = defaultvalue;
+    }
+
+    public EnvSetting(Dotenv env, String ID) {
+        this(env, ID, "");
+    }
+
+    public EnvSetting(String ID) {
+        this(DOTENV, ID, "");
+    }
+
+    /**
+     * @param value
+     */
+    @Override
+    public void set(String value) {
+
+    }
+
+    @Override
+    public String get() {
+        return env.get(id, defaultvalue);
+    }
 }

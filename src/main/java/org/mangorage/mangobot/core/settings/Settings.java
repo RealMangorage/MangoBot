@@ -20,10 +20,8 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core;
+package org.mangorage.mangobot.core.settings;
 
-public class Constants {
-    public static final String COMMAND_PREFIX = "!";
-    public static final String STARTUP_MESSAGE = "Starting up bot!";
-    public static final boolean USE_MUSIC = true;
+public class Settings {
+    public static final Setting<String> BOT_TOKEN = new EnvSetting("BOT_TOKEN");
 }
