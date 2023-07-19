@@ -33,6 +33,10 @@ public class ReplyCommand extends AbstractCommand {
         this.MESSAGE_RESPONSE = message;
     }
 
+    public String getMessage() {
+        return MESSAGE_RESPONSE;
+    }
+
     @Override
     public CommandResult execute(Message message, String... args) {
         message.reply(MESSAGE_RESPONSE).queue();

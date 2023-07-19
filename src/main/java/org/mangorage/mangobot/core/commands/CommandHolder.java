@@ -20,22 +20,33 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands.core;
+package org.mangorage.mangobot.core.commands;
 
-public class CommandHolder<T extends AbstractCommand> {
+import org.mangorage.mangobot.commands.core.AbstractCommand;
 
-    public static <T extends AbstractCommand> CommandHolder<T> create(T value) {
-        return new CommandHolder<>(value);
+import java.util.List;
+import java.util.function.Supplier;
+
+public class CommandHolder<T extends AbstractCommand> implements Supplier<T> {
+
+    public static <T extends AbstractCommand> CommandHolder<T> create(T value, List<CommandAlias> aliases) {
+        return new CommandHolder<>(value, aliases);
     }
 
     private final T value;
+    private final List<CommandAlias> aliases;
 
-    private CommandHolder(T value) {
+    private CommandHolder(T value, List<CommandAlias> aliases) {
         this.value = value;
+        this.aliases = aliases;
     }
 
     public T get() {
         return value;
+    }
+
+    public List<CommandAlias> getAliases() {
+        return aliases;
     }
 
 }

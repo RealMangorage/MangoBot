@@ -20,38 +20,29 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands.core;
+package org.mangorage.mangobot.core.permissions;
 
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Member;
 
-public abstract class AbstractCommand {
-    public static AbstractCommand create(ICommand command, boolean isGuild) {
-        if (command == null)
-            throw new IllegalStateException("Command cannot be null");
-        return new AbstractCommand() {
-            @Override
-            public CommandResult execute(Message message, String[] args) {
-                return command.execute(message, args);
-            }
+import java.util.HashMap;
+import java.util.List;
 
-            /**
-             * @return
-             */
-            @Override
-            public boolean isGuildOnly() {
-                return isGuild;
-            }
-        };
+
+// TODO: Make a Save/Load system at some point!
+public class PermissionManager {
+    private static final HashMap<String, PermissionManager> MANAGERS = new HashMap<>();
+
+    public static PermissionManager getInstance(String guildID) {
+        PermissionManager manager = MANAGERS.getOrDefault(guildID, new PermissionManager());
+        if (!MANAGERS.containsKey(guildID))
+            MANAGERS.put(guildID, manager);
+        return manager;
     }
 
-    public abstract CommandResult execute(Message message, String[] args);
+    private final HashMap<String, List<String>> COMMAND_PERMISSIONS = new HashMap<>();
 
-    public boolean isGuildOnly() {
-        return true;
-    }
 
-    @FunctionalInterface
-    public interface ICommand {
-        CommandResult execute(Message message, String[] args);
+    public boolean hasPermission(Member member, String command) {
+        return false;
     }
 }
