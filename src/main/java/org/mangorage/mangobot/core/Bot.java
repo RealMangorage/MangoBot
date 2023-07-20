@@ -60,6 +60,7 @@ public class Bot {
         builder.setActivity(Activity.of(Activity.ActivityType.PLAYING, "MinecraftForge: The Awakening of Herobrine Modpack"));
         builder.setStatus(OnlineStatus.ONLINE);
 
+
         EnumSet<GatewayIntent> intents = EnumSet.of(
                 // Enables MessageReceivedEvent for guild (also known as servers)
                 GatewayIntent.GUILD_MESSAGES,
@@ -85,8 +86,17 @@ public class Bot {
 
         builder.setEventManager(new AnnotatedEventManager());
         builder.addEventListeners(new EventListener());
+        builder.setEnableShutdownHook(true);
 
         this.BOT = builder.build();
+    }
+
+    public static void close() {
+        if (INSTANCE != null) {
+            getInstance().getEventManager().getRegisteredListeners().forEach(e -> getInstance().removeEventListener(e));
+            getInstance().shutdown();
+            System.out.println("Terminating Bot! Closing Program!");
+        }
     }
 
 }

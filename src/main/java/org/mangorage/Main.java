@@ -22,10 +22,14 @@
 
 package org.mangorage;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import org.mangorage.mangobot.core.Bot;
 
 public class Main {
     public static void main(String[] args) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> Bot.close()));
         Bot.init();
+
+        AudioPlayer player;
     }
 }

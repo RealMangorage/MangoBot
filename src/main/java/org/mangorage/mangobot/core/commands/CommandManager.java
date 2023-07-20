@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobot.core.commands;
 
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobot.commands.AliasTestCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
@@ -34,6 +35,7 @@ import org.mangorage.mangobot.commands.music.QueueCommand;
 import org.mangorage.mangobot.commands.music.StopCommand;
 import org.mangorage.mangobot.commands.music.VolumeCommand;
 import org.mangorage.mangobot.core.Constants;
+import org.mangorage.mangobot.core.music.MusicUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,6 +114,45 @@ public class CommandManager {
                         We only support Minecraft Forge on this discord server, the attached info uses other modloaders. We do not support other modloaders such as Fabric, Quilt, FeatureCreep, LiteLoader, Rift, NeoForge, or any other modloaders mods out of the box. You should contact the developers or the modloader or abstraction layer of your issue.
                         """
         ));
+        register("java", new ReplyCommand(
+                """
+                        You can download Java from the Adoptium project: https://adoptium.net/temurin/releases/
+                        Select the Version dropdown option for the Java version you wish to download.
+                        1.18 and later need Java 17
+                        1.17 needs Java 16
+                        1.16.5 and older need Java 8
+                        """
+        ));
+        register("log", new ReplyCommand(
+                """
+                        To diagnose your issue we need the game log; please provide the logs/debug.log file, in the minecraft directory, and put it in one of the following sites (preferably the first one):
+                                                
+                        Here's a list of some paste sites and their size limits:
+                            https://gist.github.com/:      [Free] [SignUp] 100MB
+                            https://paste.gemwire.uk/:  [Free] 10MB
+                            https://paste.ee/:                   [Free] 1MB, [SignUp] 6MB
+                            https://pastebin.com/:          [Free] 512KB, [SignUp] [Paid] 10MB
+                            https://hastebin.com/:          [Free] 400KB
+                            https://gist.github.com/:      [Free] [SignUp] 100MB
+                        """
+        ));
+        register("terminate", AbstractCommand.create((message, args) -> {
+            if (message.getAuthor().getId().equals("194596094200643584")) {
+                message.getChannel().sendMessage("Terminating Bot").queue();
+                System.exit(0);
+            } else {
+                message.getChannel().sendMessage("Unable to Terminate bot. Only MangoRage can do this!").queue();
+            }
+            return CommandResult.PASS;
+        }, false));
+
+        register("join", AbstractCommand.create(((message, args) -> {
+            GuildVoiceState voiceState = message.getMember().getVoiceState();
+            if (voiceState != null && voiceState.inAudioChannel()) {
+                MusicUtil.connectToAudioChannel(voiceState.getChannel().asVoiceChannel());
+            }
+            return CommandResult.PASS;
+        }), true));
 
         if (Constants.USE_MUSIC) {
             register("play", new PlayCommand());
@@ -124,6 +165,7 @@ public class CommandManager {
 
         registerAliases();
     }
+
 
     private void registerAliases() {
         COMMANDS.forEach((commandID, commandHolder) -> {

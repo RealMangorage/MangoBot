@@ -39,7 +39,7 @@ public class ReplyCommand extends AbstractCommand {
 
     @Override
     public CommandResult execute(Message message, String... args) {
-        message.reply(MESSAGE_RESPONSE).queue();
+        message.getChannel().sendMessage(MESSAGE_RESPONSE).setSuppressEmbeds(true).queue();
         return CommandResult.PASS;
     }
 

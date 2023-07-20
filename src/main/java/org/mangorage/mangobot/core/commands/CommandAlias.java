@@ -31,28 +31,22 @@ import java.util.function.Supplier;
 
 
 public class CommandAlias {
-    public static CommandAlias.Builder of(@NotNull String Allias, @NotNull ICommandAlias aliasHandler) {
-        return new CommandAlias.Builder(Allias, aliasHandler);
+    public static CommandAlias.Builder of(@NotNull String Alias, @NotNull ICommandAlias aliasHandler) {
+        return new CommandAlias.Builder(Alias, aliasHandler);
     }
 
-    public static CommandAlias.Builder of(@NotNull String Allias, Supplier<AbstractCommand> originalCommandSupplier) {
-        return of(Allias, AbstractCommand::execute);
+    public static CommandAlias.Builder of(@NotNull String Alias, Supplier<AbstractCommand> originalCommandSupplier) {
+        return of(Alias, AbstractCommand::execute);
     }
 
     private final String ID;
     private final Supplier<AbstractCommand> originalCommandSupplier;
     private final ICommandAlias alias;
 
-    private CommandAlias(String ID, Supplier<AbstractCommand> originalCommandSupplier, ICommandAlias allias) {
+    private CommandAlias(String ID, Supplier<AbstractCommand> originalCommandSupplier, ICommandAlias alias) {
         this.ID = ID;
         this.originalCommandSupplier = originalCommandSupplier;
-        this.alias = allias;
-    }
-
-    private CommandAlias() {
-        this.ID = null;
-        this.originalCommandSupplier = null;
-        this.alias = null;
+        this.alias = alias;
     }
 
     public String getID() {
