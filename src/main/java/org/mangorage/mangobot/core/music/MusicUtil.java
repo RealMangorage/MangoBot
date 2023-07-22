@@ -26,7 +26,6 @@ import net.dv8tion.jda.api.audio.SpeakingMode;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
-import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
 
 public class MusicUtil {
     public static void connectToAudioChannel(VoiceChannel channel) {
@@ -34,7 +33,7 @@ public class MusicUtil {
         AudioManager audioManager = guild.getAudioManager();
 
         audioManager.setSendingHandler(MusicPlayer.getInstance(guild.getId()));
-        audioManager.setReceivingHandler(new VoiceChatRecorder());
+
         audioManager.setSelfDeafened(true);
         audioManager.setSelfMuted(false);
         audioManager.setAutoReconnect(true);

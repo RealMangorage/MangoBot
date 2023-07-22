@@ -22,14 +22,70 @@
 
 package org.mangorage;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import net.bramp.ffmpeg.FFmpeg;
+import net.bramp.ffmpeg.FFprobe;
+import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import org.mangorage.mangobot.core.Bot;
+import org.mangorage.mangobot.core.settings.Settings;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
 
 public class Main {
-    public static void main(String[] args) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> Bot.close()));
-        Bot.init();
+    public static class FFmpegLoader {
+        private static final FFmpeg ffmpeg;
+        private static final FFprobe ffprobe;
+        private static boolean initiated = false;
 
-        AudioPlayer player;
+
+        static {
+            try {
+                ffmpeg = new FFmpeg("botresources/libraries/ffmpeg/ffmpeg.exe");
+                ffprobe = new FFprobe("botresources/libraries/ffmpeg/ffprobe.exe");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public static FFmpeg get() {
+            return ffmpeg;
+        }
+
+        public static FFprobe getProbe() {
+            return ffprobe;
+        }
+
+        public static void init() {
+            initiated = true;
+        }
+    }
+
+
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        File libraries = new File("botresources/");
+        if (!libraries.exists()) {
+            if (args.length > 0) {
+                Installer.installResources(Path.of("botresources/"), new URL("file:/F:/Discord%20Bot%20Projects/mangobot/build/resources/main"), "botresources/");
+            } else {
+                Installer.installResources(Path.of("botresources/"), Main.class.getProtectionDomain().getCodeSource().getLocation(), "botresources/");
+            }
+            System.out.println("Installed Bot Resources!");
+        }
+
+        if (Settings.BOT_TOKEN.get().equals("UNCHANGED"))
+            throw new IllegalStateException("Must set BOT_TOKEN in .env found inside of botresources to a bot token!");
+
+        FFmpegLoader.init();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
+
+        try {
+            Bot.init();
+        } catch (InvalidTokenException e) {
+            throw new IllegalStateException(e.getMessage());
+        }
     }
 }

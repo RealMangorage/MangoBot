@@ -23,9 +23,10 @@
 package org.mangorage.mangobot.core.settings;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvBuilder;
 
 public class EnvSetting extends Setting<String> {
-    public static final Dotenv DOTENV = Dotenv.load();
+    public static final Dotenv DOTENV = new DotenvBuilder().directory("botresources/").load();
     private final Dotenv env;
     private final String id;
     private final String defaultvalue;

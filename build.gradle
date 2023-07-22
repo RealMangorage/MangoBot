@@ -1,9 +1,18 @@
-plugins {
-    id 'java'
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+    }
 }
 
+apply plugin: 'java'
+
 group 'org.mangorage'
-version '1.0-SNAPSHOT'
+version '1.0'
 
 repositories {
     mavenCentral()
@@ -19,18 +28,23 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
-    implementation("net.dv8tion:JDA:5.0.0-beta.12")
-    implementation("io.github.cdimascio:dotenv-java:+")
-    implementation("com.github.walkyst:lavaplayer-fork:1.4.2")
+    implementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA
+    implementation("io.github.cdimascio:dotenv-java:+") // DotEnv for having local Variables, for BOT_TOKEN mainly
+    implementation("com.github.walkyst:lavaplayer-fork:1.4.2") // LavaPlayer to stream audio from YT/FILES to Discord
+    implementation("commons-io:commons-io:2.13.0") // Common API
+    implementation("net.bramp.ffmpeg:ffmpeg:0.7.0") // To compress audio files
+
 
     runtimeOnly("org.apache.logging.log4j:log4j-api:2.14.1")
     runtimeOnly("org.apache.logging.log4j:log4j-core:2.14.1")
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
 }
 
+
 task runBot(type: JavaExec) {
     group "Bot Tasks"
     description "Basic Tasks for MangoBot"
+    args "-dev"
     classpath = sourceSets.main.runtimeClasspath
     mainClass = "org.mangorage.Main"
 }
@@ -38,4 +52,32 @@ task runBot(type: JavaExec) {
 
 test {
     useJUnitPlatform()
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes 'Main-Class': 'org.mangorage.Main'
+    }
+}
+
+
+task fatJar(type: Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest.from jar.manifest
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+    with jar
+}
+
+artifacts {
+    archives fatJar
 }
