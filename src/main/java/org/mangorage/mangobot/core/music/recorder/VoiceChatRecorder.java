@@ -22,9 +22,6 @@
 
 package org.mangorage.mangobot.core.music.recorder;
 
-import net.bramp.ffmpeg.FFmpegExecutor;
-import net.bramp.ffmpeg.builder.FFmpegBuilder;
-import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
 import net.dv8tion.jda.api.audio.CombinedAudio;
 import net.dv8tion.jda.api.audio.SpeakingMode;
@@ -34,27 +31,34 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.mangorage.Main;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Util;
+import ws.schild.jave.Encoder;
+import ws.schild.jave.EncoderException;
+import ws.schild.jave.MultimediaObject;
+import ws.schild.jave.encode.AudioAttributes;
+import ws.schild.jave.encode.EncodingAttributes;
+import ws.schild.jave.info.MultimediaInfo;
+import ws.schild.jave.progress.EchoingEncoderProgressListener;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
 public class VoiceChatRecorder implements AudioReceiveHandler {
     private static final HashMap<String, VoiceChatRecorder> RECORDERS = new HashMap<>();
+    private static final DecimalFormat df = new DecimalFormat("#.00");
     private static final String STARTED_RECORDING = "Started Recording for %s seconds.";
     private static final String STARTED_RECORDING_LEFT = "Started Recording for %s seconds. %s seconds left.";
-    private static final String FILE_RAW_OUTPUT = "botresources/guildata/%s/recordingdata/recording_raw.wav";
-    private static final String FILE_COMPRESSED_OUTPUT = "botresources/guildata/%s/recordingdata/recording_compressed.mp3";
-    private static final String FILE_FOLDER_OUTPUT = "botresources/guildata/%s/recordingdata";
+    private static final String FILE_RAW_OUTPUT = "data/guildata/%s/recordingdata/recording_raw.wav";
+    private static final String FILE_COMPRESSED_OUTPUT = "data/guildata/%s/recordingdata/recording_compressed.mp3";
+    private static final String FILE_FOLDER_OUTPUT = "data/guildata/%s/recordingdata";
 
     public static VoiceChatRecorder getInstance(String guildID) {
         VoiceChatRecorder recorder = RECORDERS.getOrDefault(guildID, new VoiceChatRecorder(guildID));
@@ -66,6 +70,7 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
     private final ByteBuffer byteBuffer = ByteBuffer.allocate((3_840_000 * 6) * 60);
     private final String id;
     private boolean recording = false;
+    private boolean processing = false;
     private Message message;
     private Message botMessage;
     private int timeLeft;
@@ -132,22 +137,27 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
         guild.getAudioManager().setReceivingHandler(null);
         guild.getAudioManager().closeAudioConnection();
 
-        message.reply("Finished Recording, Processing... please wait upto 10 minutes").queue();
+        botMessage.editMessage("Finished Recording, Processing...").queue();
+
+        this.recording = false; // We arnt recording anymore!
+        this.processing = true; // We are processing the audio!
 
         File unCompressedFile = writeToFile();
+
         this.byteBuffer.clear(); // We have no use for this anymore
         this.seconds = -1; // We have no use for this anymore
         this.timeElapsed = -1; // We have no use for this anymore
 
         // We make sure to set recording to false and message to null after we are done needing them!
         Util.call(() ->
-                compressFile(unCompressedFile, (file) -> {
-                    message.reply("Finished Recording!").addFiles(FileUpload.fromData(file, "VC recording.mp3")).queue((message) -> {
+                compressFile((file) -> {
+                    botMessage.editMessage("Finished Recording!").setFiles(FileUpload.fromData(file, "VC recording.mp3")).queue((message) -> {
                         // Delete files, no need to have them. They take space which is bad.
                         file.delete();
                         unCompressedFile.delete();
                     });
-                    this.recording = false;
+
+                    this.processing = false;
                     this.message = null;
                     this.botMessage = null;
                 }));
@@ -161,7 +171,7 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
 
     @Override
     public void handleCombinedAudio(CombinedAudio combinedAudio) {
-        if (recording) {
+        if (recording && !processing) {
             if (byteBuffer.remaining() <= 960 || timeLeft <= 0) {
                 stopRecording();
                 return;
@@ -169,7 +179,7 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
 
             timeLeft -= 20;
             timeElapsed += 20;
-            if (timeLeft % 1000 == 0)
+            if (timeLeft % 5000 == 0)
                 botMessage.editMessage(STARTED_RECORDING_LEFT.formatted(seconds, timeLeft / 1000)).queue();
             byteBuffer.put(combinedAudio.getAudioData(1));
         }
@@ -190,34 +200,55 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
         return output;
     }
 
-    public void compressFile(Consumer<File> fileConsumer) {
-        Util.call(() -> compressFile(new File(FILE_RAW_OUTPUT.formatted(id)), fileConsumer));
+    public void compressFile(Consumer<File> fileConsumer, Message message) {
+        message.reply("working on sending file").queue((e) -> {
+            this.botMessage = e;
+            Util.call(() -> {
+                compressFile(fileConsumer);
+            });
+        });
     }
 
-    private void compressFile(File unCompressedFile, Consumer<File> fileConsumer) {
-        String output = FILE_COMPRESSED_OUTPUT.formatted(id);
+    private void compressFile(Consumer<File> fileConsumer) {
+        File input = new File(FILE_RAW_OUTPUT.formatted(id));
+        File output = new File(FILE_COMPRESSED_OUTPUT.formatted(id));
 
-        FFmpegProbeResult result;
+        AudioAttributes audio = new AudioAttributes();
+        audio.setCodec("libmp3lame");
+        audio.setChannels(1);
+        audio.setQuality(9);
+        audio.setVolume(100);
 
+        //Encoding attributes
+        EncodingAttributes attrs = new EncodingAttributes();
+        attrs.setOutputFormat("mp3");
+        attrs.setAudioAttributes(audio);
+
+
+        Encoder encoder = new Encoder();
         try {
-            result = Main.FFmpegLoader.getProbe().probe(unCompressedFile.getPath());
-        } catch (IOException e) {
+            encoder.encode(new MultimediaObject(input), output, attrs, new EchoingEncoderProgressListener() {
+                long lastTime = System.currentTimeMillis();
+
+                @Override
+                public void progress(int permil) {
+                    if (System.currentTimeMillis() - lastTime >= 1000 || permil >= 1000) {
+                        lastTime = System.currentTimeMillis();
+                        double d = ((double) permil) / 1000D;
+                        System.out.println(permil);
+                        botMessage.editMessage("Finished Recording, Processing... %s % done".formatted(df.format(d * 100))).queue();
+                    }
+                }
+
+                @Override
+                public void sourceInfo(MultimediaInfo info) {
+                }
+            });
+        } catch (EncoderException e) {
             throw new RuntimeException(e);
         }
 
-        FFmpegBuilder builder = new FFmpegBuilder()
-                .setInput(result)
-                .overrideOutputFiles(true)
-                .addOutput(output)
-                .setTargetSize(25_000_000) // 25MB
-                .setFormat("mp3")
-                .setAudioCodec("libmp3lame")
-                .done();
-
-        FFmpegExecutor executor = new FFmpegExecutor(Main.FFmpegLoader.get(), Main.FFmpegLoader.getProbe());
-        executor.createJob(builder).run();
-
-        fileConsumer.accept(new File(output));
+        fileConsumer.accept(output);
     }
 
 }

@@ -178,7 +178,7 @@ public class CommandManager {
             message.reply("sending").queue();
             VoiceChatRecorder.getInstance(message.getGuild().getId()).compressFile((file) -> {
                 channelUnion.sendMessage("Here!").addFiles(FileUpload.fromData(file)).queue();
-            });
+            }, message);
 
 
             return CommandResult.PASS;

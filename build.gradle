@@ -32,7 +32,8 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-java:+") // DotEnv for having local Variables, for BOT_TOKEN mainly
     implementation("com.github.walkyst:lavaplayer-fork:1.4.2") // LavaPlayer to stream audio from YT/FILES to Discord
     implementation("commons-io:commons-io:2.13.0") // Common API
-    implementation("net.bramp.ffmpeg:ffmpeg:0.7.0") // To compress audio files
+
+    implementation group: 'ws.schild', name: 'jave-all-deps', version: '3.3.1'
 
 
     runtimeOnly("org.apache.logging.log4j:log4j-api:2.14.1")
