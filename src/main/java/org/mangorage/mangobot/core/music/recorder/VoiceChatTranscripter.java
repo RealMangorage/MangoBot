@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.managers.AudioManager;
+import org.mangorage.mangobot.core.Util;
 import org.mangorage.mangobot.core.music.SphnixModelLoader;
 import ws.schild.jave.Encoder;
 import ws.schild.jave.EncoderException;
@@ -37,7 +38,9 @@ import ws.schild.jave.MultimediaObject;
 import ws.schild.jave.encode.AudioAttributes;
 import ws.schild.jave.encode.EncodingAttributes;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -92,7 +95,15 @@ public class VoiceChatTranscripter implements AudioReceiveHandler {
     public void handleCombinedAudio(CombinedAudio combinedAudio) {
         if (recording) {
             if (byteBuffer.remaining() <= 960) {
-                processData(byteBuffer.duplicate(), snipetCount, timeElapsed);
+                File file = writeToFile(byteBuffer.duplicate(), snipetCount, timeElapsed);
+                Util.call(() -> {
+                    compressFIle(file, (processed) -> {
+                        file.delete();
+                        SphnixModelLoader.attempt(processed, channel, (done) -> {
+                            done.delete();
+                        });
+                    }, snipetCount);
+                });
                 byteBuffer.clear();
                 snipetCount++;
                 timeElapsed = 0;
@@ -112,34 +123,19 @@ public class VoiceChatTranscripter implements AudioReceiveHandler {
         return true;
     }
 
-    private void processData(ByteBuffer byteBuffer, int count, int timeElapsedTotal) {
-        speech(byteBuffer, count, timeElapsedTotal);
-    }
 
-    private void speech(ByteBuffer byteBuffer, int count, int timeElapsedTotal) {
-
-        try {
-            ByteArrayInputStream IS = new ByteArrayInputStream(byteBuffer.array());
-            AudioInputStream AIS = new AudioInputStream(IS, AudioReceiveHandler.OUTPUT_FORMAT, 960L * (timeElapsedTotal / 20));
-
-            SphnixModelLoader.attempt(AIS, channel);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void compressFile(File input, Consumer<File> fileConsumer, int snipetCount) {
+    private void compressFIle(File input, Consumer<File> fileConsumer, int snipetCount) {
         File output = new File(FILE_PROCESSED_OUTPUT.formatted(ID, snipetCount));
 
         AudioAttributes audio = new AudioAttributes();
         audio.setBitRate(16);
         audio.setSamplingRate(16_000);
+        audio.setChannels(1);
 
         //Encoding attributes
         EncodingAttributes attrs = new EncodingAttributes();
         attrs.setAudioAttributes(audio);
-        attrs.setOutputFormat("s16le");
+        // attrs.setOutputFormat("s16le");
 
 
         Encoder encoder = new Encoder();
@@ -150,6 +146,21 @@ public class VoiceChatTranscripter implements AudioReceiveHandler {
         }
 
         fileConsumer.accept(output);
+    }
+
+    private File writeToFile(ByteBuffer byteBuffer, int count, int time) {
+        File output;
+        try {
+            ByteArrayInputStream IS = new ByteArrayInputStream(byteBuffer.array());
+            AudioInputStream AIS = new AudioInputStream(IS, AudioReceiveHandler.OUTPUT_FORMAT, 960L * (time / 20));
+
+            output = new File(FILE_RAW_OUTPUT.formatted(ID, count));
+
+            AudioSystem.write(AIS, AudioFileFormat.Type.WAVE, output);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return output;
     }
 
     public static void main(String[] args) throws EncoderException {

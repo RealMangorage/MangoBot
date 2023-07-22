@@ -29,7 +29,12 @@ import edu.cmu.sphinx.result.WordResult;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.Main;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.util.List;
+import java.util.function.Consumer;
 
 
 public class SphnixModelLoader {
@@ -58,56 +63,68 @@ public class SphnixModelLoader {
             stream.skip(44);
 
             // Simple recognition with generic model
-            recognizer.startRecognition(stream);
-            SpeechResult result;
-            while ((result = recognizer.getResult()) != null) {
+            try {
+                recognizer.startRecognition(stream);
+                SpeechResult result;
+                while ((result = recognizer.getResult()) != null) {
 
-                System.out.format("Hypothesis: %s\n", result.getHypothesis());
+                    System.out.format("Hypothesis: %s\n", result.getHypothesis());
 
-                System.out.println("List of recognized words and their times:");
-                for (WordResult r : result.getWords()) {
-                    System.out.println(r);
+                    System.out.println("List of recognized words and their times:");
+                    for (WordResult r : result.getWords()) {
+                        System.out.println(r);
+                    }
+
+                    System.out.println("Best 3 hypothesis:");
+                    for (String s : result.getNbest(3))
+                        System.out.println(s);
+
                 }
-
-                System.out.println("Best 3 hypothesis:");
-                for (String s : result.getNbest(3))
-                    System.out.println(s);
-
+            } finally {
+                recognizer.stopRecognition();
             }
-            recognizer.stopRecognition();
         } catch (Exception E) {
             throw new IllegalStateException();
         }
 
 
+
     }
 
-    public static void attempt(InputStream stream, MessageChannelUnion channelUnion) {
+    public static void attempt(File file, MessageChannelUnion channelUnion, Consumer<File> fileConsumer) {
         if (running) return;
         running = true;
 
-        recognizer.startRecognition(stream);
-        SpeechResult result;
-        while ((result = recognizer.getResult()) != null) {
-            System.out.format("Hypothesis: %s For US", result.getHypothesis());
+        try {
+            recognizer.startRecognition(file.toURL().openStream());
+            SpeechResult result;
+            while ((result = recognizer.getResult()) != null) {
+                System.out.format("Hypothesis: %s For US", result.getHypothesis());
 
-            System.out.println("List of recognized words and their times:  For US");
-            if (result.getWords() != null) {
-                for (WordResult r : result.getWords()) {
-                    System.out.println(r);
+                System.out.println("List of recognized words and their times:  For US");
+                try {
+                    List<WordResult> words = result.getWords();
+                    if (words != null) {
+                        for (WordResult r : words) {
+                            channelUnion.sendMessage(r.getWord().toString()).queue();
+                        }
+                    }
+                    channelUnion.sendMessage(result.getHypothesis()).queue();
+                } catch (NullPointerException e) {
+
                 }
+
+
             }
+        } catch (MalformedURLException e) {
 
-            System.out.println("Best 3 hypothesis: For US");
-
-            for (String s : result.getNbest(3))
-                System.out.println(s);
-
-            channelUnion.sendMessage(result.getHypothesis()).queue();
-
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            recognizer.stopRecognition();
+            fileConsumer.accept(file);
+            running = false;
         }
-
-        running = false;
     }
 
     public static void init() {
