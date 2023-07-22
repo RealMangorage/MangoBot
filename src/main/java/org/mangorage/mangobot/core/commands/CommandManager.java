@@ -42,8 +42,8 @@ import org.mangorage.mangobot.core.Util;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * TODO: Overhaul the CommandManager to create a registration system
@@ -74,11 +74,9 @@ public class CommandManager {
         CommandHolder<AbstractCommand> TRICK = register(
                 "trick",
                 new AliasTestCommand("coolTrick!"),
-                List.of(
-                        CommandAlias.of(
-                                "tickCool",
-                                (command, message, args) -> command.execute(message, new String[]{"cool!"})
-                        )
+                CommandAlias.of(
+                        "tickCool",
+                        (command, message, args) -> command.execute(message, new String[]{"cool!"})
                 )
         );
 
@@ -140,6 +138,10 @@ public class CommandManager {
                             https://gist.github.com/:      [Free] [SignUp] 100MB
                         """
         ));
+        register("tryitandsee", new ReplyCommand("https://tryitands.ee", false),
+                CommandAlias.of("test")
+        );
+
         register("terminate", AbstractCommand.create((message, args) -> {
             if (message.getAuthor().getId().equals("194596094200643584")) {
                 message.getChannel().sendMessage("Terminating Bot").queue();
@@ -220,8 +222,13 @@ public class CommandManager {
         COMMANDS.forEach((commandID, commandHolder) -> {
             commandHolder.getAliases().forEach(commandAlias -> {
                 if (COMMANDS_ALIASES.containsKey(commandAlias.getID()))
-                    throw new IllegalStateException(
-                            "Tried to register a command alias using an ID that's already been used AliasID: %s CommandID: %s".formatted(commandAlias.getID(), commandID)
+                    throw new IllegalStateException("""
+                                
+                                Tried to register a command alias using an ID that's already been used AliasID
+                                CommandID who had it First -> %s
+                                CommandID who tried to use it -> %s
+                            """
+                            .formatted(COMMANDS_ALIASES.get(commandAlias.getID()).getCommandHolder().getID(), commandID)
                     );
 
                 COMMANDS_ALIASES.put(commandAlias.getID(), commandAlias);
@@ -229,8 +236,14 @@ public class CommandManager {
         });
     }
 
-    private <T extends AbstractCommand> CommandHolder<T> registerFinal(String commandID, T command, List<CommandAlias> aliases) {
-        CommandHolder<T> HOLDER = CommandHolder.create(command, aliases);
+
+    private <T extends AbstractCommand> CommandHolder<T> register(String commandID, T command, CommandAlias.Builder... aliases) {
+        ArrayList<CommandAlias> ALIASES = new ArrayList<>();
+
+        CommandHolder<T> HOLDER = CommandHolder.create(commandID, command, ALIASES);
+
+        Arrays.stream(aliases).toList().forEach(e -> ALIASES.add(e.build(HOLDER)));
+
         if (COMMANDS.containsKey(commandID))
             throw new IllegalStateException("Tried to register a command using an ID that's already been used CommandID: %s".formatted(commandID));
 
@@ -239,27 +252,17 @@ public class CommandManager {
         return HOLDER;
     }
 
-    private <T extends AbstractCommand> CommandHolder<T> register(String commandID, T command, List<CommandAlias.Builder> builder) {
-        ArrayList<CommandAlias> ALIASES = new ArrayList<>();
-        builder.forEach(e -> ALIASES.add(e.build(command)));
-        return registerFinal(commandID, command, ALIASES);
-    }
-
-    private <T extends AbstractCommand> CommandHolder<T> register(String commandID, T command) {
-        return register(commandID, command, List.of());
-    }
-
-    public String[] handleCommand(String command, String content) {
+    public String[] handleCommandArgs(String command, String content) {
         String params = content.replaceFirst("!" + command, " ").trim();
         return params.split(" ");
     }
 
     public void handleCommand(String command, Message message) {
-        AbstractCommand commandExecutable = COMMANDS.get(command).get();
+        AbstractCommand commandExecutable = COMMANDS.get(command).getCommand();
         if (!message.isFromGuild() && commandExecutable.isGuildOnly())
             return;
 
-        CommandResult result = commandExecutable.execute(message, handleCommand(command, message.getContentDisplay()));
+        CommandResult result = commandExecutable.execute(message, handleCommandArgs(command, message.getContentDisplay()));
         if (result == CommandResult.FAIL)
             message.getChannel().sendMessage("Command failed");
 
@@ -267,11 +270,11 @@ public class CommandManager {
 
     public void handleCommandAlias(String command, Message message) {
         CommandAlias commandAliasExecutable = COMMANDS_ALIASES.get(command);
-        AbstractCommand commandExecutable = commandAliasExecutable.getCommand();
+        AbstractCommand commandExecutable = commandAliasExecutable.getCommandHolder().getCommand();
         if (!message.isFromGuild() && commandExecutable.isGuildOnly())
             return;
 
-        CommandResult result = commandAliasExecutable.execute(message, handleCommand(command, message.getContentDisplay()));
+        CommandResult result = commandAliasExecutable.execute(message, handleCommandArgs(command, message.getContentDisplay()));
         if (result == CommandResult.FAIL)
             message.getChannel().sendMessage("Command failed");
 

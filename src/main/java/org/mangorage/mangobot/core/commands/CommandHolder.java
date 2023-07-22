@@ -25,23 +25,28 @@ package org.mangorage.mangobot.core.commands;
 import org.mangorage.mangobot.commands.core.AbstractCommand;
 
 import java.util.List;
-import java.util.function.Supplier;
 
-public class CommandHolder<T extends AbstractCommand> implements Supplier<T> {
+public class CommandHolder<T extends AbstractCommand> {
 
-    public static <T extends AbstractCommand> CommandHolder<T> create(T value, List<CommandAlias> aliases) {
-        return new CommandHolder<>(value, aliases);
+    public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value, List<CommandAlias> aliases) {
+        return new CommandHolder<>(id, value, aliases);
     }
 
+    private final String id;
     private final T value;
     private final List<CommandAlias> aliases;
 
-    private CommandHolder(T value, List<CommandAlias> aliases) {
+    private CommandHolder(String id, T value, List<CommandAlias> aliases) {
+        this.id = id;
         this.value = value;
         this.aliases = aliases;
     }
 
-    public T get() {
+    public String getID() {
+        return id;
+    }
+
+    public T getCommand() {
         return value;
     }
 

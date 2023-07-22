@@ -35,17 +35,17 @@ public class CommandAlias {
         return new CommandAlias.Builder(Alias, aliasHandler);
     }
 
-    public static CommandAlias.Builder of(@NotNull String Alias, Supplier<AbstractCommand> originalCommandSupplier) {
+    public static CommandAlias.Builder of(@NotNull String Alias) {
         return of(Alias, AbstractCommand::execute);
     }
 
     private final String ID;
-    private final Supplier<AbstractCommand> originalCommandSupplier;
+    private final Supplier<CommandHolder<?>> originalCommandHolderSupplier;
     private final ICommandAlias alias;
 
-    private CommandAlias(String ID, Supplier<AbstractCommand> originalCommandSupplier, ICommandAlias alias) {
+    private CommandAlias(String ID, Supplier<CommandHolder<?>> originalCommandHolderSupplier, ICommandAlias alias) {
         this.ID = ID;
-        this.originalCommandSupplier = originalCommandSupplier;
+        this.originalCommandHolderSupplier = originalCommandHolderSupplier;
         this.alias = alias;
     }
 
@@ -53,12 +53,12 @@ public class CommandAlias {
         return ID;
     }
 
-    public AbstractCommand getCommand() {
-        return originalCommandSupplier.get();
+    public CommandHolder<? extends AbstractCommand> getCommandHolder() {
+        return originalCommandHolderSupplier.get();
     }
 
     public CommandResult execute(Message message, String[] args) {
-        return alias.execute(originalCommandSupplier.get(), message, args);
+        return alias.execute(originalCommandHolderSupplier.get().getCommand(), message, args);
     }
 
     @FunctionalInterface
@@ -75,8 +75,8 @@ public class CommandAlias {
             this.alliasHandler = alliasHandler;
         }
 
-        public CommandAlias build(AbstractCommand command) {
-            return new CommandAlias(AlliasID, () -> command, alliasHandler);
+        public CommandAlias build(CommandHolder<?> commandHolder) {
+            return new CommandAlias(AlliasID, () -> commandHolder, alliasHandler);
         }
 
     }

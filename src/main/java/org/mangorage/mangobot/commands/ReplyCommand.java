@@ -28,9 +28,15 @@ import org.mangorage.mangobot.commands.core.CommandResult;
 
 public class ReplyCommand extends AbstractCommand {
     private final String MESSAGE_RESPONSE;
+    private final boolean supress;
+
+    public ReplyCommand(String message, boolean supress) {
+        this.MESSAGE_RESPONSE = message;
+        this.supress = supress;
+    }
 
     public ReplyCommand(String message) {
-        this.MESSAGE_RESPONSE = message;
+        this(message, true);
     }
 
     public String getMessage() {
@@ -39,7 +45,7 @@ public class ReplyCommand extends AbstractCommand {
 
     @Override
     public CommandResult execute(Message message, String... args) {
-        message.getChannel().sendMessage(MESSAGE_RESPONSE).setSuppressEmbeds(true).queue();
+        message.getChannel().sendMessage(MESSAGE_RESPONSE).setSuppressEmbeds(supress).queue();
         return CommandResult.PASS;
     }
 

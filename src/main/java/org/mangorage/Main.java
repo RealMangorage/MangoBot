@@ -24,7 +24,6 @@ package org.mangorage;
 
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.core.music.SphnixModelLoader;
 import org.mangorage.mangobot.core.settings.Settings;
 
 import java.io.File;
@@ -50,7 +49,7 @@ public class Main {
         if (Settings.BOT_TOKEN.get().equals("UNCHANGED"))
             throw new IllegalStateException("Must set BOT_TOKEN in .env found inside of botresources to a bot token!");
 
-        SphnixModelLoader.init();
+        // SphnixModelLoader.init();
 
         Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
 
