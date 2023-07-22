@@ -217,7 +217,7 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
         audio.setCodec("libmp3lame");
         audio.setChannels(1);
         audio.setQuality(9);
-        audio.setVolume(100);
+        audio.setVolume(512 * 100);
 
         //Encoding attributes
         EncodingAttributes attrs = new EncodingAttributes();

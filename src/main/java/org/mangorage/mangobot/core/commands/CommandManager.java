@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobot.core.commands;
 
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -40,6 +41,7 @@ import org.mangorage.mangobot.commands.music.VolumeCommand;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
+import org.mangorage.mangobot.core.music.recorder.VoiceChatTranscripter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -183,6 +185,23 @@ public class CommandManager {
 
             return CommandResult.PASS;
         }, false));
+
+        register("startTranscripting", AbstractCommand.create(((message, args) -> {
+            MessageChannelUnion channel = message.getChannel();
+            if (args.length > 1) {
+                String channelID = args[0];
+                VoiceChannel channelC = message.getGuild().getChannelById(VoiceChannel.class, channelID);
+                if (channelC != null) {
+                    VoiceChatTranscripter.getInstance(message.getGuild().getId()).start(message, channelC);
+                }
+            } else {
+                GuildVoiceState state = message.getMember().getVoiceState();
+                if (state != null && state.inAudioChannel()) {
+                    VoiceChatTranscripter.getInstance(message.getGuild().getId()).start(message, state.getChannel().asVoiceChannel());
+                }
+            }
+            return CommandResult.PASS;
+        }), true));
 
         if (Constants.USE_MUSIC) {
             register("play", new PlayCommand());

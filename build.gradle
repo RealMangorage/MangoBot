@@ -35,6 +35,9 @@ dependencies {
 
     implementation group: 'ws.schild', name: 'jave-all-deps', version: '3.3.1'
 
+    implementation("net.sf.phat:sphinx4-core:5prealpha")
+    implementation("net.sf.phat:sphinx4-data:5prealpha")
+
 
     runtimeOnly("org.apache.logging.log4j:log4j-api:2.14.1")
     runtimeOnly("org.apache.logging.log4j:log4j-core:2.14.1")
