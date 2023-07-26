@@ -30,6 +30,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioReference;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
@@ -91,7 +92,8 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
     }
 
     public void load(String URL, Consumer<AudioTrackEvent> eventConsumer) {
-        manager.loadItem(URL, new AudioLoadResultHandler() {
+
+        manager.loadItem(new AudioReference(URL.trim(), null), new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 eventConsumer.accept(new AudioTrackEvent(track, AudioTrackEvent.Info.SUCCESS));
@@ -100,6 +102,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
                 // Allow playlists maybe?
+                System.out.println("Test Playlist!");
             }
 
             @Override

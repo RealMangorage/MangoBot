@@ -59,6 +59,8 @@ import java.util.HashMap;
  * })
  * );
  */
+
+@Deprecated(forRemoval = true, since = "7/26/23")
 public class CommandManager {
     private static final CommandManager INSTANCE = new CommandManager();
 

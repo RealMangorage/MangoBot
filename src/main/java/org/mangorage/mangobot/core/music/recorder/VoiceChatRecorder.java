@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.audio.SpeakingMode;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -185,6 +186,15 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
         }
     }
 
+    /**
+     * @param user The user whose audio was received
+     * @return
+     */
+    @Override
+    public boolean includeUserInCombinedAudio(User user) {
+        return true;
+    }
+
     private File writeToFile() {
         File output;
         try {
@@ -215,9 +225,9 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
 
         AudioAttributes audio = new AudioAttributes();
         audio.setCodec("libmp3lame");
-        audio.setChannels(1);
+        audio.setChannels(2);
+        audio.setBitRate(8);
         audio.setQuality(9);
-        audio.setVolume(512 * 100);
 
         //Encoding attributes
         EncodingAttributes attrs = new EncodingAttributes();

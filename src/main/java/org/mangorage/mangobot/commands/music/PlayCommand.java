@@ -46,7 +46,9 @@ public class PlayCommand extends AbstractCommand {
         if (voiceState.inAudioChannel()) {
             if (URL.length() > 0) {
                 if (!player.isPlaying()) {
-                    player.load(URL, e -> {
+                    System.out.println(String.join(" ", args));
+
+                    player.load(String.join(" ", args), e -> {
                         switch (e.getReason()) {
                             case SUCCESS -> {
                                 MusicUtil.connectToAudioChannel(voiceState.getChannel().asVoiceChannel());
