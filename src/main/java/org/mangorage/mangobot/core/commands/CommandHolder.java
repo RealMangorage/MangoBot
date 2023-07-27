@@ -24,22 +24,22 @@ package org.mangorage.mangobot.core.commands;
 
 import org.mangorage.mangobot.commands.core.AbstractCommand;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommandHolder<T extends AbstractCommand> {
 
-    public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value, List<CommandAlias> aliases) {
-        return new CommandHolder<>(id, value, aliases);
+    public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value) {
+        return new CommandHolder<>(id, value);
     }
 
     private final String id;
     private final T value;
-    private final List<CommandAlias> aliases;
+    private final List<CommandAlias> aliases = new ArrayList<>();
 
-    private CommandHolder(String id, T value, List<CommandAlias> aliases) {
+    private CommandHolder(String id, T value) {
         this.id = id;
         this.value = value;
-        this.aliases = aliases;
     }
 
     public String getID() {
@@ -52,6 +52,10 @@ public class CommandHolder<T extends AbstractCommand> {
 
     public List<CommandAlias> getAliases() {
         return aliases;
+    }
+
+    public void addAlias(CommandAlias alias) {
+        this.aliases.add(alias);
     }
 
 }

@@ -39,6 +39,10 @@ public class CommandAlias {
         return of(Alias, AbstractCommand::execute);
     }
 
+    public static CommandAlias build(String Alias, CommandHolder<?> holder) {
+        return new CommandAlias(Alias, () -> holder, AbstractCommand::execute);
+    }
+
     private final String ID;
     private final Supplier<CommandHolder<?>> originalCommandHolderSupplier;
     private final ICommandAlias alias;

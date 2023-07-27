@@ -25,8 +25,8 @@ package org.mangorage.mangobot.core.commands.guildcommands;
 import org.mangorage.mangobot.commands.PingCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
 import org.mangorage.mangobot.core.commands.CommandAlias;
+import org.mangorage.mangobot.core.commands.CommandHolder;
 import org.mangorage.mangobot.core.commands.CommandRegistry;
-
 public class ForgeCommands {
     public static final CommandRegistry FORGE = CommandRegistry.guild("1129059589325852724");
 
@@ -88,13 +88,13 @@ public class ForgeCommands {
                         """
         ));
         FORGE.register("tryitandsee", new ReplyCommand("https://tryitands.ee", false),
-                CommandAlias.of("test")
+                CommandAlias.of("tias")
         );
 
-        FORGE.register("pings", new PingCommand());
+        CommandHolder<PingCommand> PING = FORGE.register("pings", new PingCommand());
+        CommandAlias alias = FORGE.register(PING, CommandAlias.of("hello"));
     }
 
     public static void init() {
-        FORGE.register();
     }
 }

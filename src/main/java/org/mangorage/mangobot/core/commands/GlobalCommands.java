@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobot.core.commands;
 
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -38,17 +39,14 @@ import org.mangorage.mangobot.commands.music.VolumeCommand;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
+import org.mangorage.mangobot.core.music.recorder.VoiceRelay;
 
 public class GlobalCommands {
     public static final CommandRegistry GLOBAL = CommandRegistry.global();
 
     public static final CommandHolder<AbstractCommand> TRICK = GLOBAL.register(
             "trick",
-            new AliasTestCommand("coolTrick!"),
-            CommandAlias.of(
-                    "trickCool",
-                    (command, message, args) -> command.execute(message, new String[]{"cool!"})
-            )
+            new AliasTestCommand("coolTrick!")
     );
 
     static {
@@ -98,6 +96,17 @@ public class GlobalCommands {
             return CommandResult.PASS;
         }, false));
 
+        GLOBAL.register("testRelay", AbstractCommand.create(((message, args) -> {
+            GuildVoiceState state = message.getMember().getVoiceState();
+            if (state != null && state.inAudioChannel()) {
+                VoiceChannel voiceChannel = state.getChannel().asVoiceChannel();
+                VoiceRelay.getInstance(message.getGuild().getId()).join(voiceChannel);
+                message.reply("Connecting").queue();
+            }
+
+            return CommandResult.PASS;
+        }), true));
+
 
         if (Constants.USE_MUSIC) {
             GLOBAL.register("play", new PlayCommand());
@@ -110,7 +119,6 @@ public class GlobalCommands {
     }
 
     public static void init() {
-        GLOBAL.register(); // Register Command Aliases'
     }
 
 }

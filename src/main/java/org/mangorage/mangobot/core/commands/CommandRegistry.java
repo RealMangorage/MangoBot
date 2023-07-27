@@ -27,7 +27,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.mangobot.commands.core.AbstractCommand;
 import org.mangorage.mangobot.core.Constants;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -88,40 +87,40 @@ public class CommandRegistry {
         this.guildID = guildID;
     }
 
-    public <T extends AbstractCommand> CommandHolder<T> register(String commandID, T command, CommandAlias.Builder... aliases) {
+    public <T extends AbstractCommand> CommandHolder<T> register(String commandID, T command, CommandAlias.Builder... builders) {
         if (guildID == null && GLOBAL.getType(commandID) != CommandType.UNKNOWN)
             throw new IllegalStateException("Tried to register a command that has already been taken by the global registry: %s".formatted(commandID));
 
-        ArrayList<CommandAlias> ALIASES = new ArrayList<>();
-
-        CommandHolder<T> HOLDER = CommandHolder.create(commandID, command, ALIASES);
-
-        Arrays.stream(aliases).toList().forEach(e -> ALIASES.add(e.build(HOLDER)));
+        CommandHolder<T> HOLDER = CommandHolder.create(commandID, command);
 
         if (COMMANDS.containsKey(commandID))
             throw new IllegalStateException("Tried to register a command using an ID that's already been used CommandID: %s".formatted(commandID));
 
         COMMANDS.put(commandID, HOLDER);
+        Arrays.stream(builders).forEach(e -> register(HOLDER, e));
 
         return HOLDER;
     }
 
-    public void register() {
-        COMMANDS.forEach((commandID, commandHolder) -> {
-            commandHolder.getAliases().forEach(commandAlias -> {
-                if (COMMAND_ALIASES.containsKey(commandAlias.getID()))
-                    throw new IllegalStateException("""
-                                
-                                Tried to register a command alias using an ID that's already been used AliasID
-                                CommandID who had it First -> %s
-                                CommandID who tried to use it -> %s
-                            """
-                            .formatted(COMMAND_ALIASES.get(commandAlias.getID()).getCommandHolder().getID(), commandID)
-                    );
 
-                COMMAND_ALIASES.put(commandAlias.getID(), commandAlias);
-            });
-        });
+    public <T extends AbstractCommand> CommandAlias register(CommandHolder<T> holder, CommandAlias.Builder builder) {
+        CommandAlias alias = builder.build(holder);
+        String aliasID = alias.getID();
+
+        if (COMMAND_ALIASES.containsKey(aliasID)) {
+            CommandAlias taken = COMMAND_ALIASES.get(aliasID);
+            throw new IllegalStateException("""
+                    Tried to register a Command Alias that already is being used: %s
+                                        
+                    CommandID who is using it: %s
+                    CommandID who tried to use it: %s
+                    """.formatted(aliasID, taken.getCommandHolder().getID(), holder.getID()));
+        }
+
+        COMMAND_ALIASES.put(aliasID, alias);
+        holder.addAlias(alias);
+
+        return alias;
     }
 
 
