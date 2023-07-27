@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.mangorage.mangobot.core.commands.CommandRegistry;
 import org.mangorage.mangobot.core.commands.GlobalCommands;
 import org.mangorage.mangobot.core.commands.guildcommands.ForgeCommands;
 import org.mangorage.mangobot.core.events.EventListener;
@@ -57,6 +58,7 @@ public class Bot {
 
         GlobalCommands.init();
         ForgeCommands.init();
+        CommandRegistry.build();
 
         JDABuilder builder = JDABuilder.createDefault(Settings.BOT_TOKEN.get());
 

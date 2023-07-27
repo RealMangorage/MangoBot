@@ -25,10 +25,20 @@ package org.mangorage.mangobot.core.commands;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.mangobot.commands.core.AbstractCommand;
+import org.mangorage.mangobot.commands.core.CommandResult;
 import org.mangorage.mangobot.core.Constants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.function.Supplier;
+
+/**
+ * TODO: Figure out how to do proper registering
+ * So that GLOBAL gets its commands registered first then anything afterwards
+ */
+
 
 public class CommandRegistry {
     public enum CommandType {
@@ -46,6 +56,41 @@ public class CommandRegistry {
 
     public static CommandRegistry global() {
         return GLOBAL;
+    }
+
+    private static void check(List<RegistryBuilder> builders, List<RegistryBuilder.CommandType> commandTypes, List<RegistryBuilder.CommandAliasType> aliasTypes) {
+        builders.forEach(registryBuilder -> {
+            if (registryBuilder instanceof RegistryBuilder.CommandType<?> commandType) {
+                commandTypes.add(commandType);
+            } else if (registryBuilder instanceof RegistryBuilder.CommandAliasType<?> aliasType) {
+                aliasTypes.add(aliasType);
+            }
+        });
+    }
+
+    public static void build() {
+        HashMap<CommandRegistry, ArrayList<RegistryBuilder.CommandType>> COMMANDS_TYPES = new HashMap<>();
+        HashMap<CommandRegistry, ArrayList<RegistryBuilder.CommandAliasType>> COMMAND_ALIASES_TYPES = new HashMap<>();
+
+        COMMANDS_TYPES.computeIfAbsent(global(), (key) -> new ArrayList<>());
+        COMMAND_ALIASES_TYPES.computeIfAbsent(global(), (key) -> new ArrayList<>());
+
+        check(GLOBAL.REGISTRY_OBJECTS, COMMANDS_TYPES.get(global()), COMMAND_ALIASES_TYPES.get(global()));
+
+
+        GUILDS.forEach((key, guild) -> {
+            COMMANDS_TYPES.computeIfAbsent(guild, (keyb) -> new ArrayList<>());
+            COMMAND_ALIASES_TYPES.computeIfAbsent(guild, (keyb) -> new ArrayList<>());
+            check(guild.REGISTRY_OBJECTS, COMMANDS_TYPES.get(guild), COMMAND_ALIASES_TYPES.get(guild));
+        });
+
+        COMMANDS_TYPES.forEach((key, list) -> {
+            list.forEach(e -> e.build(key));
+        });
+
+        COMMAND_ALIASES_TYPES.forEach((key, list) -> {
+            list.forEach(e -> e.build(key));
+        });
     }
 
     public static void handleMessage(MessageReceivedEvent event) {
@@ -80,6 +125,7 @@ public class CommandRegistry {
     }
 
     private final String guildID;
+    private final List<RegistryBuilder> REGISTRY_OBJECTS = new ArrayList<>();
     private HashMap<String, CommandHolder<?>> COMMANDS = new HashMap<>();
     private HashMap<String, CommandAlias> COMMAND_ALIASES = new HashMap<>();
 
@@ -87,23 +133,32 @@ public class CommandRegistry {
         this.guildID = guildID;
     }
 
-    public <T extends AbstractCommand> CommandHolder<T> register(String commandID, T command, CommandAlias.Builder... builders) {
+    public <T extends AbstractCommand> RegistryObject<CommandHolder<T>> registerOld(String ID, T command) {
+        return register(() -> CommandHolder.create(ID, command));
+    }
+
+    public <T extends AbstractCommand> RegistryObject<CommandHolder<T>> registerOld(String ID, T command, CommandAlias.Builder... aliases) {
+        return register(() -> CommandHolder.create(ID, command), aliases);
+    }
+
+
+    private <T extends AbstractCommand> CommandHolder<T> register(CommandHolder<T> holder, List<CommandAlias.Builder> aliases) {
+        String commandID = holder.getID();
+
         if (guildID == null && GLOBAL.getType(commandID) != CommandType.UNKNOWN)
             throw new IllegalStateException("Tried to register a command that has already been taken by the global registry: %s".formatted(commandID));
-
-        CommandHolder<T> HOLDER = CommandHolder.create(commandID, command);
 
         if (COMMANDS.containsKey(commandID))
             throw new IllegalStateException("Tried to register a command using an ID that's already been used CommandID: %s".formatted(commandID));
 
-        COMMANDS.put(commandID, HOLDER);
-        Arrays.stream(builders).forEach(e -> register(HOLDER, e));
+        COMMANDS.put(commandID, holder);
+        aliases.forEach(e -> register(holder, e));
 
-        return HOLDER;
+        return holder;
     }
 
 
-    public <T extends AbstractCommand> CommandAlias register(CommandHolder<T> holder, CommandAlias.Builder builder) {
+    private <T extends AbstractCommand> CommandAlias register(CommandHolder<T> holder, CommandAlias.Builder builder) {
         CommandAlias alias = builder.build(holder);
         String aliasID = alias.getID();
 
@@ -123,6 +178,34 @@ public class CommandRegistry {
         return alias;
     }
 
+    public <T extends AbstractCommand> RegistryObject<CommandHolder<T>> register(Supplier<CommandHolder<T>> supplierObject, CommandAlias.Builder... aliases) {
+        RegistryObject<CommandHolder<T>> registryObject = new RegistryObject<>();
+
+        RegistryBuilder registryBuilder = new RegistryBuilder.CommandType<>(registryObject, supplierObject, Arrays.asList(aliases));
+        REGISTRY_OBJECTS.add(registryBuilder);
+        return registryObject;
+    }
+
+    public <T extends AbstractCommand> RegistryObject<CommandAlias> registerAlias(Supplier<CommandHolder<T>> supplierObject, CommandAlias.Builder alias) {
+        RegistryObject<CommandAlias> registryObject = new RegistryObject<>();
+
+        RegistryBuilder registryBuilder = new RegistryBuilder.CommandAliasType<>(registryObject, supplierObject, alias);
+        REGISTRY_OBJECTS.add(registryBuilder);
+
+        return registryObject;
+    }
+
+
+    public void example() {
+        register(
+                () -> CommandHolder.create("commandID", AbstractCommand.create(
+                        (message, args) -> {
+                            return CommandResult.PASS;
+                        }, false)),
+                CommandAlias.of(""));
+
+        registerAlias(null, CommandAlias.of("test"));
+    }
 
     public CommandType getType(String value) {
         if (COMMANDS.containsKey(value))
@@ -153,5 +236,51 @@ public class CommandRegistry {
             case COMMAND -> COMMANDS.get(command).getCommand().execute(message, args);
             case ALIAS -> COMMAND_ALIASES.get(command).execute(message, args);
         }
+    }
+
+    public abstract static class RegistryBuilder {
+
+        public static class CommandType<T extends AbstractCommand> extends RegistryBuilder {
+            private final RegistryObject<CommandHolder<T>> RO;
+            private final Supplier<CommandHolder<T>> HOLDER_SUPPLIER;
+            private final List<CommandAlias.Builder> ALIASES;
+
+            public CommandType(RegistryObject<CommandHolder<T>> registryObject, Supplier<CommandHolder<T>> commandHolderSupplier, List<CommandAlias.Builder> aliases) {
+                this.RO = registryObject;
+                this.HOLDER_SUPPLIER = commandHolderSupplier;
+                this.ALIASES = aliases;
+            }
+
+            /**
+             * @param registry
+             */
+            @Override
+            public void build(CommandRegistry registry) {
+                RO.set(registry.register(HOLDER_SUPPLIER.get(), ALIASES));
+            }
+        }
+
+        public static class CommandAliasType<T extends AbstractCommand> extends RegistryBuilder {
+            private final RegistryObject<CommandAlias> RO;
+            private final Supplier<CommandHolder<T>> HOLDER_SUPPLIER;
+            private final CommandAlias.Builder ALIAS_BUILDER;
+
+            public <X extends AbstractCommand> CommandAliasType(RegistryObject<CommandAlias> registryObject, Supplier<CommandHolder<T>> commandHolderSupplier, CommandAlias.Builder builder) {
+                this.RO = registryObject;
+                this.HOLDER_SUPPLIER = commandHolderSupplier;
+                this.ALIAS_BUILDER = builder;
+            }
+
+            /**
+             * @param registry
+             */
+            @Override
+            public void build(CommandRegistry registry) {
+                RO.set(registry.register(HOLDER_SUPPLIER.get(), ALIAS_BUILDER));
+            }
+        }
+
+
+        abstract public void build(CommandRegistry registry);
     }
 }
