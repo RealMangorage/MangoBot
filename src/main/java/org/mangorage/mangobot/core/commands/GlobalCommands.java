@@ -39,6 +39,10 @@ import org.mangorage.mangobot.commands.music.VolumeCommand;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
 import org.mangorage.mangobot.core.commands.guildcommands.ForgeCommands;
+import org.mangorage.mangobot.core.commands.registry.CommandAlias;
+import org.mangorage.mangobot.core.commands.registry.CommandHolder;
+import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
+import org.mangorage.mangobot.core.commands.registry.RegistryObject;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
 import org.mangorage.mangobot.core.music.recorder.VoiceRelay;
 
@@ -48,9 +52,9 @@ public class GlobalCommands {
     public static final RegistryObject<CommandHolder<AbstractCommand>> TRICK = GLOBAL.register(() -> CommandHolder.create("trick", new AliasTestCommand("coolTrick!")));
 
     static {
-        GLOBAL.registerOld("speak", new ReplyCommand("I have spoken!"));
+        GLOBAL.register("speak", new ReplyCommand("I have spoken!"));
 
-        GLOBAL.registerOld("terminate", AbstractCommand.create((message, args) -> {
+        GLOBAL.register("terminate", AbstractCommand.create((message, args) -> {
             if (message.getAuthor().getId().equals("194596094200643584")) {
                 message.getChannel().sendMessage("Terminating Bot").queue();
                 System.exit(0);
@@ -61,7 +65,7 @@ public class GlobalCommands {
         }, false));
 
 
-        GLOBAL.registerOld("record", AbstractCommand.create(((message, args) -> {
+        GLOBAL.register("record", AbstractCommand.create(((message, args) -> {
             MessageChannelUnion channel = message.getChannel();
             if (args.length > 1) {
                 String channelID = args[0];
@@ -83,7 +87,7 @@ public class GlobalCommands {
             return CommandResult.PASS;
         }), true));
 
-        GLOBAL.registerOld("sendRecording", AbstractCommand.create((message, args) -> {
+        GLOBAL.register("sendRecording", AbstractCommand.create((message, args) -> {
             MessageChannelUnion channelUnion = message.getChannel();
             message.reply("sending").queue();
             VoiceChatRecorder.getInstance(message.getGuild().getId()).compressFile((file) -> {
@@ -94,7 +98,7 @@ public class GlobalCommands {
             return CommandResult.PASS;
         }, false));
 
-        GLOBAL.registerOld("testRelay", AbstractCommand.create(((message, args) -> {
+        GLOBAL.register("testRelay", AbstractCommand.create(((message, args) -> {
             GuildVoiceState state = message.getMember().getVoiceState();
             if (state != null && state.inAudioChannel()) {
                 VoiceChannel voiceChannel = state.getChannel().asVoiceChannel();
@@ -107,12 +111,12 @@ public class GlobalCommands {
 
 
         if (Constants.USE_MUSIC) {
-            GLOBAL.registerOld("play", new PlayCommand());
-            GLOBAL.registerOld("stop", new StopCommand());
-            GLOBAL.registerOld("queue", new QueueCommand());
-            GLOBAL.registerOld("pause", new PauseCommand());
-            GLOBAL.registerOld("setVolume", new VolumeCommand());
-            GLOBAL.registerOld("playing", new PlayingCommand());
+            GLOBAL.register("play", new PlayCommand());
+            GLOBAL.register("stop", new StopCommand());
+            GLOBAL.register("queue", new QueueCommand());
+            GLOBAL.register("pause", new PauseCommand());
+            GLOBAL.register("setVolume", new VolumeCommand());
+            GLOBAL.register("playing", new PlayingCommand());
         }
 
 

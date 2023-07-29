@@ -22,20 +22,15 @@
 
 package org.mangorage.mangobot.core.commands;
 
-import java.util.function.Supplier;
+import org.mangorage.mangobot.core.commands.registry.PermissionRegistry;
 
-public class RegistryObject<T> implements Supplier<T> {
-    private T value;
+public class GlobalPermissions {
+    public static final PermissionRegistry GLOBAL = PermissionRegistry.global();
 
-    public RegistryObject() {
+    static {
+        // GLOBAL.register(ForgeCommands.PING::get, Permission.of("1129067881842360381"));
     }
 
-    public void set(T value) {
-        this.value = value;
-    }
-
-    @Override
-    public T get() {
-        return value;
+    public static void init() {
     }
 }

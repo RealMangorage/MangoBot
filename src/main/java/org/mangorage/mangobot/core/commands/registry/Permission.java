@@ -20,42 +20,20 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands;
+package org.mangorage.mangobot.core.commands.registry;
 
-import org.mangorage.mangobot.commands.core.AbstractCommand;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class CommandHolder<T extends AbstractCommand> {
-
-    public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value) {
-        return new CommandHolder<>(id, value);
+public class Permission {
+    public static Permission of(String id) {
+        return new Permission(id);
     }
 
-    private final String id;
-    private final T value;
-    private final List<CommandAlias> aliases = new ArrayList<>();
+    private final String ID;
 
-    private CommandHolder(String id, T value) {
-        this.id = id;
-        this.value = value;
+    private Permission(String roleID) {
+        this.ID = roleID;
     }
 
     public String getID() {
-        return id;
+        return ID;
     }
-
-    public T getCommand() {
-        return value;
-    }
-
-    public List<CommandAlias> getAliases() {
-        return aliases;
-    }
-
-    public void addAlias(CommandAlias alias) {
-        this.aliases.add(alias);
-    }
-
 }

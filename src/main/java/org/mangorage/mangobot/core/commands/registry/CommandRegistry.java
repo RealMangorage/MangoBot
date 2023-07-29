@@ -20,8 +20,9 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands;
+package org.mangorage.mangobot.core.commands.registry;
 
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.mangobot.commands.core.AbstractCommand;
@@ -58,7 +59,7 @@ public class CommandRegistry {
         return GLOBAL;
     }
 
-    private static void check(List<RegistryBuilder> builders, List<RegistryBuilder.CommandType> commandTypes, List<RegistryBuilder.CommandAliasType> aliasTypes) {
+    private static void check(List<RegistryBuilder> builders, List<RegistryBuilder.CommandType<?>> commandTypes, List<RegistryBuilder.CommandAliasType<?>> aliasTypes) {
         builders.forEach(registryBuilder -> {
             if (registryBuilder instanceof RegistryBuilder.CommandType<?> commandType) {
                 commandTypes.add(commandType);
@@ -69,8 +70,8 @@ public class CommandRegistry {
     }
 
     public static void build() {
-        HashMap<CommandRegistry, ArrayList<RegistryBuilder.CommandType>> COMMANDS_TYPES = new HashMap<>();
-        HashMap<CommandRegistry, ArrayList<RegistryBuilder.CommandAliasType>> COMMAND_ALIASES_TYPES = new HashMap<>();
+        HashMap<CommandRegistry, ArrayList<RegistryBuilder.CommandType<?>>> COMMANDS_TYPES = new HashMap<>();
+        HashMap<CommandRegistry, ArrayList<RegistryBuilder.CommandAliasType<?>>> COMMAND_ALIASES_TYPES = new HashMap<>();
 
         COMMANDS_TYPES.computeIfAbsent(global(), (key) -> new ArrayList<>());
         COMMAND_ALIASES_TYPES.computeIfAbsent(global(), (key) -> new ArrayList<>());
@@ -98,6 +99,7 @@ public class CommandRegistry {
         String guildID = event.getGuild().getId();
         String raw = message.getContentRaw();
         String[] rawArray = raw.split(" ");
+        Member member = event.getMember();
 
 
         if (raw.startsWith(Constants.COMMAND_PREFIX)) {
@@ -133,14 +135,13 @@ public class CommandRegistry {
         this.guildID = guildID;
     }
 
-    public <T extends AbstractCommand> RegistryObject<CommandHolder<T>> registerOld(String ID, T command) {
-        return register(() -> CommandHolder.create(ID, command));
-    }
-
-    public <T extends AbstractCommand> RegistryObject<CommandHolder<T>> registerOld(String ID, T command, CommandAlias.Builder... aliases) {
+    public <T extends AbstractCommand> RegistryObject<CommandHolder<T>> register(String ID, T command, CommandAlias.Builder... aliases) {
         return register(() -> CommandHolder.create(ID, command), aliases);
     }
 
+    public <T extends AbstractCommand> RegistryObject<CommandAlias> register(Supplier<CommandHolder<T>> holderSupplier, CommandAlias.Builder alias) {
+        return registerAlias(holderSupplier, alias);
+    }
 
     private <T extends AbstractCommand> CommandHolder<T> register(CommandHolder<T> holder, List<CommandAlias.Builder> aliases) {
         String commandID = holder.getID();
@@ -231,6 +232,13 @@ public class CommandRegistry {
 
         if (guildID == null && commandHolder.getCommand().isGuildOnly() && !message.isFromGuild())
             return;
+
+        Member member = message.getMember();
+        if (member != null && !PermissionRegistry.hasNeededPermission(member, commandHolder)) {
+            message.reply("You dont have permission to use this!").queue();
+            return;
+        }
+
 
         switch (type) {
             case COMMAND -> COMMANDS.get(command).getCommand().execute(message, args);

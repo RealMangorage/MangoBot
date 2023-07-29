@@ -20,17 +20,22 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.events;
+package org.mangorage.mangobot.core.commands.registry;
 
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
+import java.util.function.Supplier;
 
+public class RegistryObject<T> implements Supplier<T> {
+    private T value;
 
-public class EventListener {
+    public RegistryObject() {
+    }
 
-    @SubscribeEvent
-    public void messageRecieved(MessageReceivedEvent event) {
-        CommandRegistry.handleMessage(event);
+    public void set(T value) {
+        this.value = value;
+    }
+
+    @Override
+    public T get() {
+        return value;
     }
 }

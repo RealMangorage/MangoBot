@@ -20,17 +20,42 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.events;
+package org.mangorage.mangobot.core.commands.registry;
 
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
+import org.mangorage.mangobot.commands.core.AbstractCommand;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class EventListener {
+public class CommandHolder<T extends AbstractCommand> {
 
-    @SubscribeEvent
-    public void messageRecieved(MessageReceivedEvent event) {
-        CommandRegistry.handleMessage(event);
+    public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value) {
+        return new CommandHolder<>(id, value);
     }
+
+    private final String id;
+    private final T value;
+    private final List<CommandAlias> aliases = new ArrayList<>();
+
+    private CommandHolder(String id, T value) {
+        this.id = id;
+        this.value = value;
+    }
+
+    public String getID() {
+        return id;
+    }
+
+    public T getCommand() {
+        return value;
+    }
+
+    public List<CommandAlias> getAliases() {
+        return aliases;
+    }
+
+    public void addAlias(CommandAlias alias) {
+        this.aliases.add(alias);
+    }
+
 }
