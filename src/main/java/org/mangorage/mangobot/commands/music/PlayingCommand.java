@@ -28,13 +28,14 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.commands.core.AbstractCommand;
-import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.commands.AbstractCommand;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
 import org.mangorage.mangobot.core.music.MusicPlayer;
 
 public class PlayingCommand extends AbstractCommand {
     @Override
-    public CommandResult execute(Message message, String[] args) {
+    public CommandResult execute(Message message, Arguments args) {
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
 

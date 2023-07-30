@@ -24,14 +24,15 @@ package org.mangorage.mangobot.commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.commands.core.AbstractEmbedCommand;
-import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
 
 import java.awt.*;
 
-public class PingCommand extends AbstractEmbedCommand {
+public class PingCommand extends AbstractCommand {
+
     @Override
-    public CommandResult execute(Message message, String[] args) {
+    public CommandResult execute(Message message, Arguments args) {
         message.getChannel().sendMessageEmbeds(
                 new EmbedBuilder()
                         .setTitle("Please disable pings when replying to others")

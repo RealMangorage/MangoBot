@@ -23,20 +23,17 @@
 package org.mangorage.mangobot.commands;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
 
 public class AliasTestCommand extends ReplyCommand {
     public AliasTestCommand(String message) {
         super(message);
     }
 
-    /**
-     * @param message
-     * @param args
-     * @return
-     */
     @Override
-    public CommandResult execute(Message message, String... args) {
+    public CommandResult execute(Message message, Arguments arg) {
+        String[] args = arg.getArgs();
         message.getChannel().sendMessage(getMessage() + " " + args[0]).queue();
         return CommandResult.PASS;
     }

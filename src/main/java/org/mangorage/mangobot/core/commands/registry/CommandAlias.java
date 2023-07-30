@@ -24,8 +24,9 @@ package org.mangorage.mangobot.core.commands.registry;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
-import org.mangorage.mangobot.commands.core.AbstractCommand;
-import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.commands.AbstractCommand;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
 
 import java.util.function.Supplier;
 
@@ -61,13 +62,13 @@ public class CommandAlias {
         return originalCommandHolderSupplier.get();
     }
 
-    public CommandResult execute(Message message, String[] args) {
+    public CommandResult execute(Message message, Arguments args) {
         return alias.execute(originalCommandHolderSupplier.get().getCommand(), message, args);
     }
 
     @FunctionalInterface
     public interface ICommandAlias {
-        CommandResult execute(AbstractCommand command, Message message, String[] args);
+        CommandResult execute(AbstractCommand command, Message message, Arguments args);
     }
 
     public static class Builder {

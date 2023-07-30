@@ -26,10 +26,9 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.commands.AliasTestCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
-import org.mangorage.mangobot.commands.core.AbstractCommand;
-import org.mangorage.mangobot.commands.core.CommandResult;
 import org.mangorage.mangobot.commands.music.PauseCommand;
 import org.mangorage.mangobot.commands.music.PlayCommand;
 import org.mangorage.mangobot.commands.music.PlayingCommand;
@@ -43,6 +42,7 @@ import org.mangorage.mangobot.core.commands.registry.CommandAlias;
 import org.mangorage.mangobot.core.commands.registry.CommandHolder;
 import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
 import org.mangorage.mangobot.core.commands.registry.RegistryObject;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
 import org.mangorage.mangobot.core.music.recorder.VoiceRelay;
 
@@ -65,7 +65,8 @@ public class GlobalCommands {
         }, false));
 
 
-        GLOBAL.register("record", AbstractCommand.create(((message, args) -> {
+        GLOBAL.register("record", AbstractCommand.create(((message, arg) -> {
+            String[] args = arg.getArgs();
             MessageChannelUnion channel = message.getChannel();
             if (args.length > 1) {
                 String channelID = args[0];

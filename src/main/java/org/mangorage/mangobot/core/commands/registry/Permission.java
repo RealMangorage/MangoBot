@@ -22,6 +22,8 @@
 
 package org.mangorage.mangobot.core.commands.registry;
 
+import java.util.HashMap;
+
 public class Permission {
     public static Permission of(String id) {
         return new Permission(id);
@@ -35,5 +37,16 @@ public class Permission {
 
     public String getID() {
         return ID;
+    }
+
+    public static class Node {
+        private static final HashMap<String, Node> NODES = new HashMap<>();
+
+        public static Node of(String id) {
+            return NODES.computeIfAbsent(id, key -> new Node());
+        }
+
+        private Node() {
+        }
     }
 }

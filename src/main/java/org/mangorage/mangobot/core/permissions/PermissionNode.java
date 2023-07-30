@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.Member;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class PermissionNode {
     private final List<String> ROLE_IDS = new ArrayList<>();
 

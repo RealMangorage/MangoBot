@@ -25,9 +25,10 @@ package org.mangorage.mangobot.core.commands.registry;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.mangorage.mangobot.commands.core.AbstractCommand;
-import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.core.Constants;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -233,16 +234,17 @@ public class CommandRegistry {
         if (guildID == null && commandHolder.getCommand().isGuildOnly() && !message.isFromGuild())
             return;
 
-        Member member = message.getMember();
-        if (member != null && !PermissionRegistry.hasNeededPermission(member, commandHolder)) {
-            message.reply("You dont have permission to use this!").queue();
-            return;
-        }
 
+        CommandResult result = switch (type) {
+            case COMMAND -> COMMANDS.get(command).getCommand().execute(message, Arguments.of(args));
+            case ALIAS -> COMMAND_ALIASES.get(command).execute(message, Arguments.of(args));
+            case UNKNOWN -> null;
+        };
 
-        switch (type) {
-            case COMMAND -> COMMANDS.get(command).getCommand().execute(message, args);
-            case ALIAS -> COMMAND_ALIASES.get(command).execute(message, args);
+        if (result != null) {
+            switch (result) {
+                case NO_PERMISSION -> message.reply("You dont have permission to use this command!").queue();
+            }
         }
     }
 

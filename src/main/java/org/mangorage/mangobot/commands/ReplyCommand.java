@@ -23,8 +23,8 @@
 package org.mangorage.mangobot.commands;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.commands.core.AbstractCommand;
-import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
 
 public class ReplyCommand extends AbstractCommand {
     private final String MESSAGE_RESPONSE;
@@ -44,7 +44,7 @@ public class ReplyCommand extends AbstractCommand {
     }
 
     @Override
-    public CommandResult execute(Message message, String... args) {
+    public CommandResult execute(Message message, Arguments args) {
         message.getChannel().sendMessage(MESSAGE_RESPONSE).setSuppressEmbeds(supress).queue();
         return CommandResult.PASS;
     }

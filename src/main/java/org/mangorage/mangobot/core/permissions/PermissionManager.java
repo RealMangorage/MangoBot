@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-// TODO: Make a Save/Load system at some point!
+@Deprecated
 public class PermissionManager {
     private static final HashMap<String, PermissionManager> MANAGERS = new HashMap<>();
 

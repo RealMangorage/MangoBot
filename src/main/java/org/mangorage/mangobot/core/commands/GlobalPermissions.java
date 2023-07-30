@@ -22,12 +22,17 @@
 
 package org.mangorage.mangobot.core.commands;
 
+import org.mangorage.mangobot.core.commands.registry.Permission;
 import org.mangorage.mangobot.core.commands.registry.PermissionRegistry;
 
 public class GlobalPermissions {
     public static final PermissionRegistry GLOBAL = PermissionRegistry.global();
 
+    public static final Permission.Node PLAYING = Permission.Node.of("playing");
+
+
     static {
+        GLOBAL.register(PLAYING, Permission.of("1129067881842360381"));
         // GLOBAL.register(ForgeCommands.PING::get, Permission.of("1129067881842360381"));
     }
 

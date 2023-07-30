@@ -20,9 +20,10 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands.core;
+package org.mangorage.mangobot.core.commands.util;
 
 public enum CommandResult {
     PASS,
-    FAIL
+    FAIL,
+    NO_PERMISSION
 }

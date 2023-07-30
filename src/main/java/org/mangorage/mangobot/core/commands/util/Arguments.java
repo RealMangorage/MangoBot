@@ -20,38 +20,28 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands.core;
+package org.mangorage.mangobot.core.commands.util;
 
-import net.dv8tion.jda.api.entities.Message;
-
-public abstract class AbstractCommand {
-    public static AbstractCommand create(ICommand command, boolean isGuild) {
-        if (command == null)
-            throw new IllegalStateException("Command cannot be null");
-        return new AbstractCommand() {
-            @Override
-            public CommandResult execute(Message message, String[] args) {
-                return command.execute(message, args);
-            }
-
-            /**
-             * @return
-             */
-            @Override
-            public boolean isGuildOnly() {
-                return isGuild;
-            }
-        };
+public class Arguments {
+    public static Arguments of(String[] args) {
+        return new Arguments(args);
     }
 
-    public abstract CommandResult execute(Message message, String[] args);
+    private final String[] args;
 
-    public boolean isGuildOnly() {
-        return true;
+    private Arguments(String[] args) {
+        this.args = args;
     }
 
-    @FunctionalInterface
-    public interface ICommand {
-        CommandResult execute(Message message, String[] args);
+    public String[] getArgs() {
+        return args;
+    }
+
+    public String get(int index) {
+        return index > args.length ? null : args[index];
+    }
+
+    public String getOrDefault(int index, String value) {
+        return index > args.length ? value : args[index];
     }
 }

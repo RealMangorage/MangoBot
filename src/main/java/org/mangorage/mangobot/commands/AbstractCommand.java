@@ -20,7 +20,40 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands.core;
+package org.mangorage.mangobot.commands;
 
-public abstract class AbstractEmbedCommand extends AbstractCommand {
+import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
+
+public abstract class AbstractCommand {
+    public static AbstractCommand create(ICommand command, boolean isGuild) {
+        if (command == null)
+            throw new IllegalStateException("Command cannot be null");
+        return new AbstractCommand() {
+            @Override
+            public CommandResult execute(Message message, Arguments args) {
+                return command.execute(message, args);
+            }
+
+            /**
+             * @return
+             */
+            @Override
+            public boolean isGuildOnly() {
+                return isGuild;
+            }
+        };
+    }
+
+    public abstract CommandResult execute(Message message, Arguments args);
+
+    public boolean isGuildOnly() {
+        return true;
+    }
+
+    @FunctionalInterface
+    public interface ICommand {
+        CommandResult execute(Message message, Arguments args);
+    }
 }

@@ -24,16 +24,16 @@ package org.mangorage.mangobot.commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.commands.core.AbstractEmbedCommand;
-import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
 
 import java.awt.*;
 import java.sql.Time;
 import java.time.Instant;
 
-public class ReplyEmbedCommand extends AbstractEmbedCommand {
+public class ReplyEmbedCommand extends AbstractCommand {
     @Override
-    public CommandResult execute(Message message, String... args) {
+    public CommandResult execute(Message message, Arguments args) {
         message.replyEmbeds(
                 new EmbedBuilder()
                         .setTitle("Title")

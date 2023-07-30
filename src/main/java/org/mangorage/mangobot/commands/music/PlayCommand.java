@@ -26,22 +26,33 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.commands.core.AbstractCommand;
-import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.commands.AbstractCommand;
+import org.mangorage.mangobot.core.commands.GlobalPermissions;
+import org.mangorage.mangobot.core.commands.registry.PermissionRegistry;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
 import org.mangorage.mangobot.core.music.MusicPlayer;
 import org.mangorage.mangobot.core.music.MusicUtil;
 
 public class PlayCommand extends AbstractCommand {
     @Override
-    public CommandResult execute(Message message, String[] args) {
+    public CommandResult execute(Message message, Arguments arg) {
+        String[] args = arg.getArgs();
+
         String URL = args[0];
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
         MusicPlayer player = MusicPlayer.getInstance(guild.getId());
         GuildVoiceState voiceState = message.getMember().getVoiceState();
+        Member member = message.getMember();
+
+        if (member != null && !PermissionRegistry.hasNeededPermission(member, GlobalPermissions.PLAYING)) {
+            return CommandResult.NO_PERMISSION;
+        }
 
         if (voiceState.inAudioChannel()) {
             if (URL.length() > 0) {

@@ -23,10 +23,12 @@
 package org.mangorage.mangobot.commands.admin;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.commands.core.AbstractCommand;
-import org.mangorage.mangobot.commands.core.CommandResult;
+import org.mangorage.mangobot.commands.AbstractCommand;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
 import org.mangorage.mangobot.core.permissions.PermissionNode;
 
+@Deprecated
 public class AdminCommand extends AbstractCommand {
     private final PermissionNode node;
 
@@ -35,7 +37,7 @@ public class AdminCommand extends AbstractCommand {
     }
 
     @Override
-    public CommandResult execute(Message message, String[] args) {
+    public CommandResult execute(Message message, Arguments args) {
         if (node.hasPermissions(message.getMember())) {
             message.getChannel().sendMessage("Sufficent permissions").queue();
         } else {

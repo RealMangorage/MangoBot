@@ -22,7 +22,7 @@
 
 package org.mangorage.mangobot.core.commands.registry;
 
-import org.mangorage.mangobot.commands.core.AbstractCommand;
+import org.mangorage.mangobot.commands.AbstractCommand;
 
 import java.util.ArrayList;
 import java.util.List;

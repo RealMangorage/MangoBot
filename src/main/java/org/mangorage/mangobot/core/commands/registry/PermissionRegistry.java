@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
 
 public class PermissionRegistry {
     private static final HashMap<String, PermissionRegistry> REGISTRY = new HashMap<>();
@@ -44,28 +43,27 @@ public class PermissionRegistry {
         return REGISTRY.computeIfAbsent(id, PermissionRegistry::new);
     }
 
-    public static boolean hasNeededPermission(Member member, CommandHolder<?> holder) {
-        if (guild(member.getGuild().getId()).hasPermission(member, holder))
+    public static boolean hasNeededPermission(Member member, Permission.Node node) {
+        if (guild(member.getGuild().getId()).hasPermission(member, node))
             return true;
 
-        return global().hasPermission(member, holder);
+        return global().hasPermission(member, node);
     }
 
     private final String ID;
-    private final HashMap<CommandHolder<?>, ArrayList<Permission>> PERMISSIONS = new HashMap<>();
+    private final HashMap<Permission.Node, ArrayList<Permission>> PERMISSIONS = new HashMap<>();
 
     private PermissionRegistry(String id) {
         this.ID = id;
     }
 
-    public void register(Supplier<CommandHolder<?>> holderSupplier, Permission... permissions) {
-        CommandHolder<?> holder = holderSupplier.get();
-        PERMISSIONS.computeIfAbsent(holder, (commandHolder) -> new ArrayList<>());
-        PERMISSIONS.get(holder).addAll(Arrays.stream(permissions).toList());
+    public void register(Permission.Node node, Permission... permissions) {
+        PERMISSIONS.computeIfAbsent(node, (key) -> new ArrayList<>());
+        PERMISSIONS.get(node).addAll(Arrays.stream(permissions).toList());
     }
 
-    public boolean hasPermission(Member member, CommandHolder<?> holder) {
-        ArrayList<Permission> permissions = PERMISSIONS.get(holder);
+    public boolean hasPermission(Member member, Permission.Node node) {
+        ArrayList<Permission> permissions = PERMISSIONS.get(node);
         List<Role> ROLES = member.getRoles();
 
         if (permissions == null)
