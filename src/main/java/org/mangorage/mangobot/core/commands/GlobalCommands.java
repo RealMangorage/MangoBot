@@ -27,7 +27,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.mangorage.mangobot.commands.AbstractCommand;
-import org.mangorage.mangobot.commands.AliasTestCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
 import org.mangorage.mangobot.commands.music.PauseCommand;
 import org.mangorage.mangobot.commands.music.PlayCommand;
@@ -37,19 +36,13 @@ import org.mangorage.mangobot.commands.music.StopCommand;
 import org.mangorage.mangobot.commands.music.VolumeCommand;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
-import org.mangorage.mangobot.core.commands.guildcommands.ForgeCommands;
-import org.mangorage.mangobot.core.commands.registry.CommandAlias;
-import org.mangorage.mangobot.core.commands.registry.CommandHolder;
 import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
-import org.mangorage.mangobot.core.commands.registry.RegistryObject;
 import org.mangorage.mangobot.core.commands.util.CommandResult;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
 import org.mangorage.mangobot.core.music.recorder.VoiceRelay;
 
 public class GlobalCommands {
     public static final CommandRegistry GLOBAL = CommandRegistry.global();
-
-    public static final RegistryObject<CommandHolder<AbstractCommand>> TRICK = GLOBAL.register(() -> CommandHolder.create("trick", new AliasTestCommand("coolTrick!")));
 
     static {
         GLOBAL.register("speak", new ReplyCommand("I have spoken!"));
@@ -119,9 +112,6 @@ public class GlobalCommands {
             GLOBAL.register("setVolume", new VolumeCommand());
             GLOBAL.register("playing", new PlayingCommand());
         }
-
-
-        RegistryObject<CommandAlias> ALIAS = GLOBAL.registerAlias(() -> ForgeCommands.PING.get(), CommandAlias.of("pingGlobal"));
     }
 
     public static void init() {

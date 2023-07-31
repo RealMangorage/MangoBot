@@ -22,18 +22,21 @@
 
 package org.mangorage.mangobot.core.commands;
 
-import org.mangorage.mangobot.core.commands.registry.Permission;
+import net.dv8tion.jda.api.Permission;
+import org.mangorage.mangobot.core.commands.registry.APermission;
 import org.mangorage.mangobot.core.commands.registry.PermissionRegistry;
 
 public class GlobalPermissions {
     public static final PermissionRegistry GLOBAL = PermissionRegistry.global();
 
-    public static final Permission.Node PLAYING = Permission.Node.of("playing");
+    public static final APermission.Node PLAYING = APermission.Node.of("playing");
 
 
     static {
-        GLOBAL.register(PLAYING, Permission.of("1129067881842360381"));
-        // GLOBAL.register(ForgeCommands.PING::get, Permission.of("1129067881842360381"));
+        GLOBAL.register(PLAYING, Permission.ADMINISTRATOR);
+
+        //GLOBAL.register(PLAYING, APermission.of("1129067881842360381a"));
+        // GLOBAL.register(ForgeCommands.PING::get, APermission.of("1129067881842360381"));
     }
 
     public static void init() {

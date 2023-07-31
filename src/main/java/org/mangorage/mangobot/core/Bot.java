@@ -31,7 +31,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.mangobot.core.commands.GlobalCommands;
 import org.mangorage.mangobot.core.commands.GlobalPermissions;
-import org.mangorage.mangobot.core.commands.guildcommands.ForgeCommands;
+import org.mangorage.mangobot.core.commands.guilds.ForgeCommands;
 import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
 import org.mangorage.mangobot.core.events.EventListener;
 import org.mangorage.mangobot.core.settings.Settings;

@@ -27,7 +27,6 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioReference;
@@ -67,8 +66,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
         this.manager = new DefaultAudioPlayerManager();
         this.audioPlayer = new DefaultAudioPlayer(manager);
 
-        AudioSourceManagers.registerLocalSource(manager);
-        AudioSourceManagers.registerRemoteSources(manager);
+        MusicUtil.registerRemoteSources(manager);
 
         audioPlayer.addListener(this);
     }

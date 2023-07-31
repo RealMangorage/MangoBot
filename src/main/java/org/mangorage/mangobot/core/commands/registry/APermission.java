@@ -24,14 +24,14 @@ package org.mangorage.mangobot.core.commands.registry;
 
 import java.util.HashMap;
 
-public class Permission {
-    public static Permission of(String id) {
-        return new Permission(id);
+public class APermission {
+    public static APermission of(String id) {
+        return new APermission(id);
     }
 
     private final String ID;
 
-    private Permission(String roleID) {
+    private APermission(String roleID) {
         this.ID = roleID;
     }
 

@@ -25,13 +25,16 @@ package org.mangorage.mangobot.core.commands.registry;
 import java.util.function.Supplier;
 
 public class RegistryObject<T> implements Supplier<T> {
-    private T value;
+    private final T value;
+    private final CommandRegistry.CommandType type;
 
-    public RegistryObject() {
+    public RegistryObject(T value, CommandRegistry.CommandType type) {
+        this.value = value;
+        this.type = type;
     }
 
-    public void set(T value) {
-        this.value = value;
+    public CommandRegistry.CommandType getType() {
+        return type;
     }
 
     @Override

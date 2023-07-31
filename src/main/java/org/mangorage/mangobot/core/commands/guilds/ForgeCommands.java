@@ -20,23 +20,31 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.guildcommands;
+package org.mangorage.mangobot.core.commands.guilds;
 
 import org.mangorage.mangobot.commands.PingCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
-import org.mangorage.mangobot.core.commands.GlobalCommands;
+import org.mangorage.mangobot.commands.TrickCommand;
+import org.mangorage.mangobot.core.commands.registry.APermission;
 import org.mangorage.mangobot.core.commands.registry.CommandAlias;
 import org.mangorage.mangobot.core.commands.registry.CommandHolder;
 import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
+import org.mangorage.mangobot.core.commands.registry.PermissionRegistry;
 import org.mangorage.mangobot.core.commands.registry.RegistryObject;
 
 public class ForgeCommands {
-    public static final CommandRegistry FORGE = CommandRegistry.guild("1129059589325852724");
+    public static final CommandRegistry COMMANDS = CommandRegistry.guild("1129059589325852724");
+    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.guild(COMMANDS.getID());
 
-    public static final RegistryObject<CommandHolder<PingCommand>> PING = FORGE.register("pings", new PingCommand());
+    public static final APermission.Node TRICK_ADMIN = APermission.Node.of("trickadmin");
+
+    public static final RegistryObject<CommandHolder<PingCommand>> PING = COMMANDS.register("pings", new PingCommand());
+    public static final RegistryObject<CommandHolder<TrickCommand>> TRICK = COMMANDS.register("trick", new TrickCommand(COMMANDS));
 
     static {
-        FORGE.register("paste", new ReplyCommand(
+        PERMISSIONS.register(TRICK_ADMIN, APermission.of("1129067881842360381"));
+
+        COMMANDS.register("paste", new ReplyCommand(
                 """
                         Please use a paste site for large blocks of code/logs, instead of dumping it in chat or taking a screenshot.
                                         
@@ -50,7 +58,7 @@ public class ForgeCommands {
                             https://mclo.gs/:                        [Free] 15MB
                         """
         ));
-        FORGE.register("sl", new ReplyCommand(
+        COMMANDS.register("sl", new ReplyCommand(
                 """
                         # Forge Only Supports 1.19.x and 1.20.x
                         The Forge Discord only supports 1.19.x and 1.20.x
@@ -60,17 +68,17 @@ public class ForgeCommands {
                         All of the older versions work and there are some other communities that offer support for older versions.
                         """
         ));
-        FORGE.register("neoforge", new ReplyCommand(
+        COMMANDS.register("neoforge", new ReplyCommand(
                 """
                         You mentioned NeoForge. NeoForge is a fork of MinecraftForge by many former MC Forge staff and the old discord. We are not affiliated with NeoForge and to get support with NeoForge you should consider joining their discord if you are not already banned. https://discord.neoforged.net/
                                                 """
         ));
-        FORGE.register("notforge", new ReplyCommand(
+        COMMANDS.register("notforge", new ReplyCommand(
                 """
                         We only support Minecraft Forge on this discord server, the attached info uses other modloaders. We do not support other modloaders such as Fabric, Quilt, FeatureCreep, LiteLoader, Rift, NeoForge, or any other modloaders mods out of the box. You should contact the developers or the modloader or abstraction layer of your issue.
                         """
         ));
-        FORGE.register("java", new ReplyCommand(
+        COMMANDS.register("java", new ReplyCommand(
                 """
                         You can download Java from the Adoptium project: https://adoptium.net/temurin/releases/
                         Select the Version dropdown option for the Java version you wish to download.
@@ -79,7 +87,7 @@ public class ForgeCommands {
                         1.16.5 and older need Java 8
                         """
         ));
-        FORGE.register("log", new ReplyCommand(
+        COMMANDS.register("log", new ReplyCommand(
                 """
                         To diagnose your issue we need the game log; please provide the logs/debug.log file, in the minecraft directory, and put it in one of the following sites (preferably the first one):
                                                 
@@ -92,9 +100,10 @@ public class ForgeCommands {
                             https://gist.github.com/:      [Free] [SignUp] 100MB
                         """
         ));
-        FORGE.register("tryitandsee", new ReplyCommand("https://tryitands.ee", false),
+        COMMANDS.register("tryitandsee", new ReplyCommand("https://tryitands.ee", false),
                 CommandAlias.of("tias")
         );
+
         /**
          FORGE.register("rules", new ReplyCommand("""
          # Rules
@@ -120,10 +129,6 @@ public class ForgeCommands {
          **backup:** https://discord.com/invite/UuM6bmAjXh
          """));
          **/
-
-        RegistryObject<CommandAlias> alias = FORGE.register(PING, CommandAlias.of("hello"));
-
-        RegistryObject<CommandAlias> ALIAS_TRICK = FORGE.register(GlobalCommands.TRICK, CommandAlias.of("trickForge"));
     }
 
     public static void init() {

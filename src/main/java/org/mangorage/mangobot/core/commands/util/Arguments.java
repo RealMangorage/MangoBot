@@ -23,7 +23,7 @@
 package org.mangorage.mangobot.core.commands.util;
 
 public class Arguments {
-    public static Arguments of(String[] args) {
+    public static Arguments of(String... args) {
         return new Arguments(args);
     }
 
@@ -38,10 +38,27 @@ public class Arguments {
     }
 
     public String get(int index) {
-        return index > args.length ? null : args[index];
+        return index >= args.length ? null : args[index];
     }
 
     public String getOrDefault(int index, String value) {
-        return index > args.length ? value : args[index];
+        return index >= args.length ? value : args[index];
+    }
+
+    public boolean has(int index) {
+        return index < args.length;
+    }
+
+    public String getFrom(int index) {
+        StringBuilder result = new StringBuilder();
+
+        while (has(index)) {
+            result.append(" ").append(get(index));
+            index++;
+        }
+
+        result.trimToSize();
+
+        return result.toString();
     }
 }

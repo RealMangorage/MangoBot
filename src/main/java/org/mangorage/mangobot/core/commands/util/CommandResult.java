@@ -22,8 +22,28 @@
 
 package org.mangorage.mangobot.core.commands.util;
 
+import net.dv8tion.jda.api.entities.Message;
+
+import java.util.function.Consumer;
+
 public enum CommandResult {
     PASS,
-    FAIL,
-    NO_PERMISSION
+    FAIL((m) -> m.reply("An error occured while executing this command").queue()),
+    NO_PERMISSION((m) -> m.reply("You dont have permission to use this command!").queue());
+
+
+    private final Consumer<Message> messageConsumer;
+
+    CommandResult(Consumer<Message> messageConsumer) {
+        this.messageConsumer = messageConsumer;
+    }
+
+    CommandResult() {
+        this((message) -> {
+        });
+    }
+
+    public void accept(Message message) {
+        messageConsumer.accept(message);
+    }
 }

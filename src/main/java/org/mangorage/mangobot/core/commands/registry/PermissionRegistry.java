@@ -22,14 +22,15 @@
 
 package org.mangorage.mangobot.core.commands.registry;
 
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PermissionRegistry {
     private static final HashMap<String, PermissionRegistry> REGISTRY = new HashMap<>();
@@ -43,7 +44,7 @@ public class PermissionRegistry {
         return REGISTRY.computeIfAbsent(id, PermissionRegistry::new);
     }
 
-    public static boolean hasNeededPermission(Member member, Permission.Node node) {
+    public static boolean hasNeededPermission(Member member, APermission.Node node) {
         if (guild(member.getGuild().getId()).hasPermission(member, node))
             return true;
 
@@ -51,34 +52,47 @@ public class PermissionRegistry {
     }
 
     private final String ID;
-    private final HashMap<Permission.Node, ArrayList<Permission>> PERMISSIONS = new HashMap<>();
+    private final HashMap<APermission.Node, ArrayList<APermission>> PERMISSIONS = new HashMap<>();
+    private final HashMap<APermission.Node, ArrayList<Permission>> DISCORD_PERMISSIONS = new HashMap<>(); // Global only
 
     private PermissionRegistry(String id) {
         this.ID = id;
     }
 
-    public void register(Permission.Node node, Permission... permissions) {
+    public void register(APermission.Node node, Permission... permissions) {
+        if (ID != null)
+            throw new IllegalStateException("Unable to register permissions on a GUILD level, this is for Global permissions only...");
+        DISCORD_PERMISSIONS.computeIfAbsent(node, (key) -> new ArrayList<>());
+        DISCORD_PERMISSIONS.get(node).addAll(Arrays.asList(permissions));
+    }
+
+    public void register(APermission.Node node, APermission... permissions) {
+        if (ID == null)
+            throw new IllegalStateException("Unable to register permissions on a GLOBAL level, this is for guilds only...");
+
         PERMISSIONS.computeIfAbsent(node, (key) -> new ArrayList<>());
-        PERMISSIONS.get(node).addAll(Arrays.stream(permissions).toList());
+        PERMISSIONS.get(node).addAll(Arrays.asList(permissions));
     }
 
-    public boolean hasPermission(Member member, Permission.Node node) {
-        ArrayList<Permission> permissions = PERMISSIONS.get(node);
-        List<Role> ROLES = member.getRoles();
+    public boolean hasPermission(Member member, APermission.Node node) {
+        // Check for Guild Perms first -> Discord Perms
+        if (ID == null) {
+            ArrayList<Permission> permissions = DISCORD_PERMISSIONS.get(node);
+            EnumSet<Permission> memberPerms = member.getPermissions();
 
-        if (permissions == null)
-            return ID == null;
+            if (permissions == null)
+                return false;
 
-        AtomicBoolean hasPerm = new AtomicBoolean(false);
+            return memberPerms.stream().anyMatch(permissions::contains);
+        } else {
+            ArrayList<APermission> permissions = PERMISSIONS.get(node);
+            List<String> rolesIDs = member.getRoles().stream().map(ISnowflake::getId).toList();
 
-        ROLES.forEach(role -> {
-            permissions.forEach(permission -> {
-                if (!hasPerm.get())
-                    hasPerm.set(permission.getID().equals(role.getId()));
-            });
-        });
+            if (permissions == null)
+                return false;
 
-
-        return hasPerm.get();
+            return rolesIDs.stream().anyMatch(permissions.stream().map(APermission::getID).toList()::contains);
+        }
     }
+
 }
