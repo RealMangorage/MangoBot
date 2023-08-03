@@ -23,22 +23,22 @@
 package org.mangorage.mangobot.core.events;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class EventBus {
-    public static final EventBus GLOBAL = new EventBus();
-
-
-    private final HashMap<Class<?>, EventListener<?>> listenerHashMap = new HashMap<>();
-
-    @SuppressWarnings("unchecked")
-    public <X> EventListener<X> get(Class<X> xClass) {
-        return (EventListener<X>) listenerHashMap.computeIfAbsent(xClass, (k) -> new EventListener<>(DEFAULT_PRIORITY));
+    public static EventBus create() {
+        return new EventBus();
     }
 
+    public static EventBus create(EventPriority defaultPriority) {
+        return new EventBus(defaultPriority);
+    }
+
+    private final HashMap<Class<?>, EventListener<?>> listenerHashMap = new HashMap<>();
     private final EventPriority DEFAULT_PRIORITY;
 
     private EventBus() {
@@ -47,6 +47,44 @@ public class EventBus {
 
     private EventBus(EventPriority priority) {
         this.DEFAULT_PRIORITY = priority;
+    }
+
+    public void register(Object target) {
+        // Do a scan of said Object!
+        try {
+            Class<?> targetClass = null;
+            if (target instanceof Class<?> classZ)
+                targetClass = classZ;
+
+            Object realTarget = targetClass == null ? target : targetClass.newInstance();
+
+            Arrays.stream(realTarget.getClass().getMethods()).filter(e -> e.getAnnotation(SubscribeEvent.class) != null).forEach(method -> {
+                SubscribeEvent annotation = method.getAnnotation(SubscribeEvent.class);
+                Class<?> eventClass = method.getParameters()[0].getType();
+                System.out.println("""
+                            Subscribing Event Listener ->
+                                Listener Class: %s
+                                Method: %s
+                                Event Class: %s
+                                Priortiy: %s
+                        """.formatted(method.getDeclaringClass().getCanonicalName(), method.getName(), eventClass.getName(), annotation.priority()));
+
+                get(eventClass).addListener((e) -> {
+                    try {
+                        method.invoke(realTarget, e);
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+            });
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <X> EventListener<X> get(Class<X> xClass) {
+        return (EventListener<X>) listenerHashMap.computeIfAbsent(xClass, (k) -> new EventListener<>(DEFAULT_PRIORITY));
     }
 
     @SuppressWarnings("unchecked")
@@ -63,17 +101,17 @@ public class EventBus {
         }
 
         public void post(X event) {
-            for (EventPriority value : EventPriority.values()) {
+            for (EventPriority value : EventPriority.get()) {
                 List<Consumer<X>> consumers = LISTENERS.getOrDefault(value, null);
                 if (consumers != null) consumers.forEach(e -> e.accept(event));
             }
         }
 
-        public void register(Consumer<X> eventConsumer) {
-            register(DEFAULT_PRIORITY, eventConsumer);
+        public void addListener(Consumer<X> eventConsumer) {
+            addListener(DEFAULT_PRIORITY, eventConsumer);
         }
 
-        public void register(EventPriority priority, Consumer<X> eventConsumer) {
+        public void addListener(EventPriority priority, Consumer<X> eventConsumer) {
             LISTENERS.computeIfAbsent(priority, (key) -> new ArrayList<>()).add(eventConsumer);
         }
     }

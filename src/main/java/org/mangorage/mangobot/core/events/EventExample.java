@@ -22,26 +22,37 @@
 
 package org.mangorage.mangobot.core.events;
 
-public enum EventPriority {
-    HIGHEST,
-    HIGH,
-    NORMAL,
-    LOW,
-    LOWEST,
-    DEFAULT; // Dont use!
 
-    private static final EventPriority[] list;
+public class EventExample {
+    public static final EventBus EVENT_BUS = EventBus.create(EventPriority.NORMAL); // Example Bus for testing purpose!
+    public static final EventExample example;
 
     static {
-        list = new EventPriority[5];
-        list[0] = HIGHEST;
-        list[1] = HIGH;
-        list[2] = NORMAL;
-        list[3] = LOW;
-        list[4] = LOWEST;
+        example = new EventExample();
+        CommandEvent.addListener(EVENT_BUS, commandEvent -> {
+            System.out.println("Woooh! 1");
+        });
+
+        CommandEvent.addListener(EVENT_BUS, EventExample::test);
+
+        EVENT_BUS.register(EventExample.class);
+        EVENT_BUS.register(example);
+
+        EVENT_BUS.post(new CommandEvent());
     }
 
-    public static EventPriority[] get() {
-        return list;
+    public static void main(String[] args) {
+    }
+
+    public static void test(CommandEvent event) {
+        System.out.println("Woooh! 2");
+    }
+
+    public EventExample() {
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void annotationTest(CommandEvent event) {
+        System.out.println("Woooh! 3");
     }
 }

@@ -22,7 +22,13 @@
 
 package org.mangorage.mangobot.core.events;
 
-public class CommandEvent {
+import java.util.function.Consumer;
+
+public class CommandEvent extends Event {
+    public static void addListener(EventBus bus, Consumer<CommandEvent> eventConsumer) {
+        bus.get(CommandEvent.class).addListener(eventConsumer);
+    }
+
     public int getID() {
         // Test
         return 0;

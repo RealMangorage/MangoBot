@@ -33,7 +33,9 @@ import org.mangorage.mangobot.core.commands.GlobalCommands;
 import org.mangorage.mangobot.core.commands.GlobalPermissions;
 import org.mangorage.mangobot.core.commands.guilds.ForgeCommands;
 import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
+import org.mangorage.mangobot.core.events.EventBus;
 import org.mangorage.mangobot.core.events.EventListener;
+import org.mangorage.mangobot.core.events.EventPriority;
 import org.mangorage.mangobot.core.settings.Settings;
 
 import java.util.EnumSet;
@@ -42,6 +44,7 @@ import static org.mangorage.mangobot.core.Constants.STARTUP_MESSAGE;
 
 public class Bot {
     private static Bot INSTANCE = null;
+    public static final EventBus EVENT_BUS = EventBus.create(EventPriority.NORMAL);
 
     public static void init() {
         INSTANCE = new Bot();

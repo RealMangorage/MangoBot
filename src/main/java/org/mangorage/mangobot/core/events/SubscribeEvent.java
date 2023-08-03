@@ -22,26 +22,14 @@
 
 package org.mangorage.mangobot.core.events;
 
-public enum EventPriority {
-    HIGHEST,
-    HIGH,
-    NORMAL,
-    LOW,
-    LOWEST,
-    DEFAULT; // Dont use!
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-    private static final EventPriority[] list;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    static {
-        list = new EventPriority[5];
-        list[0] = HIGHEST;
-        list[1] = HIGH;
-        list[2] = NORMAL;
-        list[3] = LOW;
-        list[4] = LOWEST;
-    }
-
-    public static EventPriority[] get() {
-        return list;
-    }
+@Retention(value = RUNTIME)
+@Target(value = METHOD)
+public @interface SubscribeEvent {
+    EventPriority priority() default EventPriority.DEFAULT;
 }

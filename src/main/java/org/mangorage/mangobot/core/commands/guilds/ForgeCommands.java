@@ -104,8 +104,9 @@ public class ForgeCommands {
                 CommandAlias.of("tias")
         );
 
+
         /**
-         FORGE.register("rules", new ReplyCommand("""
+         COMMANDS.register("rules", new ReplyCommand("""
          # Rules
          1) Do not DM anyone without asking for permission first.
          2) No spamming. This includes emojis, GIFs, many single word messages or advertisements.
@@ -124,10 +125,10 @@ public class ForgeCommands {
 
          # Ban Appeals
          <@155149108183695360> will you send you a forum when/if you are banned.
-         ** If you believe anyone has broken any rules by pinging <@&1129070272302022656> or sending them a Private Message. **
+         ** If you believe anyone has broken any rules please do not hesitate to contact moderators by pinging <@&1129070272302022656> or sending them a Private Message. **
          **invite:** https://discord.minecraftforge.net/
          **backup:** https://discord.com/invite/UuM6bmAjXh
-         """));
+         """).notifications(false));
          **/
     }
 
