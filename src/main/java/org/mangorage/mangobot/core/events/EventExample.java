@@ -23,6 +23,8 @@
 package org.mangorage.mangobot.core.events;
 
 
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
 public class EventExample {
     public static final EventBus EVENT_BUS = EventBus.create(EventPriority.NORMAL); // Example Bus for testing purpose!
     public static final EventExample example;
@@ -33,11 +35,23 @@ public class EventExample {
             System.out.println("Woooh! 1");
         });
 
+        EVENT_BUS.get(MessageReceivedEvent.class).addListener(event -> {
+
+        });
+
         CommandEvent.addListener(EVENT_BUS, EventExample::test);
 
         EVENT_BUS.register(EventExample.class);
         EVENT_BUS.register(example);
 
+        System.out.println("Posted First");
+        EVENT_BUS.post(new CommandEvent());
+
+        EVENT_BUS.unregister(example);
+        EVENT_BUS.unregister(EventExample.class);
+
+
+        System.out.println("Posted Second");
         EVENT_BUS.post(new CommandEvent());
     }
 
@@ -51,7 +65,7 @@ public class EventExample {
     public EventExample() {
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void annotationTest(CommandEvent event) {
         System.out.println("Woooh! 3");
     }

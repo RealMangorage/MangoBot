@@ -24,7 +24,7 @@ package org.mangorage.mangobot.core.events;
 
 import java.util.function.Consumer;
 
-public class CommandEvent extends Event {
+public class CommandEvent {
     public static void addListener(EventBus bus, Consumer<CommandEvent> eventConsumer) {
         bus.get(CommandEvent.class).addListener(eventConsumer);
     }

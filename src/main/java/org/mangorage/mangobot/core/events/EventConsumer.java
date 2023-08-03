@@ -22,5 +22,28 @@
 
 package org.mangorage.mangobot.core.events;
 
-public class Event {
+import java.util.function.Consumer;
+
+public class EventConsumer {
+    private final Consumer<?> eventConsumer;
+    private final Class<?> eventClass;
+    private final EventPriority priority;
+
+    public EventConsumer(Class<?> eventClass, EventPriority priority, Consumer<?> eventConsumer) {
+        this.eventClass = eventClass;
+        this.priority = priority;
+        this.eventConsumer = eventConsumer;
+    }
+
+    public Consumer<?> getEventConsumer() {
+        return eventConsumer;
+    }
+
+    public Class<?> getEventClass() {
+        return eventClass;
+    }
+
+    public EventPriority getPriority() {
+        return priority;
+    }
 }

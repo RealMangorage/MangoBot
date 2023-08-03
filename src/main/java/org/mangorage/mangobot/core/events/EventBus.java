@@ -25,8 +25,8 @@ package org.mangorage.mangobot.core.events;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class EventBus {
@@ -38,7 +38,8 @@ public class EventBus {
         return new EventBus(defaultPriority);
     }
 
-    private final HashMap<Class<?>, EventListener<?>> listenerHashMap = new HashMap<>();
+    private final ConcurrentHashMap<Class<?>, EventListener<?>> listenerHashMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Object, ArrayList<EventConsumer>> registeredObjects = new ConcurrentHashMap<>();
     private final EventPriority DEFAULT_PRIORITY;
 
     private EventBus() {
@@ -51,6 +52,9 @@ public class EventBus {
 
     public void register(Object target) {
         // Do a scan of said Object!
+        if (registeredObjects.containsKey(target))
+            return;
+
         try {
             Class<?> targetClass = null;
             if (target instanceof Class<?> classZ)
@@ -60,6 +64,7 @@ public class EventBus {
 
             Arrays.stream(realTarget.getClass().getMethods()).filter(e -> e.getAnnotation(SubscribeEvent.class) != null).forEach(method -> {
                 SubscribeEvent annotation = method.getAnnotation(SubscribeEvent.class);
+                EventPriority priority = annotation.priority() == EventPriority.DEFAULT ? DEFAULT_PRIORITY : annotation.priority();
                 Class<?> eventClass = method.getParameters()[0].getType();
                 System.out.println("""
                             Subscribing Event Listener ->
@@ -67,19 +72,36 @@ public class EventBus {
                                 Method: %s
                                 Event Class: %s
                                 Priortiy: %s
-                        """.formatted(method.getDeclaringClass().getCanonicalName(), method.getName(), eventClass.getName(), annotation.priority()));
+                        """.formatted(method.getDeclaringClass().getCanonicalName(), method.getName(), eventClass.getName(), priority));
 
-                get(eventClass).addListener((e) -> {
+                Consumer<?> eventConsumer = get(eventClass).addListener(priority, (e) -> {
                     try {
                         method.invoke(realTarget, e);
                     } catch (Exception exception) {
                         exception.printStackTrace();
                     }
                 });
+
+                registeredObjects.computeIfAbsent(target, (k) -> new ArrayList<>()).add(new EventConsumer(eventClass, priority, eventConsumer));
             });
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public void unregister(Object target) {
+        if (!registeredObjects.containsKey(target))
+            return;
+
+        registeredObjects.get(target).forEach(e -> {
+            Class<?> eventClass = e.getEventClass();
+            EventPriority priority = e.getPriority();
+            Consumer<?> consumer = e.getEventConsumer();
+
+            get(eventClass).removeListener(priority, consumer);
+        });
+
+        registeredObjects.remove(target); // We handled the unrregistering of it already so now remove it!
     }
 
     @SuppressWarnings("unchecked")
@@ -107,12 +129,18 @@ public class EventBus {
             }
         }
 
-        public void addListener(Consumer<X> eventConsumer) {
-            addListener(DEFAULT_PRIORITY, eventConsumer);
+        public Consumer<X> addListener(Consumer<X> eventConsumer) {
+            return addListener(DEFAULT_PRIORITY, eventConsumer);
         }
 
-        public void addListener(EventPriority priority, Consumer<X> eventConsumer) {
+        public Consumer<X> addListener(EventPriority priority, Consumer<X> eventConsumer) {
             LISTENERS.computeIfAbsent(priority, (key) -> new ArrayList<>()).add(eventConsumer);
+            return eventConsumer;
+        }
+
+        public void removeListener(EventPriority priority, Consumer<?> consumer) {
+            if (LISTENERS.containsKey(priority))
+                LISTENERS.get(priority).remove(consumer);
         }
     }
 }
