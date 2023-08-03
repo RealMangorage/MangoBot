@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * TODO: Figure out how to do proper registering
@@ -140,6 +141,7 @@ public class CommandRegistry {
     private final List<RegistryObject<?>> REGISTRY_OBJECTS = new ArrayList<>();
     private HashMap<String, CommandHolder<?>> COMMANDS = new HashMap<>();
     private HashMap<String, CommandAlias> COMMAND_ALIASES = new HashMap<>();
+    private final AtomicBoolean frozen = new AtomicBoolean(false);
 
     private CommandRegistry(String guildID) {
         this.guildID = guildID;
@@ -147,9 +149,12 @@ public class CommandRegistry {
 
     public void clearRegistryBuilder() {
         REGISTRY_OBJECTS.clear();
+        //frozen.set(true);
     }
 
     public <X extends AbstractCommand> RegistryObject<CommandHolder<X>> register(String id, X command, CommandAlias.Builder... builders) {
+        if (frozen.get())
+            throw new IllegalStateException("Cannot register stuff to a frozen registry");
         RegistryObject<CommandHolder<X>> RO = new RegistryObject<>(CommandHolder.create(id, command), CommandType.COMMAND);
         REGISTRY_OBJECTS.add(RO);
         Arrays.asList(builders).forEach(e -> registerAlias(RO.get(), e));
@@ -157,6 +162,8 @@ public class CommandRegistry {
     }
 
     public <X extends AbstractCommand> RegistryObject<CommandAlias> registerAlias(CommandHolder<X> holder, CommandAlias.Builder builder) {
+        if (frozen.get())
+            throw new IllegalStateException("Cannot register stuff to a frozen registry. Use CommandEvent to ");
         RegistryObject<CommandAlias> RO = new RegistryObject<>(builder.build(holder), CommandType.ALIAS);
         REGISTRY_OBJECTS.add(RO);
         return RO;

@@ -20,31 +20,12 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.util;
+package org.mangorage.mangobot.core.events;
 
-import net.dv8tion.jda.api.entities.Message;
-
-import java.util.function.Consumer;
-
-public enum CommandResult {
-    PASS,
-    FAIL((m) -> m.reply("An error occured while executing this command").queue()),
-    NO_PERMISSION((m) -> m.reply("You dont have permission to use this command!").queue()),
-    UNDER_MAINTENANCE((m) -> m.reply("Currently under maintenance! Try again later!").queue());
-
-
-    private final Consumer<Message> messageConsumer;
-
-    CommandResult(Consumer<Message> messageConsumer) {
-        this.messageConsumer = messageConsumer;
-    }
-
-    CommandResult() {
-        this((m) -> {
-        });
-    }
-
-    public void accept(Message message) {
-        messageConsumer.accept(message);
-    }
+public enum EventPriority {
+    HIGHEST,
+    HIGH,
+    NORMAL,
+    LOW,
+    LOWEST
 }

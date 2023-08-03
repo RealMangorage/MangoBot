@@ -59,6 +59,7 @@ public class TrickCommand extends AbstractCommand {
                 return command.execute(messageb, Arguments.of("-s", id));
             }));
             CommandRegistry.build();
+            message.reply("Added: " + id).queue();
             return CommandResult.PASS;
         } else if (type.equals("-r") && id != null) {
             if (!PermissionRegistry.hasNeededPermission(member, ForgeCommands.TRICK_ADMIN))
