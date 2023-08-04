@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobot.commands;
 
+import com.google.gson.Gson;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -35,6 +36,10 @@ import org.mangorage.mangobot.core.eventbus.events.CommandEvent;
 import org.mangorage.mangobot.core.eventbus.events.LoadEvent;
 import org.mangorage.mangobot.core.eventbus.events.SaveEvent;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 import static org.mangorage.mangobot.core.Bot.EVENT_BUS;
@@ -43,22 +48,70 @@ public class TrickCommand extends AbstractCommand {
     private final HashMap<String, HashMap<String, String>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
 
     @SubscribeEvent
-    public static void onSaveEvent(SaveEvent event) {
-        String savePath = "botresources/guilddata/";
+    public void onSaveEvent(SaveEvent event) {
+        System.out.println("Saving Data!");
+        String savePath = "botresources/guilddata/tricksdata/%s/";
+
+        File saveDir = new File("botresources/guilddata/tricksdata/");
+        if (saveDir.exists()) {
+            for (File dir : saveDir.listFiles())
+                if (dir.isDirectory())
+                    for (File file : dir.listFiles())
+                        if (!file.isDirectory())
+                            file.delete();
+        } else {
+            saveDir.mkdirs();
+        }
+
+        CONTENT.forEach((guildID, data) -> {
+            data.forEach((trickid, content) -> {
+                File dir = new File(savePath.formatted(guildID));
+                if (!dir.exists())
+                    dir.mkdirs();
+
+                Gson gson = new Gson();
+                try {
+                    String json = gson.toJson(new Data(guildID, trickid, content));
+                    Files.writeString(Path.of((savePath + "%s.json").formatted(guildID, trickid)), json);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        });
+
+
     }
 
     @SubscribeEvent
-    public static void onLoadEvent(LoadEvent event) {
+    public void onLoadEvent(LoadEvent event) {
+        String savePath = "botresources/guilddata/tricksdata/%s/";
 
+        File saveDir = new File("botresources/guilddata/tricksdata/");
+        if (saveDir.exists()) {
+            for (File dir : saveDir.listFiles())
+                if (dir.isDirectory())
+                    for (File file : dir.listFiles())
+                        if (!file.isDirectory())
+                            load(file);
+        }
     }
 
-    static {
-        LoadEvent.addListener(EVENT_BUS, TrickCommand::onLoadEvent);
-        SaveEvent.addListener(EVENT_BUS, TrickCommand::onSaveEvent);
+    private void load(File file) {
+        Gson gson = new Gson();
+        try {
+            Data data = gson.fromJson(Files.readString(file.toPath()), Data.class);
+            if (data.content != null && data.trickid != null && data.guildid != null)
+                CONTENT.computeIfAbsent(data.guildid, (k) -> new HashMap<>()).put(data.trickid, data.content);
+        } catch (Exception e) {
+
+        }
     }
 
     public TrickCommand() {
-        CommandEvent.addListener(EVENT_BUS, this::onCommandEvent); // Register this listener to bot's event bus!
+        // Register listeners to Bot.EVENT_BUS
+        LoadEvent.addListener(EVENT_BUS, this::onLoadEvent);
+        SaveEvent.addListener(EVENT_BUS, this::onSaveEvent);
+        CommandEvent.addListener(EVENT_BUS, this::onCommandEvent);
     }
 
 
@@ -92,6 +145,7 @@ public class TrickCommand extends AbstractCommand {
             } else {
                 dMessage.apply(message.reply("Trick '%s' does not exist.")).queue();
             }
+            return CommandResult.PASS;
         } else if (type.equals("-s") && id != null) {
             MessageChannelUnion channel = message.getChannel();
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
@@ -125,13 +179,26 @@ public class TrickCommand extends AbstractCommand {
         }
     }
 
-    public record Data(String guildid, String id, String content) {
+    public class Data {
+        private String guildid;
+        private String trickid;
+        private String content;
+
+        public Data() {
+        }
+
+        public Data(String guildid, String trickid, String content) {
+            this.guildid = guildid;
+            this.trickid = trickid;
+            this.content = content;
+        }
+
         public String getGuildID() {
             return guildid;
         }
 
-        public String getID() {
-            return content;
+        public String getTrickID() {
+            return trickid;
         }
 
         public String getContent() {
