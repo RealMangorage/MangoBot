@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
+import org.mangorage.mangobot.commands.TrickCommand;
 import org.mangorage.mangobot.commands.music.PauseCommand;
 import org.mangorage.mangobot.commands.music.PlayCommand;
 import org.mangorage.mangobot.commands.music.PlayingCommand;
@@ -36,18 +37,21 @@ import org.mangorage.mangobot.commands.music.StopCommand;
 import org.mangorage.mangobot.commands.music.VolumeCommand;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
+import org.mangorage.mangobot.core.commands.registry.CommandHolder;
 import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
+import org.mangorage.mangobot.core.commands.registry.RegistryObject;
 import org.mangorage.mangobot.core.commands.util.CommandResult;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
 import org.mangorage.mangobot.core.music.recorder.VoiceRelay;
 
 public class GlobalCommands {
-    public static final CommandRegistry GLOBAL = CommandRegistry.global();
+    public static final CommandRegistry COMMANDS = CommandRegistry.global();
+    public static final RegistryObject<CommandHolder<TrickCommand>> TRICK_COMMAND = COMMANDS.register("tricks", new TrickCommand());
 
     static {
-        GLOBAL.register("speak", new ReplyCommand("I have spoken!"));
+        COMMANDS.register("speak", new ReplyCommand("I have spoken!"));
 
-        GLOBAL.register("terminate", AbstractCommand.create((message, args) -> {
+        COMMANDS.register("terminate", AbstractCommand.create((message, args) -> {
             if (message.getAuthor().getId().equals("194596094200643584")) {
                 message.getChannel().sendMessage("Terminating Bot").queue();
                 System.exit(0);
@@ -58,7 +62,7 @@ public class GlobalCommands {
         }, false));
 
 
-        GLOBAL.register("record", AbstractCommand.create(((message, arg) -> {
+        COMMANDS.register("record", AbstractCommand.create(((message, arg) -> {
             String[] args = arg.getArgs();
             MessageChannelUnion channel = message.getChannel();
             if (args.length > 1) {
@@ -81,7 +85,7 @@ public class GlobalCommands {
             return CommandResult.PASS;
         }), true));
 
-        GLOBAL.register("sendRecording", AbstractCommand.create((message, args) -> {
+        COMMANDS.register("sendRecording", AbstractCommand.create((message, args) -> {
             MessageChannelUnion channelUnion = message.getChannel();
             message.reply("sending").queue();
             VoiceChatRecorder.getInstance(message.getGuild().getId()).compressFile((file) -> {
@@ -92,7 +96,7 @@ public class GlobalCommands {
             return CommandResult.PASS;
         }, false));
 
-        GLOBAL.register("testRelay", AbstractCommand.create(((message, args) -> {
+        COMMANDS.register("testRelay", AbstractCommand.create(((message, args) -> {
             GuildVoiceState state = message.getMember().getVoiceState();
             if (state != null && state.inAudioChannel()) {
                 VoiceChannel voiceChannel = state.getChannel().asVoiceChannel();
@@ -105,12 +109,12 @@ public class GlobalCommands {
 
 
         if (Constants.USE_MUSIC) {
-            GLOBAL.register("play", new PlayCommand());
-            GLOBAL.register("stop", new StopCommand());
-            GLOBAL.register("queue", new QueueCommand());
-            GLOBAL.register("pause", new PauseCommand());
-            GLOBAL.register("setVolume", new VolumeCommand());
-            GLOBAL.register("playing", new PlayingCommand());
+            COMMANDS.register("play", new PlayCommand());
+            COMMANDS.register("stop", new StopCommand());
+            COMMANDS.register("queue", new QueueCommand());
+            COMMANDS.register("pause", new PauseCommand());
+            COMMANDS.register("setVolume", new VolumeCommand());
+            COMMANDS.register("playing", new PlayingCommand());
         }
     }
 

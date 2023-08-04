@@ -110,8 +110,8 @@ public class EventBus {
     }
 
     @SuppressWarnings("unchecked")
-    public <X> void post(X event) {
-        ((EventListener<X>) get(event.getClass())).post(event);
+    public <X> X post(X event) {
+        return ((EventListener<X>) get(event.getClass())).post(event);
     }
 
     public static final class EventListener<X> {
@@ -122,11 +122,12 @@ public class EventBus {
             this.DEFAULT_PRIORITY = defaultPriority;
         }
 
-        public void post(X event) {
+        public X post(X event) {
             for (EventPriority value : EventPriority.get()) {
                 List<Consumer<X>> consumers = LISTENERS.getOrDefault(value, null);
                 if (consumers != null) consumers.forEach(e -> e.accept(event));
             }
+            return event;
         }
 
         public Consumer<X> addListener(Consumer<X> eventConsumer) {

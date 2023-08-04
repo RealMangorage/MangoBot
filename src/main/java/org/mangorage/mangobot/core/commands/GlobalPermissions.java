@@ -27,16 +27,15 @@ import org.mangorage.mangobot.core.commands.registry.APermission;
 import org.mangorage.mangobot.core.commands.registry.PermissionRegistry;
 
 public class GlobalPermissions {
-    public static final PermissionRegistry GLOBAL = PermissionRegistry.global();
+    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.global();
 
     public static final APermission.Node PLAYING = APermission.Node.of("playing");
+    public static final APermission.Node TRICK_ADMIN = APermission.Node.of("trickadmin");
 
 
     static {
-        GLOBAL.register(PLAYING, Permission.ADMINISTRATOR);
-
-        //GLOBAL.register(PLAYING, APermission.of("1129067881842360381a"));
-        // GLOBAL.register(ForgeCommands.PING::get, APermission.of("1129067881842360381"));
+        PERMISSIONS.register(PLAYING, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(TRICK_ADMIN, Permission.ADMINISTRATOR);
     }
 
     public static void init() {

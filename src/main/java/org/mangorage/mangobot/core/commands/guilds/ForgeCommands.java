@@ -24,7 +24,6 @@ package org.mangorage.mangobot.core.commands.guilds;
 
 import org.mangorage.mangobot.commands.PingCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
-import org.mangorage.mangobot.commands.TrickCommand;
 import org.mangorage.mangobot.core.commands.registry.APermission;
 import org.mangorage.mangobot.core.commands.registry.CommandAlias;
 import org.mangorage.mangobot.core.commands.registry.CommandHolder;
@@ -32,14 +31,14 @@ import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
 import org.mangorage.mangobot.core.commands.registry.PermissionRegistry;
 import org.mangorage.mangobot.core.commands.registry.RegistryObject;
 
+import static org.mangorage.mangobot.core.commands.GlobalPermissions.TRICK_ADMIN;
+
 public class ForgeCommands {
     public static final CommandRegistry COMMANDS = CommandRegistry.guild("1129059589325852724");
     public static final PermissionRegistry PERMISSIONS = PermissionRegistry.guild(COMMANDS.getID());
 
-    public static final APermission.Node TRICK_ADMIN = APermission.Node.of("trickadmin");
-
     public static final RegistryObject<CommandHolder<PingCommand>> PING = COMMANDS.register("pings", new PingCommand());
-    public static final RegistryObject<CommandHolder<TrickCommand>> TRICK = COMMANDS.register("trick", new TrickCommand(COMMANDS));
+
 
     static {
         PERMISSIONS.register(TRICK_ADMIN, APermission.of("1129067881842360381"));

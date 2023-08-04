@@ -22,6 +22,10 @@
 
 package org.mangorage.mangobot.core.events;
 
+import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobot.core.commands.util.Arguments;
+import org.mangorage.mangobot.core.commands.util.CommandResult;
+
 import java.util.function.Consumer;
 
 public class CommandEvent {
@@ -29,8 +33,42 @@ public class CommandEvent {
         bus.get(CommandEvent.class).addListener(eventConsumer);
     }
 
-    public int getID() {
-        // Test
-        return 0;
+    private final Message message;
+    private final String command;
+    private final Arguments arguments;
+
+    public CommandEvent(Message message, String command, Arguments arguments) {
+        this.message = message;
+        this.command = command;
+        this.arguments = arguments;
+    }
+
+    private boolean handled = false;
+    private CommandResult result;
+
+    public boolean isHandled() {
+        return handled;
+    }
+
+    public CommandResult getResult() {
+        return result;
+    }
+
+    public void setHandled(CommandResult result) {
+        if (handled) return;
+        this.handled = true;
+        this.result = result;
+    }
+
+    public Message getMessage() {
+        return message;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public Arguments getArguments() {
+        return arguments;
     }
 }

@@ -71,7 +71,6 @@ public class Bot {
         builder.setActivity(Activity.of(Activity.ActivityType.PLAYING, "MinecraftForge: The Awakening of Herobrine Modpack"));
         builder.setStatus(OnlineStatus.ONLINE);
 
-
         EnumSet<GatewayIntent> intents = EnumSet.of(
                 // Enables MessageReceivedEvent for guild (also known as servers)
                 GatewayIntent.GUILD_MESSAGES,

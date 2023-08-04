@@ -26,9 +26,11 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.mangobot.commands.AbstractCommand;
+import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.commands.util.Arguments;
 import org.mangorage.mangobot.core.commands.util.CommandResult;
+import org.mangorage.mangobot.core.events.CommandEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -126,8 +128,9 @@ public class CommandRegistry {
             }
 
             if (globalType == CommandType.UNKNOWN && guildType == CommandType.UNKNOWN) {
-                event.getMessage().reply("Invalid Command").queue();
-                return;
+                CommandEvent commandEvent = Bot.EVENT_BUS.post(new CommandEvent(message, command, Arguments.of(params)));
+                if (!commandEvent.isHandled())
+                    event.getMessage().reply("Invalid Command").queue();
             } else {
                 if (globalType != CommandType.UNKNOWN)
                     GLOBAL.execute(message, command, params);
@@ -163,7 +166,7 @@ public class CommandRegistry {
 
     public <X extends AbstractCommand> RegistryObject<CommandAlias> registerAlias(CommandHolder<X> holder, CommandAlias.Builder builder) {
         if (frozen.get())
-            throw new IllegalStateException("Cannot register stuff to a frozen registry. Use CommandEvent to ");
+            throw new IllegalStateException("Cannot register stuff to a frozen registry. Use CommandEvent to handle further command alias's");
         RegistryObject<CommandAlias> RO = new RegistryObject<>(builder.build(holder), CommandType.ALIAS);
         REGISTRY_OBJECTS.add(RO);
         return RO;
