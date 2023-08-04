@@ -31,6 +31,7 @@ import java.awt.*;
 import java.sql.Time;
 import java.time.Instant;
 
+@Deprecated
 public class ReplyEmbedCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {

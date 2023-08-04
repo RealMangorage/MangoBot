@@ -30,7 +30,7 @@ import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.commands.util.Arguments;
 import org.mangorage.mangobot.core.commands.util.CommandResult;
-import org.mangorage.mangobot.core.events.CommandEvent;
+import org.mangorage.mangobot.core.eventbus.events.CommandEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;

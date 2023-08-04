@@ -41,6 +41,7 @@ import org.mangorage.mangobot.core.commands.registry.CommandHolder;
 import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
 import org.mangorage.mangobot.core.commands.registry.RegistryObject;
 import org.mangorage.mangobot.core.commands.util.CommandResult;
+import org.mangorage.mangobot.core.commands.util.MessageSettings;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
 import org.mangorage.mangobot.core.music.recorder.VoiceRelay;
 
@@ -52,17 +53,26 @@ public class GlobalCommands {
         COMMANDS.register("speak", new ReplyCommand("I have spoken!"));
 
         COMMANDS.register("terminate", AbstractCommand.create((message, args) -> {
+            MessageSettings settings = MessageSettings.create().build();
+
             if (message.getAuthor().getId().equals("194596094200643584")) {
                 message.getChannel().sendMessage("Terminating Bot").queue();
-                System.exit(0);
+                Util.call(() -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+
+                    }
+                    System.exit(0);
+                });
             } else {
-                message.getChannel().sendMessage("Unable to Terminate bot. Only MangoRage can do this!").queue();
+                settings.apply(message.getChannel().sendMessage("Unable to Terminate bot. Only MangoRage can do this!")).queue();
             }
             return CommandResult.PASS;
         }, false));
 
 
-        COMMANDS.register("record", AbstractCommand.create(((message, arg) -> {
+        COMMANDS.register("record", AbstractCommand.create((message, arg) -> {
             String[] args = arg.getArgs();
             MessageChannelUnion channel = message.getChannel();
             if (args.length > 1) {
@@ -83,7 +93,7 @@ public class GlobalCommands {
                     channel.sendMessage("Max allowed time to record is 3600 seconds").queue();
             }
             return CommandResult.PASS;
-        }), true));
+        }, true));
 
         COMMANDS.register("sendRecording", AbstractCommand.create((message, args) -> {
             MessageChannelUnion channelUnion = message.getChannel();
@@ -96,7 +106,7 @@ public class GlobalCommands {
             return CommandResult.PASS;
         }, false));
 
-        COMMANDS.register("testRelay", AbstractCommand.create(((message, args) -> {
+        COMMANDS.register("testRelay", AbstractCommand.create((message, args) -> {
             GuildVoiceState state = message.getMember().getVoiceState();
             if (state != null && state.inAudioChannel()) {
                 VoiceChannel voiceChannel = state.getChannel().asVoiceChannel();
@@ -105,7 +115,7 @@ public class GlobalCommands {
             }
 
             return CommandResult.PASS;
-        }), true));
+        }, true));
 
 
         if (Constants.USE_MUSIC) {

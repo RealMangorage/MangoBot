@@ -33,9 +33,12 @@ import org.mangorage.mangobot.core.commands.GlobalCommands;
 import org.mangorage.mangobot.core.commands.GlobalPermissions;
 import org.mangorage.mangobot.core.commands.guilds.ForgeCommands;
 import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
-import org.mangorage.mangobot.core.events.EventBus;
-import org.mangorage.mangobot.core.events.EventListener;
-import org.mangorage.mangobot.core.events.EventPriority;
+import org.mangorage.mangobot.core.commands.util.MessageSettings;
+import org.mangorage.mangobot.core.eventbus.EventBus;
+import org.mangorage.mangobot.core.eventbus.EventListener;
+import org.mangorage.mangobot.core.eventbus.EventPriority;
+import org.mangorage.mangobot.core.eventbus.events.LoadEvent;
+import org.mangorage.mangobot.core.eventbus.events.SaveEvent;
 import org.mangorage.mangobot.core.settings.Settings;
 
 import java.util.EnumSet;
@@ -45,6 +48,7 @@ import static org.mangorage.mangobot.core.Constants.STARTUP_MESSAGE;
 public class Bot {
     private static Bot INSTANCE = null;
     public static final EventBus EVENT_BUS = EventBus.create(EventPriority.NORMAL);
+    public static final MessageSettings DEFAULT_SETTINGS = MessageSettings.create().build();
 
     public static void init() {
         INSTANCE = new Bot();
@@ -59,12 +63,15 @@ public class Bot {
 
     public Bot() {
         System.out.println(STARTUP_MESSAGE);
+        EVENT_BUS.startup();
 
         GlobalCommands.init();
         ForgeCommands.init();
 
         CommandRegistry.build();
         GlobalPermissions.init();
+
+        EVENT_BUS.post(new LoadEvent());
 
         JDABuilder builder = JDABuilder.createDefault(Settings.BOT_TOKEN.get());
 
@@ -105,6 +112,10 @@ public class Bot {
         if (INSTANCE != null) {
             getInstance().getEventManager().getRegisteredListeners().forEach(e -> getInstance().removeEventListener(e));
             getInstance().shutdown();
+
+            EVENT_BUS.post(new SaveEvent());
+            EVENT_BUS.shutdown();
+
             System.out.println("Terminating Bot! Closing Program!");
         }
     }

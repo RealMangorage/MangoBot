@@ -32,9 +32,8 @@ import org.mangorage.mangobot.core.music.MusicPlayer;
 
 public class VolumeCommand extends AbstractCommand {
     @Override
-    public CommandResult execute(Message message, Arguments arg) {
-        String[] args = arg.getArgs();
-        String VOLUME = args[0];
+    public CommandResult execute(Message message, Arguments args) {
+        String VOLUME = args.getOrDefault(0, "10");
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
         CommandResult result = CommandResult.FAIL;

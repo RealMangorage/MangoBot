@@ -25,26 +25,46 @@ package org.mangorage.mangobot.commands;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.commands.GlobalPermissions;
 import org.mangorage.mangobot.core.commands.registry.PermissionRegistry;
 import org.mangorage.mangobot.core.commands.util.Arguments;
 import org.mangorage.mangobot.core.commands.util.CommandResult;
-import org.mangorage.mangobot.core.events.CommandEvent;
-import org.mangorage.mangobot.core.events.SubscribeEvent;
+import org.mangorage.mangobot.core.commands.util.MessageSettings;
+import org.mangorage.mangobot.core.eventbus.SubscribeEvent;
+import org.mangorage.mangobot.core.eventbus.events.CommandEvent;
+import org.mangorage.mangobot.core.eventbus.events.LoadEvent;
+import org.mangorage.mangobot.core.eventbus.events.SaveEvent;
 
 import java.util.HashMap;
+
+import static org.mangorage.mangobot.core.Bot.EVENT_BUS;
 
 public class TrickCommand extends AbstractCommand {
     private final HashMap<String, HashMap<String, String>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
 
+    @SubscribeEvent
+    public static void onSaveEvent(SaveEvent event) {
+        String savePath = "botresources/guilddata/";
+    }
+
+    @SubscribeEvent
+    public static void onLoadEvent(LoadEvent event) {
+
+    }
+
+    static {
+        LoadEvent.addListener(EVENT_BUS, TrickCommand::onLoadEvent);
+        SaveEvent.addListener(EVENT_BUS, TrickCommand::onSaveEvent);
+    }
+
     public TrickCommand() {
-        CommandEvent.addListener(Bot.EVENT_BUS, this::onCommandEvent); // Register this listener to bot's event bus!
+        CommandEvent.addListener(EVENT_BUS, this::onCommandEvent); // Register this listener to bot's event bus!
     }
 
 
     @Override
     public CommandResult execute(Message message, Arguments args) {
+        MessageSettings dMessage = MessageSettings.create().build();
         Member member = message.getMember();
         String guildID = message.getGuild().getId();
         String type = args.get(0);
@@ -56,22 +76,29 @@ public class TrickCommand extends AbstractCommand {
                 return CommandResult.NO_PERMISSION;
 
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
-                message.reply("Trick '%s' already exists!".formatted(id)).mentionRepliedUser(false).setSuppressedNotifications(true).queue();
+                dMessage.apply(message.reply("Trick '%s' already exists!".formatted(id))).queue();
             } else {
                 CONTENT.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(id, content);
-                message.reply("Added Trick: '%s'".formatted(id)).mentionRepliedUser(false).setSuppressedNotifications(true).queue();
+                dMessage.apply(message.reply("Added Trick: '%s'".formatted(id))).queue();
             }
             return CommandResult.PASS;
         } else if (type.equals("-r") && id != null) {
             if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.TRICK_ADMIN))
                 return CommandResult.NO_PERMISSION;
+
+            if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
+                CONTENT.get(guildID).remove(id);
+                dMessage.apply(message.reply("Removed trick '%s'".formatted(id))).queue();
+            } else {
+                dMessage.apply(message.reply("Trick '%s' does not exist.")).queue();
+            }
         } else if (type.equals("-s") && id != null) {
             MessageChannelUnion channel = message.getChannel();
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
                 String response = CONTENT.get(guildID).get(id);
                 channel.sendMessage(response).setSuppressedNotifications(true).queue();
             } else {
-                message.reply("Trick '%s' does not exist!".formatted(id)).mentionRepliedUser(false).setSuppressedNotifications(true).queue();
+                dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(id))).queue();
             }
             return CommandResult.PASS;
         }
@@ -95,6 +122,20 @@ public class TrickCommand extends AbstractCommand {
             // event.setHandled() insures that the command has been handled!
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(command))
                 event.setHandled(execute(message, Arguments.of("-s", command)));
+        }
+    }
+
+    public record Data(String guildid, String id, String content) {
+        public String getGuildID() {
+            return guildid;
+        }
+
+        public String getID() {
+            return content;
+        }
+
+        public String getContent() {
+            return content;
         }
     }
 }

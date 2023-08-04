@@ -26,11 +26,13 @@ import net.dv8tion.jda.api.entities.Message;
 
 import java.util.function.Consumer;
 
+import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
+
 public enum CommandResult {
     PASS,
-    FAIL((m) -> m.reply("An error occured while executing this command").queue()),
-    NO_PERMISSION((m) -> m.reply("You dont have permission to use this command!").queue()),
-    UNDER_MAINTENANCE((m) -> m.reply("Currently under maintenance! Try again later!").queue());
+    FAIL((m) -> DEFAULT_SETTINGS.apply(m.reply("An error occured while executing this command")).queue()),
+    NO_PERMISSION((m) -> DEFAULT_SETTINGS.apply(m.reply("You dont have permission to use this command!")).queue()),
+    UNDER_MAINTENANCE((m) -> DEFAULT_SETTINGS.apply(m.reply("This is currently under maintenance! Please try again later!")).queue());
 
 
     private final Consumer<Message> messageConsumer;

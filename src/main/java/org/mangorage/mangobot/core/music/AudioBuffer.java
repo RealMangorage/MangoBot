@@ -23,5 +23,6 @@
 package org.mangorage.mangobot.core.music;
 
 /* Handles Audio Input and converts it into a file which can then be processed */
+@Deprecated
 public class AudioBuffer {
 }
