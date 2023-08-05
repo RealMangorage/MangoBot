@@ -93,7 +93,7 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
             if (recording) {
                 message.getChannel().sendMessage("Already recording!").queue();
             } else {
-                message.reply(STARTED_RECORDING.formatted(seconds)).submit().thenAccept((botMessage) -> this.botMessage = botMessage);
+                message.reply(STARTED_RECORDING.formatted(seconds)).queue((botMessage) -> this.botMessage = botMessage);
                 startRecording(seconds, message, state.getChannel().asVoiceChannel());
             }
         } else {
@@ -104,9 +104,9 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
     public void record(Message message, int seconds, VoiceChannel channel) {
         if (channel != null) {
             if (recording) {
-                message.getChannel().sendMessage("Already recording!").submit().thenAccept((botMessage) -> this.botMessage = botMessage);
+                message.getChannel().sendMessage("Already recording!").queue();
             } else {
-                message.reply(STARTED_RECORDING.formatted(seconds)).queue();
+                message.reply(STARTED_RECORDING.formatted(seconds)).queue((replied) -> this.botMessage = replied);
                 startRecording(seconds, message, channel);
             }
         }

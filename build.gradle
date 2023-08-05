@@ -35,9 +35,6 @@ sourceSets {
     }
 
     main {
-        runtimeClasspath += sourceSets.api.output
-        compileClasspath += sourceSets.api.output
-
         java {
             srcDir 'java'
         }
@@ -53,16 +50,14 @@ dependencies {
 
     // Bot Libraries -> Must include API's librarys
     implementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA
-    implementation("commons-io:commons-io:2.13.0") // Common API
+    apiImplementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA for BotAPI
+    implementation(sourceSets.api.output) // We must include our API!
 
+    implementation("commons-io:commons-io:2.13.0") // Common API
     implementation("io.github.cdimascio:dotenv-java:+") // DotEnv for having local Variables, for BOT_TOKEN mainly
     implementation("com.github.walkyst:lavaplayer-fork:1.4.2") // LavaPlayer to stream audio from YT/FILES to Discord
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("ws.schild:jave-all-deps:3.3.1")
-
-    // API Libraries
-    apiImplementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA
-    apiImplementation("commons-io:commons-io:2.13.0") // Common API
 
     // Fix these later...
     runtimeOnly("org.apache.logging.log4j:log4j-api:2.14.1")
@@ -72,11 +67,21 @@ dependencies {
 
 
 task runBot(type: JavaExec) {
-    group "Bot Tasks"
-    description "Basic Tasks for MangoBot"
+    group "bot tasks"
+    description "Runs the bot"
     args "-dev"
     classpath = sourceSets.main.runtimeClasspath
-    mainClass = "org.mangorage.Main"
+    mainClass = 'org.mangorage.mangobot.Main'
+}
+
+task buildBot(type: JavaExec) {
+    group "bot tasks"
+    description "Build the Bot Jar with API included"
+}
+
+task buildAPI(type: JavaExec) {
+    group "bot tasks"
+    description "Build the bot API"
 }
 
 test {
@@ -88,7 +93,7 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
-        attributes 'Main-Class': 'org.mangorage.Main'
+        attributes 'Main-Class': 'org.mangorage.mangobot.Main'
     }
 }
 

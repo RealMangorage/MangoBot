@@ -1,0 +1,1 @@
+This is here to please the IDE, since fatJar errors out when /resources/ is empty!

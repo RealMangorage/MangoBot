@@ -31,13 +31,13 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.mangobot.core.commands.ForgeCommands;
 import org.mangorage.mangobot.core.commands.GlobalCommands;
+import org.mangorage.mangobot.core.events.EventListener;
 import org.mangorage.mangobot.core.events.LoadEvent;
 import org.mangorage.mangobot.core.events.SaveEvent;
 import org.mangorage.mangobot.core.permissions.GlobalPermissions;
 import org.mangorage.mangobot.core.settings.Settings;
 import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
-import org.mangorage.mangobotapi.core.eventbus.EventListener;
 import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
@@ -52,13 +52,14 @@ public class Bot {
     public static final MessageSettings DEFAULT_SETTINGS = MessageSettings.create().build();
 
     public static void init() {
-        INSTANCE = new Bot();
-
+        // Always configure the API first! So it can have our EventBus and other stuff.
         MangoBotAPI API = MangoBotAPI.getInstance();
         API.setEventBus(EVENT_BUS);
         API.setPrefix("!");
         API.setMessageSettings(DEFAULT_SETTINGS);
         API.build();
+
+        INSTANCE = new Bot();
     }
 
     private final JDA BOT;
