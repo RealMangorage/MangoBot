@@ -84,8 +84,7 @@ public class TrickCommand extends AbstractCommand {
 
     @SubscribeEvent
     public void onLoadEvent(LoadEvent event) {
-        String savePath = "botresources/guilddata/tricksdata/%s/";
-
+        System.out.println("Loading Data!");
         File saveDir = new File("botresources/guilddata/tricksdata/");
         if (saveDir.exists()) {
             for (File dir : saveDir.listFiles())

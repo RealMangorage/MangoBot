@@ -28,25 +28,14 @@ import java.util.function.Consumer;
 
 import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
 
-public enum CommandResult {
-    PASS,
-    FAIL((m) -> DEFAULT_SETTINGS.apply(m.reply("An error occured while executing this command")).queue()),
-    NO_PERMISSION((m) -> DEFAULT_SETTINGS.apply(m.reply("You dont have permission to use this command!")).queue()),
-    UNDER_MAINTENANCE((m) -> DEFAULT_SETTINGS.apply(m.reply("This is currently under maintenance! Please try again later!")).queue());
-
-
-    private final Consumer<Message> messageConsumer;
-
-    CommandResult(Consumer<Message> messageConsumer) {
-        this.messageConsumer = messageConsumer;
-    }
-
-    CommandResult() {
-        this((m) -> {
-        });
-    }
+public record CommandResult(Consumer<Message> consumer) {
+    public static final CommandResult PASS = new CommandResult((m) -> {
+    });
+    public static final CommandResult FAIL = new CommandResult((m) -> DEFAULT_SETTINGS.apply(m.reply("An error occured while executing this command")).queue());
+    public static final CommandResult NO_PERMISSION = new CommandResult((m) -> DEFAULT_SETTINGS.apply(m.reply("You dont have permission to use this command!")));
+    public static final CommandResult UNDER_MAINTENANCE = new CommandResult((m) -> DEFAULT_SETTINGS.apply(m.reply("This is currently under maintenance! Please try again later!")).queue());
 
     public void accept(Message message) {
-        messageConsumer.accept(message);
+        consumer.accept(message);
     }
 }

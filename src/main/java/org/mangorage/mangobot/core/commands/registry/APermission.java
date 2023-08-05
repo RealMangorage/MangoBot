@@ -39,14 +39,11 @@ public class APermission {
         return ID;
     }
 
-    public static class Node {
+    public record Node(String id) {
         private static final HashMap<String, Node> NODES = new HashMap<>();
 
         public static Node of(String id) {
-            return NODES.computeIfAbsent(id, key -> new Node());
-        }
-
-        private Node() {
+            return NODES.computeIfAbsent(id, key -> new Node(id));
         }
     }
 }
