@@ -24,16 +24,45 @@ repositories {
     }
 }
 
+sourceSets {
+    api {
+        java {
+            srcDir 'java'
+        }
+        resources {
+            srcDir 'resources'
+        }
+    }
+
+    main {
+        runtimeClasspath += sourceSets.api.output
+        compileClasspath += sourceSets.api.output
+
+        java {
+            srcDir 'java'
+        }
+        resources {
+            srcDir 'resources'
+        }
+    }
+}
+
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
+    // Bot Libraries -> Must include API's librarys
     implementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA
+    implementation("commons-io:commons-io:2.13.0") // Common API
+
     implementation("io.github.cdimascio:dotenv-java:+") // DotEnv for having local Variables, for BOT_TOKEN mainly
     implementation("com.github.walkyst:lavaplayer-fork:1.4.2") // LavaPlayer to stream audio from YT/FILES to Discord
-    implementation("commons-io:commons-io:2.13.0") // Common API
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation group: 'ws.schild', name: 'jave-all-deps', version: '3.3.1'
+    implementation("ws.schild:jave-all-deps:3.3.1")
+
+    // API Libraries
+    apiImplementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA
+    apiImplementation("commons-io:commons-io:2.13.0") // Common API
 
     // Fix these later...
     runtimeOnly("org.apache.logging.log4j:log4j-api:2.14.1")
@@ -50,10 +79,10 @@ task runBot(type: JavaExec) {
     mainClass = "org.mangorage.Main"
 }
 
-
 test {
     useJUnitPlatform()
 }
+
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE

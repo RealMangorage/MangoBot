@@ -20,30 +20,40 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.registry;
+package org.mangorage.mangobotapi.core;
 
-import java.util.HashMap;
+import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobotapi.core.util.Arguments;
+import org.mangorage.mangobotapi.core.util.CommandResult;
 
-public class APermission {
-    public static APermission of(String id) {
-        return new APermission(id);
+public abstract class AbstractCommand {
+    public static AbstractCommand create(ICommand command, boolean isGuild) {
+        if (command == null)
+            throw new IllegalStateException("Command cannot be null");
+        return new AbstractCommand() {
+            @Override
+            public CommandResult execute(Message message, Arguments args) {
+                return command.execute(message, args);
+            }
+
+            /**
+             * @return
+             */
+            @Override
+            public boolean isGuildOnly() {
+                return isGuild;
+            }
+        };
     }
 
-    private final String ID;
+    public abstract CommandResult execute(Message message, Arguments args);
 
-    private APermission(String roleID) {
-        this.ID = roleID;
+    public boolean isGuildOnly() {
+        return true;
     }
 
-    public String getID() {
-        return ID;
-    }
-
-    public record Node(String id) {
-        private static final HashMap<String, Node> NODES = new HashMap<>();
-
-        public static Node of(String id) {
-            return NODES.computeIfAbsent(id, key -> new Node(id));
-        }
+    @FunctionalInterface
+    public interface ICommand {
+        CommandResult execute(Message message, Arguments args);
     }
 }

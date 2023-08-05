@@ -35,6 +35,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
+// TODO: Remove Installer and Instead have it just list out dependenices which get generated at dev time.
+@Deprecated
 public class Installer extends SimpleFileVisitor<Path> {
 
     public static void installResources(Path dst, URL location, String root) throws URISyntaxException, IOException {

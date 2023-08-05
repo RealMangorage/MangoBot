@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.eventbus;
+package org.mangorage.mangobotapi.core.eventbus;
 
 import java.util.ArrayList;
 import java.util.Arrays;

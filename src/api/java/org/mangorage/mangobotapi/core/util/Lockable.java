@@ -20,14 +20,16 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.eventbus.events;
+package org.mangorage.mangobotapi.core.util;
 
-import org.mangorage.mangobot.core.eventbus.EventBus;
+public class Lockable {
+    private boolean locked = false;
 
-import java.util.function.Consumer;
+    public void lock() {
+        this.locked = true;
+    }
 
-public class LoadEvent {
-    public static void addListener(EventBus bus, Consumer<LoadEvent> eventConsumer) {
-        bus.get(LoadEvent.class).addListener(eventConsumer);
+    public boolean isLocked() {
+        return locked;
     }
 }

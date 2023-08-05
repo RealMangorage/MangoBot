@@ -20,40 +20,17 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands;
+package org.mangorage.mangobotapi.core.eventbus;
 
-import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.core.commands.util.Arguments;
-import org.mangorage.mangobot.core.commands.util.CommandResult;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.SubscribeEvent;
+import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
-public abstract class AbstractCommand {
-    public static AbstractCommand create(ICommand command, boolean isGuild) {
-        if (command == null)
-            throw new IllegalStateException("Command cannot be null");
-        return new AbstractCommand() {
-            @Override
-            public CommandResult execute(Message message, Arguments args) {
-                return command.execute(message, args);
-            }
 
-            /**
-             * @return
-             */
-            @Override
-            public boolean isGuildOnly() {
-                return isGuild;
-            }
-        };
-    }
+public class EventListener {
 
-    public abstract CommandResult execute(Message message, Arguments args);
-
-    public boolean isGuildOnly() {
-        return true;
-    }
-
-    @FunctionalInterface
-    public interface ICommand {
-        CommandResult execute(Message message, Arguments args);
+    @SubscribeEvent
+    public void messageRecieved(MessageReceivedEvent event) {
+        CommandRegistry.handleMessage(event);
     }
 }

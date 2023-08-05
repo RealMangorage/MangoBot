@@ -20,30 +20,14 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.eventbus;
+package org.mangorage.mangobot.core.events;
+
+import org.mangorage.mangobotapi.core.eventbus.EventBus;
 
 import java.util.function.Consumer;
 
-public class EventConsumer {
-    private final Consumer<?> eventConsumer;
-    private final Class<?> eventClass;
-    private final EventPriority priority;
-
-    public EventConsumer(Class<?> eventClass, EventPriority priority, Consumer<?> eventConsumer) {
-        this.eventClass = eventClass;
-        this.priority = priority;
-        this.eventConsumer = eventConsumer;
-    }
-
-    public Consumer<?> getEventConsumer() {
-        return eventConsumer;
-    }
-
-    public Class<?> getEventClass() {
-        return eventClass;
-    }
-
-    public EventPriority getPriority() {
-        return priority;
+public class SaveEvent {
+    public static void addListener(EventBus bus, Consumer<SaveEvent> eventConsumer) {
+        bus.get(SaveEvent.class).addListener(eventConsumer);
     }
 }

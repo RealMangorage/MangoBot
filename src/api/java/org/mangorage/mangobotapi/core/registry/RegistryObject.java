@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.registry;
+package org.mangorage.mangobotapi.core.registry;
 
 import java.util.function.Supplier;
 

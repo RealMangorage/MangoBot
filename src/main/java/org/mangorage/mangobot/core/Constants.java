@@ -23,7 +23,6 @@
 package org.mangorage.mangobot.core;
 
 public class Constants {
-    public static final String COMMAND_PREFIX = "!";
     public static final String STARTUP_MESSAGE = "Starting up bot!";
     public static final boolean USE_MUSIC = true;
 }

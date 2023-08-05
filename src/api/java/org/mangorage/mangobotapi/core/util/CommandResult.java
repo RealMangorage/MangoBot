@@ -20,45 +20,24 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.util;
+package org.mangorage.mangobotapi.core.util;
 
-public class Arguments {
-    public static Arguments of(String... args) {
-        return new Arguments(args);
-    }
+import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobotapi.MangoBotAPI;
 
-    private final String[] args;
+import java.util.function.Consumer;
 
-    private Arguments(String[] args) {
-        this.args = args;
-    }
 
-    public String[] getArgs() {
-        return args;
-    }
+public record CommandResult(Consumer<Message> consumer) {
+    public static final MessageSettings DEFAULT_SETTINGS = MangoBotAPI.getInstance().getDefaultMessageSettings();
 
-    public String get(int index) {
-        return index >= args.length ? null : args[index];
-    }
+    public static final CommandResult PASS = new CommandResult((m) -> {
+    });
+    public static final CommandResult FAIL = new CommandResult((m) -> DEFAULT_SETTINGS.apply(m.reply("An error occured while executing this command")).queue());
+    public static final CommandResult NO_PERMISSION = new CommandResult((m) -> DEFAULT_SETTINGS.apply(m.reply("You dont have permission to use this command!")));
+    public static final CommandResult UNDER_MAINTENANCE = new CommandResult((m) -> DEFAULT_SETTINGS.apply(m.reply("This is currently under maintenance! Please try again later!")).queue());
 
-    public String getOrDefault(int index, String value) {
-        return index >= args.length ? value : args[index];
-    }
-
-    public boolean has(int index) {
-        return index < args.length;
-    }
-
-    public String getFrom(int index) {
-        StringBuilder result = new StringBuilder();
-
-        while (has(index)) {
-            result.append(" ").append(get(index));
-            index++;
-        }
-
-        result.trimToSize();
-
-        return result.toString();
+    public void accept(Message message) {
+        consumer.accept(message);
     }
 }

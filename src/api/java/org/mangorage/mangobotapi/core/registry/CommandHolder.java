@@ -20,9 +20,9 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.registry;
+package org.mangorage.mangobotapi.core.registry;
 
-import org.mangorage.mangobot.commands.AbstractCommand;
+import org.mangorage.mangobotapi.core.AbstractCommand;
 
 import java.util.ArrayList;
 import java.util.List;

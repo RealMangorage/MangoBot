@@ -32,8 +32,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 
-public class Main {
 
+/**
+ * TODO: Make the API stuff in its own Source Set (Main is Bot)
+ */
+
+public class Main {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         File libraries = new File("botresources/");

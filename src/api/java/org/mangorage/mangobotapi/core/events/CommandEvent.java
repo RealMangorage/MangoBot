@@ -20,12 +20,12 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.eventbus.events;
+package org.mangorage.mangobotapi.core.events;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.core.commands.util.Arguments;
-import org.mangorage.mangobot.core.commands.util.CommandResult;
-import org.mangorage.mangobot.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.util.Arguments;
+import org.mangorage.mangobotapi.core.util.CommandResult;
 
 import java.util.function.Consumer;
 

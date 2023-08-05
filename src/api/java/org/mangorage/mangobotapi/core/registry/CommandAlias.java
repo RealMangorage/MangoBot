@@ -20,13 +20,13 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.registry;
+package org.mangorage.mangobotapi.core.registry;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
-import org.mangorage.mangobot.commands.AbstractCommand;
-import org.mangorage.mangobot.core.commands.util.Arguments;
-import org.mangorage.mangobot.core.commands.util.CommandResult;
+import org.mangorage.mangobotapi.core.AbstractCommand;
+import org.mangorage.mangobotapi.core.util.Arguments;
+import org.mangorage.mangobotapi.core.util.CommandResult;
 
 import java.util.function.Supplier;
 

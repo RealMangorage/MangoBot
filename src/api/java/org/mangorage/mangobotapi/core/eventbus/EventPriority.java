@@ -20,16 +20,28 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.util;
+package org.mangorage.mangobotapi.core.eventbus;
 
-public class Lockable {
-    private boolean locked = false;
+public enum EventPriority {
+    HIGHEST,
+    HIGH,
+    NORMAL,
+    LOW,
+    LOWEST,
+    DEFAULT; // Dont use!
 
-    public void lock() {
-        this.locked = true;
+    private static final EventPriority[] list;
+
+    static {
+        list = new EventPriority[5];
+        list[0] = HIGHEST;
+        list[1] = HIGH;
+        list[2] = NORMAL;
+        list[3] = LOW;
+        list[4] = LOWEST;
     }
 
-    public boolean isLocked() {
-        return locked;
+    public static EventPriority[] get() {
+        return list;
     }
 }

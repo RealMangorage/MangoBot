@@ -20,14 +20,30 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.eventbus.events;
+package org.mangorage.mangobotapi.core.registry;
 
-import org.mangorage.mangobot.core.eventbus.EventBus;
+import java.util.HashMap;
 
-import java.util.function.Consumer;
+public class APermission {
+    public static APermission of(String id) {
+        return new APermission(id);
+    }
 
-public class SaveEvent {
-    public static void addListener(EventBus bus, Consumer<SaveEvent> eventConsumer) {
-        bus.get(SaveEvent.class).addListener(eventConsumer);
+    private final String ID;
+
+    private APermission(String roleID) {
+        this.ID = roleID;
+    }
+
+    public String getID() {
+        return ID;
+    }
+
+    public record Node(String id) {
+        private static final HashMap<String, Node> NODES = new HashMap<>();
+
+        public static Node of(String id) {
+            return NODES.computeIfAbsent(id, key -> new Node(id));
+        }
     }
 }

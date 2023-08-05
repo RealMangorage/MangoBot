@@ -20,17 +20,24 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.eventbus;
+package org.mangorage.mangobot.core.permissions;
 
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
+import net.dv8tion.jda.api.Permission;
+import org.mangorage.mangobotapi.core.registry.APermission;
+import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+
+public class GlobalPermissions {
+    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.global();
+
+    public static final APermission.Node PLAYING = APermission.Node.of("playing");
+    public static final APermission.Node TRICK_ADMIN = APermission.Node.of("trickadmin");
 
 
-public class EventListener {
+    static {
+        PERMISSIONS.register(PLAYING, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(TRICK_ADMIN, Permission.ADMINISTRATOR);
+    }
 
-    @SubscribeEvent
-    public void messageRecieved(MessageReceivedEvent event) {
-        CommandRegistry.handleMessage(event);
+    public static void init() {
     }
 }

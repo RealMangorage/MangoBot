@@ -23,8 +23,9 @@
 package org.mangorage.mangobot.commands;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.core.commands.util.Arguments;
-import org.mangorage.mangobot.core.commands.util.CommandResult;
+import org.mangorage.mangobotapi.core.AbstractCommand;
+import org.mangorage.mangobotapi.core.util.Arguments;
+import org.mangorage.mangobotapi.core.util.CommandResult;
 
 public class ReplyCommand extends AbstractCommand {
     private final String MESSAGE_RESPONSE;

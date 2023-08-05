@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.util;
+package org.mangorage.mangobotapi.core.util;
 
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 

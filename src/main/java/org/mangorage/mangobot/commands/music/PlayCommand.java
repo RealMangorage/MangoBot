@@ -30,13 +30,13 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.commands.AbstractCommand;
-import org.mangorage.mangobot.core.commands.GlobalPermissions;
-import org.mangorage.mangobot.core.commands.registry.PermissionRegistry;
-import org.mangorage.mangobot.core.commands.util.Arguments;
-import org.mangorage.mangobot.core.commands.util.CommandResult;
 import org.mangorage.mangobot.core.music.MusicPlayer;
 import org.mangorage.mangobot.core.music.MusicUtil;
+import org.mangorage.mangobot.core.permissions.GlobalPermissions;
+import org.mangorage.mangobotapi.core.AbstractCommand;
+import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.util.Arguments;
+import org.mangorage.mangobotapi.core.util.CommandResult;
 
 public class PlayCommand extends AbstractCommand {
     @Override

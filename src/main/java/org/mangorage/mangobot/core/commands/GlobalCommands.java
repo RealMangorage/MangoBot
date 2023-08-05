@@ -26,7 +26,6 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.mangorage.mangobot.commands.AbstractCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
 import org.mangorage.mangobot.commands.TrickCommand;
 import org.mangorage.mangobot.commands.music.PauseCommand;
@@ -37,13 +36,14 @@ import org.mangorage.mangobot.commands.music.StopCommand;
 import org.mangorage.mangobot.commands.music.VolumeCommand;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
-import org.mangorage.mangobot.core.commands.registry.CommandHolder;
-import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
-import org.mangorage.mangobot.core.commands.registry.RegistryObject;
-import org.mangorage.mangobot.core.commands.util.CommandResult;
-import org.mangorage.mangobot.core.commands.util.MessageSettings;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
 import org.mangorage.mangobot.core.music.recorder.VoiceRelay;
+import org.mangorage.mangobotapi.core.AbstractCommand;
+import org.mangorage.mangobotapi.core.registry.CommandHolder;
+import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobotapi.core.registry.RegistryObject;
+import org.mangorage.mangobotapi.core.util.CommandResult;
+import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 public class GlobalCommands {
     public static final CommandRegistry COMMANDS = CommandRegistry.global();

@@ -20,17 +20,16 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.registry;
+package org.mangorage.mangobotapi.core.registry;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.mangorage.mangobot.commands.AbstractCommand;
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.core.Constants;
-import org.mangorage.mangobot.core.commands.util.Arguments;
-import org.mangorage.mangobot.core.commands.util.CommandResult;
-import org.mangorage.mangobot.core.eventbus.events.CommandEvent;
+import org.mangorage.mangobotapi.MangoBotAPI;
+import org.mangorage.mangobotapi.core.AbstractCommand;
+import org.mangorage.mangobotapi.core.events.CommandEvent;
+import org.mangorage.mangobotapi.core.util.Arguments;
+import org.mangorage.mangobotapi.core.util.CommandResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -109,15 +108,16 @@ public class CommandRegistry {
 
     public static void handleMessage(MessageReceivedEvent event) {
         Message message = event.getMessage();
+        String commandPrefix = MangoBotAPI.getInstance().getCommandPrefix();
         String guildID = event.getGuild().getId();
         String raw = message.getContentRaw();
         String[] rawArray = raw.split(" ");
         Member member = event.getMember();
 
 
-        if (raw.startsWith(Constants.COMMAND_PREFIX)) {
-            String command = rawArray[0].replaceFirst("!", "");
-            String[] params = raw.replaceFirst("!" + command, "").trim().split(" ");
+        if (raw.startsWith(commandPrefix)) {
+            String command = rawArray[0].replaceFirst(commandPrefix, "");
+            String[] params = raw.replaceFirst(commandPrefix + command, "").trim().split(" ");
 
             CommandType globalType = GLOBAL.getType(command);
             CommandType guildType = CommandType.UNKNOWN;
@@ -128,7 +128,7 @@ public class CommandRegistry {
             }
 
             if (globalType == CommandType.UNKNOWN && guildType == CommandType.UNKNOWN) {
-                CommandEvent commandEvent = Bot.EVENT_BUS.post(new CommandEvent(message, command, Arguments.of(params)));
+                CommandEvent commandEvent = MangoBotAPI.getInstance().getEventBus().post(new CommandEvent(message, command, Arguments.of(params)));
                 if (!commandEvent.isHandled())
                     event.getMessage().reply("Invalid Command").queue();
             } else {

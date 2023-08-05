@@ -20,16 +20,45 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.eventbus;
+package org.mangorage.mangobotapi.core.util;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+public class Arguments {
+    public static Arguments of(String... args) {
+        return new Arguments(args);
+    }
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+    private final String[] args;
 
-@Retention(value = RUNTIME)
-@Target(value = METHOD)
-public @interface SubscribeEvent {
-    EventPriority priority() default EventPriority.DEFAULT;
+    private Arguments(String[] args) {
+        this.args = args;
+    }
+
+    public String[] getArgs() {
+        return args;
+    }
+
+    public String get(int index) {
+        return index >= args.length ? null : args[index];
+    }
+
+    public String getOrDefault(int index, String value) {
+        return index >= args.length ? value : args[index];
+    }
+
+    public boolean has(int index) {
+        return index < args.length;
+    }
+
+    public String getFrom(int index) {
+        StringBuilder result = new StringBuilder();
+
+        while (has(index)) {
+            result.append(" ").append(get(index));
+            index++;
+        }
+
+        result.trimToSize();
+
+        return result.toString();
+    }
 }

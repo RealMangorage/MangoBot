@@ -29,17 +29,18 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.mangorage.mangobot.core.commands.ForgeCommands;
 import org.mangorage.mangobot.core.commands.GlobalCommands;
-import org.mangorage.mangobot.core.commands.GlobalPermissions;
-import org.mangorage.mangobot.core.commands.guilds.ForgeCommands;
-import org.mangorage.mangobot.core.commands.registry.CommandRegistry;
-import org.mangorage.mangobot.core.commands.util.MessageSettings;
-import org.mangorage.mangobot.core.eventbus.EventBus;
-import org.mangorage.mangobot.core.eventbus.EventListener;
-import org.mangorage.mangobot.core.eventbus.EventPriority;
-import org.mangorage.mangobot.core.eventbus.events.LoadEvent;
-import org.mangorage.mangobot.core.eventbus.events.SaveEvent;
+import org.mangorage.mangobot.core.events.LoadEvent;
+import org.mangorage.mangobot.core.events.SaveEvent;
+import org.mangorage.mangobot.core.permissions.GlobalPermissions;
 import org.mangorage.mangobot.core.settings.Settings;
+import org.mangorage.mangobotapi.MangoBotAPI;
+import org.mangorage.mangobotapi.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.eventbus.EventListener;
+import org.mangorage.mangobotapi.core.eventbus.EventPriority;
+import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 import java.util.EnumSet;
 
@@ -52,6 +53,12 @@ public class Bot {
 
     public static void init() {
         INSTANCE = new Bot();
+
+        MangoBotAPI API = MangoBotAPI.getInstance();
+        API.setEventBus(EVENT_BUS);
+        API.setPrefix("!");
+        API.setMessageSettings(DEFAULT_SETTINGS);
+        API.build();
     }
 
     private final JDA BOT;

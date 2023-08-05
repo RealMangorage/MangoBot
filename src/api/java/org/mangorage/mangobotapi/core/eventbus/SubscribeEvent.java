@@ -20,24 +20,16 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands;
+package org.mangorage.mangobotapi.core.eventbus;
 
-import net.dv8tion.jda.api.Permission;
-import org.mangorage.mangobot.core.commands.registry.APermission;
-import org.mangorage.mangobot.core.commands.registry.PermissionRegistry;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-public class GlobalPermissions {
-    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.global();
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    public static final APermission.Node PLAYING = APermission.Node.of("playing");
-    public static final APermission.Node TRICK_ADMIN = APermission.Node.of("trickadmin");
-
-
-    static {
-        PERMISSIONS.register(PLAYING, Permission.ADMINISTRATOR);
-        PERMISSIONS.register(TRICK_ADMIN, Permission.ADMINISTRATOR);
-    }
-
-    public static void init() {
-    }
+@Retention(value = RUNTIME)
+@Target(value = METHOD)
+public @interface SubscribeEvent {
+    EventPriority priority() default EventPriority.DEFAULT;
 }
