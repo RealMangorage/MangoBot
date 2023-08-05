@@ -74,14 +74,36 @@ task runBot(type: JavaExec) {
     mainClass = 'org.mangorage.mangobot.Main'
 }
 
-task buildBot(type: JavaExec) {
+task buildBotJar(type: Jar) {
     group "bot tasks"
     description "Build the Bot Jar with API included"
+
+
+    baseName = 'mangobot'
+    version = '1.0'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // Include classes from the main source set
+    from sourceSets.main.output
+    from sourceSets.api.output
+
+    // Include resources from the main source set
+    from sourceSets.main.resources
 }
 
-task buildAPI(type: JavaExec) {
+task buildAPIJar(type: Jar) {
     group "bot tasks"
-    description "Build the bot API"
+    description "Build the bot API jar"
+
+    baseName = 'mangobotapi'
+    version = '1.0'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // Include classes from the main source set
+    from sourceSets.api.output
+
+    // Include resources from the main source set
+    from sourceSets.api.resources
 }
 
 test {
