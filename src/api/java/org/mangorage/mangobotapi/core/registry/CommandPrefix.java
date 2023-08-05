@@ -20,30 +20,24 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot;
+package org.mangorage.mangobotapi.core.registry;
 
-import net.dv8tion.jda.api.exceptions.InvalidTokenException;
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.core.settings.Settings;
+import org.mangorage.mangobotapi.MangoBotAPI;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.HashMap;
 
-/**
- * TODO: Use Log4J as our logger instead of System.out
- */
-public class Main {
+public class CommandPrefix {
+    public static final String DEFAULT = MangoBotAPI.getInstance().getCommandPrefix();
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        if (Settings.BOT_TOKEN.get().equals("UNCHANGED"))
-            throw new IllegalStateException("Must set BOT_TOKEN in .env found inside of botresources to a bot token!");
+    public static final HashMap<String, String> GUILD_PREFIXES = new HashMap<>();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
+    public static void configure(String guildID, String prefix) {
+        GUILD_PREFIXES.put(guildID, prefix);
+    }
 
-        try {
-            Bot.init();
-        } catch (InvalidTokenException e) {
-            throw new IllegalStateException(e.getMessage());
-        }
+    public static String getPrefix(String guildID) {
+        if (guildID == null)
+            return DEFAULT;
+        return GUILD_PREFIXES.getOrDefault(guildID, DEFAULT);
     }
 }

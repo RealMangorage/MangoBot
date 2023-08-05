@@ -24,6 +24,7 @@ package org.mangorage.mangobotapi.core.events;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.CommandResult;
 
@@ -37,15 +38,21 @@ public class CommandEvent {
     private final Message message;
     private final String command;
     private final Arguments arguments;
-
-    public CommandEvent(Message message, String command, Arguments arguments) {
-        this.message = message;
-        this.command = command;
-        this.arguments = arguments;
-    }
+    private final CommandRegistry source;
 
     private boolean handled = false;
     private CommandResult result;
+
+    public CommandEvent(Message message, String command, Arguments arguments, CommandRegistry source) {
+        this.message = message;
+        this.command = command;
+        this.arguments = arguments;
+        this.source = source;
+    }
+
+    public CommandEvent(Message message, String command, Arguments arguments) {
+        this(message, command, arguments, null);
+    }
 
     public boolean isHandled() {
         return handled;
@@ -71,5 +78,9 @@ public class CommandEvent {
 
     public Arguments getArguments() {
         return arguments;
+    }
+
+    public CommandRegistry getSource() {
+        return source;
     }
 }

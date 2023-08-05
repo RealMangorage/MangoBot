@@ -22,14 +22,16 @@
 
 package org.mangorage.mangobotapi.core.registry;
 
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.core.AbstractCommand;
+import org.mangorage.mangobotapi.core.eventbus.EventBus;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
+import org.mangorage.mangobotapi.core.events.RegistryEvent;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.CommandResult;
+import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +54,7 @@ public class CommandRegistry {
 
     private static final CommandRegistry GLOBAL = new CommandRegistry(null);
     private static final HashMap<String, CommandRegistry> GUILDS = new HashMap<>();
+    private static final MessageSettings DEFAULT_SETTINGS = MangoBotAPI.getInstance().getDefaultMessageSettings();
 
     public static CommandRegistry guild(String guildID) {
         return GUILDS.computeIfAbsent(guildID, CommandRegistry::new);
@@ -61,81 +64,27 @@ public class CommandRegistry {
         return GLOBAL;
     }
 
-
-    public static void build() {
-        HashMap<CommandRegistry, ArrayList<RegistryObject<CommandHolder<?>>>> COMMANDS_TYPES = new HashMap<>();
-        HashMap<CommandRegistry, ArrayList<RegistryObject<CommandAlias>>> COMMAND_ALIASES_TYPES = new HashMap<>();
-
-        COMMANDS_TYPES.computeIfAbsent(global(), (key) -> new ArrayList<>());
-        COMMAND_ALIASES_TYPES.computeIfAbsent(global(), (key) -> new ArrayList<>());
-
-
-        global().REGISTRY_OBJECTS.forEach(ro -> {
-            if (ro.getType() == CommandType.COMMAND)
-                COMMANDS_TYPES.get(global()).add((RegistryObject<CommandHolder<?>>) ro);
-            if (ro.getType() == CommandType.ALIAS)
-                COMMAND_ALIASES_TYPES.get(global()).add((RegistryObject<CommandAlias>) ro);
-        });
-
-        GUILDS.forEach((key, guild) -> {
-            COMMANDS_TYPES.computeIfAbsent(guild, (k) -> new ArrayList<>());
-            COMMAND_ALIASES_TYPES.computeIfAbsent(guild, (k) -> new ArrayList<>());
-
-            guild.REGISTRY_OBJECTS.forEach(ro -> {
-                if (ro.getType() == CommandType.COMMAND)
-                    COMMANDS_TYPES.get(guild).add((RegistryObject<CommandHolder<?>>) ro);
-                if (ro.getType() == CommandType.ALIAS)
-                    COMMAND_ALIASES_TYPES.get(guild).add((RegistryObject<CommandAlias>) ro);
-            });
-        });
-
-        global().registerCommands(COMMANDS_TYPES.get(global()));
-        GUILDS.forEach((key, guild) -> {
-            guild.registerCommands(COMMANDS_TYPES.get(guild));
-        });
-
-        global().registerAliases(COMMAND_ALIASES_TYPES.get(global()));
-        GUILDS.forEach((key, guild) -> {
-            guild.registerAliases(COMMAND_ALIASES_TYPES.get(guild));
-        });
-
-        COMMANDS_TYPES.clear();
-        COMMAND_ALIASES_TYPES.clear();
-
-        global().clearRegistryBuilder();
-        GUILDS.forEach((a, b) -> b.clearRegistryBuilder());
+    public static void initRegistration(EventBus bus) {
+        bus.post(new RegistryEvent(CommandType.COMMAND));
+        bus.post(new RegistryEvent(CommandType.ALIAS));
     }
 
     public static void handleMessage(MessageReceivedEvent event) {
+        // Handle Message and prefix
+        String Prefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : CommandPrefix.DEFAULT;
+
         Message message = event.getMessage();
-        String commandPrefix = MangoBotAPI.getInstance().getCommandPrefix();
-        String guildID = event.getGuild().getId();
-        String raw = message.getContentRaw();
-        String[] rawArray = raw.split(" ");
-        Member member = event.getMember();
+        String rawMessage = message.getContentRaw();
+        if (rawMessage.startsWith(Prefix)) {
+            String[] command_pre = rawMessage.replaceFirst(Prefix, "").split(" ");
+            String command = command_pre[0];
+            Arguments arguments = Arguments.of(Arguments.of(command_pre).getFrom(1));
 
-
-        if (raw.startsWith(commandPrefix)) {
-            String command = rawArray[0].replaceFirst(commandPrefix, "");
-            String[] params = raw.replaceFirst(commandPrefix + command, "").trim().split(" ");
-
-            CommandType globalType = GLOBAL.getType(command);
-            CommandType guildType = CommandType.UNKNOWN;
-            CommandRegistry guildRegistry = null;
-            if (GUILDS.containsKey(guildID)) {
-                guildRegistry = GUILDS.get(guildID);
-                guildType = guildRegistry.getType(command);
-            }
-
-            if (globalType == CommandType.UNKNOWN && guildType == CommandType.UNKNOWN) {
-                CommandEvent commandEvent = MangoBotAPI.getInstance().getEventBus().post(new CommandEvent(message, command, Arguments.of(params)));
-                if (!commandEvent.isHandled())
-                    event.getMessage().reply("Invalid Command").queue();
+            CommandEvent commandEvent = MangoBotAPI.getInstance().getEventBus().post(new CommandEvent(event.getMessage(), command, arguments));
+            if (commandEvent.isHandled()) {
+                commandEvent.getResult().accept(message);
             } else {
-                if (globalType != CommandType.UNKNOWN)
-                    GLOBAL.execute(message, command, params);
-                else
-                    guildRegistry.execute(message, command, params);
+                DEFAULT_SETTINGS.apply(message.reply("Invalid Command")).queue();
             }
         }
     }
@@ -150,9 +99,10 @@ public class CommandRegistry {
         this.guildID = guildID;
     }
 
+    @Deprecated
     public void clearRegistryBuilder() {
         REGISTRY_OBJECTS.clear();
-        //frozen.set(true);
+        frozen.set(true);
     }
 
     public <X extends AbstractCommand> RegistryObject<CommandHolder<X>> register(String id, X command, CommandAlias.Builder... builders) {
@@ -162,6 +112,38 @@ public class CommandRegistry {
         REGISTRY_OBJECTS.add(RO);
         Arrays.asList(builders).forEach(e -> registerAlias(RO.get(), e));
         return RO;
+    }
+
+    public void registryEvent(RegistryEvent event) {
+        REGISTRY_OBJECTS.forEach(registryObject -> {
+            if (registryObject.getType() == CommandType.COMMAND && registryObject.getType() == event.type()) {
+                CommandHolder<?> holder = (CommandHolder<?>) registryObject.get();
+                COMMANDS.put(holder.getID(), holder);
+            } else if (registryObject.getType() == CommandType.ALIAS && registryObject.getType() == event.type()) {
+                CommandAlias alias = (CommandAlias) registryObject.get();
+                COMMAND_ALIASES.put(alias.getID(), alias);
+            }
+        });
+        if (event.type() == CommandType.ALIAS) { // We have registered everything!
+            frozen.set(true);
+            REGISTRY_OBJECTS.clear();
+        }
+    }
+
+    public void commandEvent(CommandEvent event) {
+        if (!event.isHandled()) {
+            CommandType type = getType(event.getCommand());
+            if (type == CommandType.COMMAND && COMMANDS.containsKey(event.getCommand())) {
+                event.setHandled(COMMANDS.get(event.getCommand()).getCommand().execute(event.getMessage(), event.getArguments()));
+            } else if (type == CommandType.ALIAS && COMMAND_ALIASES.containsKey(event.getCommand())) {
+                event.setHandled(COMMAND_ALIASES.get(event.getCommand()).execute(event.getMessage(), event.getArguments()));
+            }
+        }
+    }
+
+    public void register(EventBus bus) {
+        RegistryEvent.addListener(bus, this::registryEvent);
+        CommandEvent.addListener(bus, this::commandEvent);
     }
 
     public <X extends AbstractCommand> RegistryObject<CommandAlias> registerAlias(CommandHolder<X> holder, CommandAlias.Builder builder) {

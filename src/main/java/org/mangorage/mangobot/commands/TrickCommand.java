@@ -46,14 +46,17 @@ import java.util.HashMap;
 import static org.mangorage.mangobot.core.Bot.EVENT_BUS;
 
 public class TrickCommand extends AbstractCommand {
+    private static final String TRICKS_DIR = "data/guilddata/tricks/";
+    private static final String SAVE_PATH = "data/guilddata/tricks/%s/";
+
+
     private final HashMap<String, HashMap<String, String>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
 
     @SubscribeEvent
     public void onSaveEvent(SaveEvent event) {
-        System.out.println("Saving Data!");
-        String savePath = "botresources/guilddata/tricksdata/%s/";
+        System.out.println("Saving Tricks Data!");
 
-        File saveDir = new File("botresources/guilddata/tricksdata/");
+        File saveDir = new File(TRICKS_DIR);
         if (saveDir.exists()) {
             for (File dir : saveDir.listFiles())
                 if (dir.isDirectory())
@@ -66,14 +69,14 @@ public class TrickCommand extends AbstractCommand {
 
         CONTENT.forEach((guildID, data) -> {
             data.forEach((trickid, content) -> {
-                File dir = new File(savePath.formatted(guildID));
+                File dir = new File(SAVE_PATH.formatted(guildID));
                 if (!dir.exists())
                     dir.mkdirs();
 
                 Gson gson = new Gson();
                 try {
                     String json = gson.toJson(new Data(guildID, trickid, content));
-                    Files.writeString(Path.of((savePath + "%s.json").formatted(guildID, trickid)), json);
+                    Files.writeString(Path.of((SAVE_PATH + "%s.json").formatted(guildID, trickid)), json);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -85,8 +88,8 @@ public class TrickCommand extends AbstractCommand {
 
     @SubscribeEvent
     public void onLoadEvent(LoadEvent event) {
-        System.out.println("Loading Data!");
-        File saveDir = new File("botresources/guilddata/tricksdata/");
+        System.out.println("Loading Tricks Data!");
+        File saveDir = new File(TRICKS_DIR);
         if (saveDir.exists()) {
             for (File dir : saveDir.listFiles())
                 if (dir.isDirectory())
@@ -100,10 +103,11 @@ public class TrickCommand extends AbstractCommand {
         Gson gson = new Gson();
         try {
             Data data = gson.fromJson(Files.readString(file.toPath()), Data.class);
-            if (data.content != null && data.trickid != null && data.guildid != null)
-                CONTENT.computeIfAbsent(data.guildid, (k) -> new HashMap<>()).put(data.trickid, data.content);
+            System.out.println("Loaded Trick: '%s'".formatted(data.trickID()));
+            if (data.content() != null && data.trickID() != null && data.guildID() != null)
+                CONTENT.computeIfAbsent(data.guildID, (k) -> new HashMap<>()).put(data.trickID(), data.content());
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -179,30 +183,6 @@ public class TrickCommand extends AbstractCommand {
         }
     }
 
-    public class Data {
-        private String guildid;
-        private String trickid;
-        private String content;
-
-        public Data() {
-        }
-
-        public Data(String guildid, String trickid, String content) {
-            this.guildid = guildid;
-            this.trickid = trickid;
-            this.content = content;
-        }
-
-        public String getGuildID() {
-            return guildid;
-        }
-
-        public String getTrickID() {
-            return trickid;
-        }
-
-        public String getContent() {
-            return content;
-        }
+    public record Data(String guildID, String trickID, String content) {
     }
 }

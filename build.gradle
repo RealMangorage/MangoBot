@@ -9,7 +9,10 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+}
 
 group 'org.mangorage'
 version '1.0'
@@ -54,14 +57,16 @@ dependencies {
     implementation(sourceSets.api.output) // We must include our API!
 
     implementation("commons-io:commons-io:2.13.0") // Common API
-    implementation("io.github.cdimascio:dotenv-java:+") // DotEnv for having local Variables, for BOT_TOKEN mainly
+    implementation("io.github.cdimascio:dotenv-java:3.0.0") // DotEnv for having local Variables, for BOT_TOKEN mainly
     implementation("com.github.walkyst:lavaplayer-fork:1.4.2") // LavaPlayer to stream audio from YT/FILES to Discord
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("ws.schild:jave-all-deps:3.3.1")
 
     // Fix these later...
-    runtimeOnly("org.apache.logging.log4j:log4j-api:2.14.1")
-    runtimeOnly("org.apache.logging.log4j:log4j-core:2.14.1")
+    // runtimeOnly("org.apache.logging.log4j:log4j-api:2.14.1")
+    // runtimeOnly("org.apache.logging.log4j:log4j-core:2.14.1")
+
+    // Only need this
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
 }
 
@@ -80,7 +85,7 @@ task buildBotJar(type: Jar) {
 
 
     baseName = 'mangobot'
-    version = '1.0'
+    version = "${BOT_VERSION}"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     // Include classes from the main source set
@@ -89,6 +94,10 @@ task buildBotJar(type: Jar) {
 
     // Include resources from the main source set
     from sourceSets.main.resources
+
+    manifest {
+        attributes 'Main-Class': 'org.mangorage.mangobot.Main'
+    }
 }
 
 task buildAPIJar(type: Jar) {
@@ -96,7 +105,7 @@ task buildAPIJar(type: Jar) {
     description "Build the bot API jar"
 
     baseName = 'mangobotapi'
-    version = '1.0'
+    version = "${BOT_API_VERSION}"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     // Include classes from the main source set
@@ -119,22 +128,13 @@ jar {
     }
 }
 
+shadowJar {
+    // Optionally, configure the JAR name (if needed)
+    archiveFileName.set("my-application-all.jar")
 
-task fatJar(type: Jar) {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    // Include the custom JAR contents and resources
+    from buildBotJar
 
-    manifest.from jar.manifest
-
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    } {
-        exclude "META-INF/*.SF"
-        exclude "META-INF/*.DSA"
-        exclude "META-INF/*.RSA"
-    }
-    with jar
-}
-
-artifacts {
-    archives fatJar
+    // Optionally, exclude any specific dependencies from the fat JAR
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
 }

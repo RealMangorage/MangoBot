@@ -57,9 +57,9 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
     private static final DecimalFormat df = new DecimalFormat("#.00");
     private static final String STARTED_RECORDING = "Started Recording for %s seconds.";
     private static final String STARTED_RECORDING_LEFT = "Started Recording for %s seconds. %s seconds left.";
-    private static final String FILE_RAW_OUTPUT = "data/guilddata/%s/recordingdata/recording_raw.wav";
-    private static final String FILE_COMPRESSED_OUTPUT = "data/guilddata/%s/recordingdata/recording_compressed.mp3";
-    private static final String FILE_FOLDER_OUTPUT = "data/guilddata/%s/recordingdata";
+    private static final String FILE_RAW_OUTPUT = "data/guilddata/vcr/%s/recordingdata/recording_raw.wav";
+    private static final String FILE_COMPRESSED_OUTPUT = "data/guilddata/vcr/%s/recordingdata/recording_compressed.mp3";
+    private static final String FILE_FOLDER_OUTPUT = "data/vcr/guilddata/vcr/%s/recordingdata";
 
     public static VoiceChatRecorder getInstance(String guildID) {
         VoiceChatRecorder recorder = RECORDERS.getOrDefault(guildID, new VoiceChatRecorder(guildID));

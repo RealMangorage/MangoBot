@@ -76,10 +76,12 @@ public class Bot {
         GlobalCommands.init();
         ForgeCommands.init();
 
-        CommandRegistry.build();
+        CommandRegistry.initRegistration(EVENT_BUS);
         GlobalPermissions.init();
 
+        System.out.println("Sent LoadEvent.class Event");
         EVENT_BUS.post(new LoadEvent());
+        System.out.println("Finished LoadEvent.class Event");
 
         JDABuilder builder = JDABuilder.createDefault(Settings.BOT_TOKEN.get());
 
@@ -118,10 +120,13 @@ public class Bot {
 
     public static void close() {
         if (INSTANCE != null) {
+
             getInstance().getEventManager().getRegisteredListeners().forEach(e -> getInstance().removeEventListener(e));
             getInstance().shutdown();
 
+            System.out.println("Sent SaveEvent.class Event");
             EVENT_BUS.post(new SaveEvent());
+            System.out.println("Finished SaveEvent.class Event");
             EVENT_BUS.shutdown();
 
             System.out.println("Terminating Bot! Closing Program!");

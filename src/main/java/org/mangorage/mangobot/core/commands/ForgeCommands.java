@@ -24,6 +24,7 @@ package org.mangorage.mangobot.core.commands;
 
 import org.mangorage.mangobot.commands.PingCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
+import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobotapi.core.registry.APermission;
 import org.mangorage.mangobotapi.core.registry.CommandAlias;
 import org.mangorage.mangobotapi.core.registry.CommandHolder;
@@ -132,5 +133,6 @@ public class ForgeCommands {
     }
 
     public static void init() {
+        COMMANDS.register(Bot.EVENT_BUS);
     }
 }

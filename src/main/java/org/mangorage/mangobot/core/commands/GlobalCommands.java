@@ -34,6 +34,7 @@ import org.mangorage.mangobot.commands.music.PlayingCommand;
 import org.mangorage.mangobot.commands.music.QueueCommand;
 import org.mangorage.mangobot.commands.music.StopCommand;
 import org.mangorage.mangobot.commands.music.VolumeCommand;
+import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
@@ -129,6 +130,7 @@ public class GlobalCommands {
     }
 
     public static void init() {
+        COMMANDS.register(Bot.EVENT_BUS);
     }
 
 }
