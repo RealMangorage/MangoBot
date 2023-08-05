@@ -1,6 +1,6 @@
 # User-specific stuff
 .idea/
-**/botresources/
+
 
 *.iml
 *.ipr
@@ -121,3 +121,5 @@ run/
 generated
 .cache
 /.env
+/data/
+/botresources/
