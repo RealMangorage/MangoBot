@@ -20,34 +20,18 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.settings;
+package org.mangorage.mangobottest;
 
-import io.github.cdimascio.dotenv.Dotenv;
-import io.github.cdimascio.dotenv.DotenvBuilder;
-import org.mangorage.mangobotapi.misc.Setting;
+import org.mangorage.mangobot.core.settings.Settings;
+import org.mangorage.mangobottest.core.Bot;
 
-public class EnvSetting implements Setting<String> {
-    public static final Dotenv DOTENV = new DotenvBuilder().directory("botresources/").load();
-    private final Dotenv env;
-    private final String id;
-    private final String defaultvalue;
+public class Main {
+    public static void main(String[] args) {
+        if (Settings.BOT_TOKEN.get().equals("UNCHANGED"))
+            throw new IllegalStateException("Must set BOT_TOKEN in .env found inside of botresources to a bot token!");
 
-    public EnvSetting(Dotenv env, String ID, String defaultvalue) {
-        this.env = env;
-        this.id = ID;
-        this.defaultvalue = defaultvalue;
-    }
+        Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
 
-    public EnvSetting(Dotenv env, String ID) {
-        this(env, ID, "");
-    }
-
-    public EnvSetting(String ID) {
-        this(DOTENV, ID);
-    }
-
-    @Override
-    public String get() {
-        return env.get(id, defaultvalue);
+        Bot.initiate(Settings.BOT_TOKEN.get());
     }
 }

@@ -134,7 +134,7 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
     }
 
     private void stopRecording() {
-        Guild guild = Bot.getInstance().getGuildById(id);
+        Guild guild = Bot.getJDAInstance().getGuildById(id);
         guild.getAudioManager().setReceivingHandler(null);
         guild.getAudioManager().closeAudioConnection();
 

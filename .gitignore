@@ -123,3 +123,4 @@ generated
 /.env
 /data/
 /botresources/
+secrets.properties

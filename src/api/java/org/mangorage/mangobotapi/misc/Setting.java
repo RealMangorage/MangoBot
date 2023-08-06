@@ -20,34 +20,11 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.settings;
+package org.mangorage.mangobotapi.misc;
 
-import io.github.cdimascio.dotenv.Dotenv;
-import io.github.cdimascio.dotenv.DotenvBuilder;
-import org.mangorage.mangobotapi.misc.Setting;
+import java.util.function.Supplier;
 
-public class EnvSetting implements Setting<String> {
-    public static final Dotenv DOTENV = new DotenvBuilder().directory("botresources/").load();
-    private final Dotenv env;
-    private final String id;
-    private final String defaultvalue;
-
-    public EnvSetting(Dotenv env, String ID, String defaultvalue) {
-        this.env = env;
-        this.id = ID;
-        this.defaultvalue = defaultvalue;
-    }
-
-    public EnvSetting(Dotenv env, String ID) {
-        this(env, ID, "");
-    }
-
-    public EnvSetting(String ID) {
-        this(DOTENV, ID);
-    }
-
-    @Override
-    public String get() {
-        return env.get(id, defaultvalue);
-    }
+public interface Setting<X> extends Supplier<X> {
+     default void set(X value) {
+     }
 }

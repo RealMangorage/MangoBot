@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core;
+package org.mangorage.mangobottest.core;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -29,9 +29,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.mangorage.mangobot.core.commands.ForgeCommands;
-import org.mangorage.mangobot.core.commands.GlobalCommands;
-import org.mangorage.mangobot.core.events.EventListener;
 import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.MangoBotAPIBuilder;
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
@@ -41,6 +38,8 @@ import org.mangorage.mangobotapi.core.events.ShutdownEvent;
 import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.util.LockableReference;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
+import org.mangorage.mangobottest.core.commands.GlobalCommands;
+import org.mangorage.mangobottest.core.events.EventListener;
 
 import java.util.EnumSet;
 
@@ -139,7 +138,6 @@ public class Bot {
         switch (event.phase()) {
             case STARTUP -> {
                 GlobalCommands.init();
-                ForgeCommands.init();
             }
             case FINISHED -> {
             }

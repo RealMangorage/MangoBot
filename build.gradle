@@ -15,7 +15,7 @@ plugins {
 }
 
 group 'org.mangorage'
-version '1.0'
+version "${BOT_VERSION}"
 
 repositories {
     mavenCentral()
@@ -79,13 +79,20 @@ task runBot(type: JavaExec) {
     mainClass = 'org.mangorage.mangobot.Main'
 }
 
+task runTestBot(type: JavaExec) {
+    group "bot tasks"
+    description "Runs the test bot"
+    args "-dev"
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.mangorage.mangobottest.Main'
+}
+
 task buildBotJar(type: Jar) {
     group "bot tasks"
     description "Build the Bot Jar with API included"
 
 
     baseName = 'mangobot'
-    version = "${BOT_VERSION}"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     // Include classes from the main source set

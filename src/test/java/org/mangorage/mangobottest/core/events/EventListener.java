@@ -20,34 +20,16 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.settings;
+package org.mangorage.mangobottest.core.events;
 
-import io.github.cdimascio.dotenv.Dotenv;
-import io.github.cdimascio.dotenv.DotenvBuilder;
-import org.mangorage.mangobotapi.misc.Setting;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.SubscribeEvent;
+import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
-public class EnvSetting implements Setting<String> {
-    public static final Dotenv DOTENV = new DotenvBuilder().directory("botresources/").load();
-    private final Dotenv env;
-    private final String id;
-    private final String defaultvalue;
 
-    public EnvSetting(Dotenv env, String ID, String defaultvalue) {
-        this.env = env;
-        this.id = ID;
-        this.defaultvalue = defaultvalue;
-    }
-
-    public EnvSetting(Dotenv env, String ID) {
-        this(env, ID, "");
-    }
-
-    public EnvSetting(String ID) {
-        this(DOTENV, ID);
-    }
-
-    @Override
-    public String get() {
-        return env.get(id, defaultvalue);
+public class EventListener {
+    @SubscribeEvent
+    public void messageRecieved(MessageReceivedEvent event) {
+        CommandRegistry.handleMessage(event);
     }
 }

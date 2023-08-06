@@ -20,10 +20,21 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.settings;
+package org.mangorage.mangobotapi.core.util;
 
-public abstract class Setting<X> {
-    abstract public void set(X value);
+import java.util.function.Supplier;
 
-    abstract public X get();
+public class LockableReference<T> extends Lockable implements Supplier<T> {
+    private T object;
+
+    public void set(T object) {
+        if (isLocked())
+            throw new IllegalStateException("Attempted to set value on a locked reference");
+        this.object = object;
+    }
+
+    @Override
+    public T get() {
+        return object;
+    }
 }

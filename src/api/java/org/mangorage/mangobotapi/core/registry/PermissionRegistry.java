@@ -75,7 +75,6 @@ public class PermissionRegistry {
     public void register(APermission.Node node, APermission... permissions) {
         if (guildID == null)
             throw new IllegalStateException("Unable to register permissions on a GLOBAL level, this is for guilds only...");
-
         PERMISSIONS.computeIfAbsent(node, (key) -> new ArrayList<>());
         PERMISSIONS.get(node).addAll(Arrays.asList(permissions));
     }
