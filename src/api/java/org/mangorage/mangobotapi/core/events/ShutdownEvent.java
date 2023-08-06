@@ -20,30 +20,24 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot;
+package org.mangorage.mangobotapi.core.events;
 
-import net.dv8tion.jda.api.exceptions.InvalidTokenException;
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.core.settings.Settings;
+import org.mangorage.mangobotapi.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.function.Consumer;
 
-/**
- * TODO: Use Log4J as our logger instead of System.out
- */
-public class Main {
+public record ShutdownEvent(Phase phase) {
+    public static void addListener(EventBus bus, Consumer<ShutdownEvent> shutdownEventConsumer) {
+        bus.get(ShutdownEvent.class).addListener(shutdownEventConsumer);
+    }
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        if (Settings.BOT_TOKEN.get().equals("UNCHANGED"))
-            throw new IllegalStateException("Must set BOT_TOKEN in .env found inside of botresources to a bot token!");
+    public static void addListener(EventBus bus, EventPriority priority, Consumer<ShutdownEvent> shutdownEventConsumer) {
+        bus.get(ShutdownEvent.class).addListener(priority, shutdownEventConsumer);
+    }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
-
-        try {
-            Bot.initiate();
-        } catch (InvalidTokenException e) {
-            throw new IllegalStateException(e.getMessage());
-        }
+    public enum Phase {
+        PRE,
+        POST
     }
 }

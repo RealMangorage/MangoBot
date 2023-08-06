@@ -31,17 +31,19 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class PermissionRegistry {
     private static final HashMap<String, PermissionRegistry> REGISTRY = new HashMap<>();
-    private static final PermissionRegistry GLOBAL = new PermissionRegistry(null);
+    private static final PermissionRegistry GLOBAL = new PermissionRegistry();
 
     public static PermissionRegistry global() {
         return GLOBAL;
     }
 
-    public static PermissionRegistry guild(String id) {
-        return REGISTRY.computeIfAbsent(id, PermissionRegistry::new);
+    public static PermissionRegistry guild(String guildID) {
+        Objects.requireNonNull(guildID);
+        return REGISTRY.computeIfAbsent(guildID, PermissionRegistry::new);
     }
 
     public static boolean hasNeededPermission(Member member, APermission.Node node) {
@@ -51,23 +53,27 @@ public class PermissionRegistry {
         return global().hasPermission(member, node);
     }
 
-    private final String ID;
     private final HashMap<APermission.Node, ArrayList<APermission>> PERMISSIONS = new HashMap<>();
     private final HashMap<APermission.Node, ArrayList<Permission>> DISCORD_PERMISSIONS = new HashMap<>(); // Global only
+    private final String guildID;
 
-    private PermissionRegistry(String id) {
-        this.ID = id;
+    private PermissionRegistry(String guildID) {
+        this.guildID = guildID;
+    }
+
+    private PermissionRegistry() {
+        this(null);
     }
 
     public void register(APermission.Node node, Permission... permissions) {
-        if (ID != null)
+        if (guildID != null)
             throw new IllegalStateException("Unable to register permissions on a GUILD level, this is for Global permissions only...");
         DISCORD_PERMISSIONS.computeIfAbsent(node, (key) -> new ArrayList<>());
         DISCORD_PERMISSIONS.get(node).addAll(Arrays.asList(permissions));
     }
 
     public void register(APermission.Node node, APermission... permissions) {
-        if (ID == null)
+        if (guildID == null)
             throw new IllegalStateException("Unable to register permissions on a GLOBAL level, this is for guilds only...");
 
         PERMISSIONS.computeIfAbsent(node, (key) -> new ArrayList<>());
@@ -76,7 +82,7 @@ public class PermissionRegistry {
 
     public boolean hasPermission(Member member, APermission.Node node) {
         // Check for Guild Perms first -> Discord Perms
-        if (ID == null) {
+        if (guildID == null) {
             ArrayList<Permission> permissions = DISCORD_PERMISSIONS.get(node);
             EnumSet<Permission> memberPerms = member.getPermissions();
 

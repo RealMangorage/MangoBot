@@ -32,14 +32,14 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.mangobot.core.commands.ForgeCommands;
 import org.mangorage.mangobot.core.commands.GlobalCommands;
 import org.mangorage.mangobot.core.events.EventListener;
-import org.mangorage.mangobot.core.events.LoadEvent;
-import org.mangorage.mangobot.core.events.SaveEvent;
-import org.mangorage.mangobot.core.permissions.GlobalPermissions;
 import org.mangorage.mangobot.core.settings.Settings;
 import org.mangorage.mangobotapi.MangoBotAPI;
+import org.mangorage.mangobotapi.MangoBotAPIBuilder;
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
 import org.mangorage.mangobotapi.core.eventbus.EventPriority;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobotapi.core.events.SaveEvent;
+import org.mangorage.mangobotapi.core.events.ShutdownEvent;
+import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 import java.util.EnumSet;
@@ -47,19 +47,23 @@ import java.util.EnumSet;
 import static org.mangorage.mangobot.core.Constants.STARTUP_MESSAGE;
 
 public class Bot {
-    private static Bot INSTANCE = null;
+    private static final Bot INSTANCE;
     public static final EventBus EVENT_BUS = EventBus.create(EventPriority.NORMAL);
     public static final MessageSettings DEFAULT_SETTINGS = MessageSettings.create().build();
+    public static final MangoBotAPI APIHook;
 
-    public static void init() {
-        // Always configure the API first! So it can have our EventBus and other stuff.
-        MangoBotAPI API = MangoBotAPI.getInstance();
-        API.setEventBus(EVENT_BUS);
-        API.setPrefix("!");
-        API.setMessageSettings(DEFAULT_SETTINGS);
-        API.build();
+    static {
+        MangoBotAPIBuilder.hook((builder) -> {
+            builder.setEventBus(EVENT_BUS);
+            builder.setPrefix("!");
+            builder.setMessageSettings(DEFAULT_SETTINGS);
+        });
 
+        APIHook = MangoBotAPI.getInstance();
         INSTANCE = new Bot();
+    }
+
+    public static void initiate() {
     }
 
     private final JDA BOT;
@@ -68,20 +72,27 @@ public class Bot {
         return INSTANCE.BOT;
     }
 
+    public static void close() {
+        if (INSTANCE != null) {
+
+            getInstance().getEventManager().getRegisteredListeners().forEach(e -> getInstance().removeEventListener(e));
+            getInstance().shutdown();
+
+            APIHook.shutdown();
+
+            System.out.println("Terminating Bot! Closing Program!");
+        }
+    }
 
     public Bot() {
         System.out.println(STARTUP_MESSAGE);
-        EVENT_BUS.startup();
 
-        GlobalCommands.init();
-        ForgeCommands.init();
+        Runnable post = MangoBotAPI.getInstance().startup();
 
-        CommandRegistry.initRegistration(EVENT_BUS);
-        GlobalPermissions.init();
+        StartupEvent.addListener(EVENT_BUS, this::onStartup);
+        ShutdownEvent.addListener(EVENT_BUS, this::onShutdown);
 
-        System.out.println("Sent LoadEvent.class Event");
-        EVENT_BUS.post(new LoadEvent());
-        System.out.println("Finished LoadEvent.class Event");
+        post.run();
 
         JDABuilder builder = JDABuilder.createDefault(Settings.BOT_TOKEN.get());
 
@@ -118,18 +129,22 @@ public class Bot {
         this.BOT = builder.build();
     }
 
-    public static void close() {
-        if (INSTANCE != null) {
+    public void onStartup(StartupEvent event) {
+        switch (event.phase()) {
+            case STARTUP -> {
+                GlobalCommands.init();
+                ForgeCommands.init();
+            }
+            case FINISHED -> {
+            }
+        }
+    }
 
-            getInstance().getEventManager().getRegisteredListeners().forEach(e -> getInstance().removeEventListener(e));
-            getInstance().shutdown();
-
-            System.out.println("Sent SaveEvent.class Event");
-            EVENT_BUS.post(new SaveEvent());
-            System.out.println("Finished SaveEvent.class Event");
-            EVENT_BUS.shutdown();
-
-            System.out.println("Terminating Bot! Closing Program!");
+    public void onShutdown(ShutdownEvent event) {
+        switch (event.phase()) {
+            case PRE -> {
+                EVENT_BUS.post(new SaveEvent());
+            }
         }
     }
 

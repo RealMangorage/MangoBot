@@ -23,32 +23,31 @@
 package org.mangorage.mangobotapi;
 
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
-import org.mangorage.mangobotapi.core.util.Lockable;
+import org.mangorage.mangobotapi.core.eventbus.EventPriority;
+import org.mangorage.mangobotapi.core.events.LoadEvent;
+import org.mangorage.mangobotapi.core.events.RegistryEvent;
+import org.mangorage.mangobotapi.core.events.SaveEvent;
+import org.mangorage.mangobotapi.core.events.ShutdownEvent;
+import org.mangorage.mangobotapi.core.events.StartupEvent;
+import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
+
 public class MangoBotAPI {
-    private static final MangoBotAPI INSTANCE = new MangoBotAPI();
+    private static final MangoBotAPI INSTANCE = MangoBotAPIBuilder.create();
 
     public static MangoBotAPI getInstance() {
         return INSTANCE;
     }
 
+    private final EventBus EVENT_BUS;
+    private final String COMMAND_PREFIX;
+    private final MessageSettings DEFAULT_MESSAGE_SETTINGS;
 
-    private EventBus EVENT_BUS;
-    private String COMMAND_PREFIX = "!";
-    private MessageSettings DEFAULT_MESSAGE_SETTINGS;
-    private Lockable built = new Lockable();
-
-    public void setEventBus(EventBus bus) {
-        this.EVENT_BUS = bus;
-    }
-
-    public void setPrefix(String prefix) {
-        this.COMMAND_PREFIX = prefix;
-    }
-
-    public void setMessageSettings(MessageSettings settings) {
-        this.DEFAULT_MESSAGE_SETTINGS = settings;
+    protected MangoBotAPI(MangoBotAPIBuilder builder) {
+        this.EVENT_BUS = builder.getEventBus();
+        this.COMMAND_PREFIX = builder.getCommandPrefix();
+        this.DEFAULT_MESSAGE_SETTINGS = builder.getDefaultMessageSettings();
     }
 
     public EventBus getEventBus() {
@@ -63,11 +62,43 @@ public class MangoBotAPI {
         return DEFAULT_MESSAGE_SETTINGS;
     }
 
-    public void build() {
-        this.built.lock();
+    public Runnable startup() {
+        EVENT_BUS.startup();
+
+        StartupEvent.addListener(EVENT_BUS, EventPriority.HIGHEST, (event) -> {
+            switch (event.phase()) {
+                case STARTUP -> {
+
+                }
+                case REGISTRATION -> {
+                    EVENT_BUS.post(new RegistryEvent(CommandRegistry.CommandType.COMMAND));
+                    EVENT_BUS.post(new RegistryEvent(CommandRegistry.CommandType.ALIAS));
+                }
+                case FINISHED -> {
+                    EVENT_BUS.post(new LoadEvent());
+                }
+            }
+        });
+
+        ShutdownEvent.addListener(EVENT_BUS, EventPriority.HIGHEST, (event -> {
+            switch (event.phase()) {
+                case PRE -> {
+                }
+                case POST -> {
+                    EVENT_BUS.post(new SaveEvent());
+                }
+            }
+        }));
+
+        return () -> {
+            for (StartupEvent.Phase phase : StartupEvent.Phase.values())
+                EVENT_BUS.post(new StartupEvent(phase));
+        };
     }
 
-    public boolean isBuilt() {
-        return built.isLocked();
+    public void shutdown() {
+        for (ShutdownEvent.Phase phase : ShutdownEvent.Phase.values())
+            EVENT_BUS.post(new ShutdownEvent(phase));
+        EVENT_BUS.shutdown();
     }
 }

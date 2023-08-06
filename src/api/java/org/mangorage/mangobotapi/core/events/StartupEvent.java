@@ -20,14 +20,25 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.events;
+package org.mangorage.mangobotapi.core.events;
 
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 
 import java.util.function.Consumer;
 
-public class SaveEvent {
-    public static void addListener(EventBus bus, Consumer<SaveEvent> eventConsumer) {
-        bus.get(SaveEvent.class).addListener(eventConsumer);
+public record StartupEvent(Phase phase) {
+    public static void addListener(EventBus bus, Consumer<StartupEvent> startupEventConsumer) {
+        bus.get(StartupEvent.class).addListener(startupEventConsumer);
+    }
+
+    public static void addListener(EventBus bus, EventPriority priority, Consumer<StartupEvent> startupEventConsumer) {
+        bus.get(StartupEvent.class).addListener(priority, startupEventConsumer);
+    }
+
+    public enum Phase {
+        STARTUP,
+        REGISTRATION,
+        FINISHED
     }
 }

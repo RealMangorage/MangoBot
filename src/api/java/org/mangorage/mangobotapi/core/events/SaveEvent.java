@@ -20,30 +20,14 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot;
+package org.mangorage.mangobotapi.core.events;
 
-import net.dv8tion.jda.api.exceptions.InvalidTokenException;
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.core.settings.Settings;
+import org.mangorage.mangobotapi.core.eventbus.EventBus;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.function.Consumer;
 
-/**
- * TODO: Use Log4J as our logger instead of System.out
- */
-public class Main {
-
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        if (Settings.BOT_TOKEN.get().equals("UNCHANGED"))
-            throw new IllegalStateException("Must set BOT_TOKEN in .env found inside of botresources to a bot token!");
-
-        Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
-
-        try {
-            Bot.initiate();
-        } catch (InvalidTokenException e) {
-            throw new IllegalStateException(e.getMessage());
-        }
+public class SaveEvent {
+    public static void addListener(EventBus bus, Consumer<SaveEvent> eventConsumer) {
+        bus.get(SaveEvent.class).addListener(eventConsumer);
     }
 }

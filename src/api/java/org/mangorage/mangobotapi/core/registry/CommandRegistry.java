@@ -29,6 +29,7 @@ import org.mangorage.mangobotapi.core.AbstractCommand;
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mangobotapi.core.events.RegistryEvent;
+import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.CommandResult;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -52,21 +54,17 @@ public class CommandRegistry {
         UNKNOWN
     }
 
-    private static final CommandRegistry GLOBAL = new CommandRegistry(null);
+    private static final CommandRegistry GLOBAL = new CommandRegistry();
     private static final HashMap<String, CommandRegistry> GUILDS = new HashMap<>();
     private static final MessageSettings DEFAULT_SETTINGS = MangoBotAPI.getInstance().getDefaultMessageSettings();
 
     public static CommandRegistry guild(String guildID) {
+        Objects.requireNonNull(guildID);
         return GUILDS.computeIfAbsent(guildID, CommandRegistry::new);
     }
 
     public static CommandRegistry global() {
         return GLOBAL;
-    }
-
-    public static void initRegistration(EventBus bus) {
-        bus.post(new RegistryEvent(CommandType.COMMAND));
-        bus.post(new RegistryEvent(CommandType.ALIAS));
     }
 
     public static void handleMessage(MessageReceivedEvent event) {
@@ -99,10 +97,8 @@ public class CommandRegistry {
         this.guildID = guildID;
     }
 
-    @Deprecated
-    public void clearRegistryBuilder() {
-        REGISTRY_OBJECTS.clear();
-        frozen.set(true);
+    private CommandRegistry() {
+        this(null);
     }
 
     public <X extends AbstractCommand> RegistryObject<CommandHolder<X>> register(String id, X command, CommandAlias.Builder... builders) {
@@ -124,9 +120,13 @@ public class CommandRegistry {
                 COMMAND_ALIASES.put(alias.getID(), alias);
             }
         });
-        if (event.type() == CommandType.ALIAS) { // We have registered everything!
-            frozen.set(true);
+    }
+
+    public void startupEvent(StartupEvent event) {
+        if (event.phase() == StartupEvent.Phase.FINISHED) {
+            System.out.println("Clearing Registry Objects and Freezing Registry for id: %s".formatted(guildID));
             REGISTRY_OBJECTS.clear();
+            frozen.set(true);
         }
     }
 
@@ -142,6 +142,7 @@ public class CommandRegistry {
     }
 
     public void register(EventBus bus) {
+        StartupEvent.addListener(bus, this::startupEvent);
         RegistryEvent.addListener(bus, this::registryEvent);
         CommandEvent.addListener(bus, this::commandEvent);
     }

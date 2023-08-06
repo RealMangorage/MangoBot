@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -124,11 +125,12 @@ public class EventBus {
     public <X> X post(X event) {
         if (shutdown)
             return null;
+        System.out.println("Attempting to post event: %s".formatted(event.getClass()));
         return ((EventListener<X>) get(event.getClass())).post(event);
     }
 
     public static final class EventListener<X> {
-        private final EnumMap<EventPriority, List<Consumer<X>>> LISTENERS = new EnumMap<>(EventPriority.class);
+        private final EnumMap<EventPriority, CopyOnWriteArrayList<Consumer<X>>> LISTENERS = new EnumMap<>(EventPriority.class);
         private final EventBus BUS;
         private final EventPriority DEFAULT_PRIORITY;
 
@@ -156,7 +158,7 @@ public class EventBus {
         public Consumer<X> addListener(EventPriority priority, Consumer<X> eventConsumer) {
             if (BUS.shutdown)
                 return null;
-            LISTENERS.computeIfAbsent(priority, (key) -> new ArrayList<>()).add(eventConsumer);
+            LISTENERS.computeIfAbsent(priority, (key) -> new CopyOnWriteArrayList<>()).add(eventConsumer);
             return eventConsumer;
         }
 
