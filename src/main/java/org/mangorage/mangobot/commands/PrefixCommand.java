@@ -22,47 +22,44 @@
 
 package org.mangorage.mangobot.commands;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.AbstractCommand;
+import org.mangorage.mangobotapi.core.registry.CommandPrefix;
+import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.CommandResult;
 
 import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
+import static org.mangorage.mangobot.core.permissions.GlobalPermissions.PREFIX_ADMIN;
 
-public class ReplyCommand extends AbstractCommand {
-    private final String MESSAGE_RESPONSE;
-    private final boolean supress;
-    private boolean notifications;
-
-    public ReplyCommand(String message, boolean supress) {
-        this.MESSAGE_RESPONSE = message;
-        this.supress = supress;
-    }
-
-    public ReplyCommand(String message) {
-        this(message, true);
-    }
-
-    public ReplyCommand notifications(boolean value) {
-        this.notifications = !value;
-        return this;
-    }
-
-    public String getMessage() {
-        return MESSAGE_RESPONSE;
-    }
-
+public class PrefixCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
-        DEFAULT_SETTINGS.apply(message.getChannel().sendMessage(MESSAGE_RESPONSE)).queue();
-        return CommandResult.PASS;
+        String prefix = args.getOrDefault(0, "");
+        Member member = message.getMember();
+        Guild guild = message.getGuild();
+
+        if (!PermissionRegistry.hasNeededPermission(member, PREFIX_ADMIN))
+            return CommandResult.of("You dont have permission to use this command! Lacking Permission Node '%s'".formatted(PREFIX_ADMIN.id()));
+
+        if (prefix.equals(CommandPrefix.getPrefix(guild.getId()))) {
+            DEFAULT_SETTINGS.apply(message.reply("Already have command prefix set to '%s'".formatted(prefix))).queue();
+            return CommandResult.PASS;
+        }
+
+        if (prefix.length() > 0) {
+            CommandPrefix.configure(guild.getId(), prefix);
+            DEFAULT_SETTINGS.apply(message.reply("Changed command prefix to '%s'".formatted(prefix))).queue();
+            return CommandResult.PASS;
+        }
+
+        return CommandResult.FAIL;
     }
 
-    /**
-     * @return
-     */
     @Override
     public boolean isGuildOnly() {
-        return false;
+        return true;
     }
 }

@@ -51,14 +51,56 @@ public class Arguments {
 
     public String getFrom(int index) {
         StringBuilder result = new StringBuilder();
-
+        boolean first = false;
         while (has(index)) {
             result.append(" ").append(get(index));
             index++;
         }
 
-        result.trimToSize();
+        return result.toString().trim();
+    }
 
-        return result.toString();
+    public String findArg(String arg) {
+        String result = null;
+        int index = 0;
+
+        loop:
+        while (has(index)) {
+            if (get(index).equals(arg)) {
+                result = get(index + 1);
+                break loop;
+            }
+            index++;
+        }
+
+        return result;
+    }
+
+    public boolean hasArg(String arg) {
+        int index = 0;
+        while (has(index)) {
+            if (get(index).equals(arg))
+                return true;
+            index++;
+        }
+        return false;
+    }
+
+    public int getArgIndex(String arg) {
+        int index = 0;
+
+        while (has(index)) {
+            if (get(index).equals(arg))
+                return index;
+            index++;
+        }
+
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        Arguments arguments = Arguments.of("-a", "value", "howdy", "okay", "eeeek!", "-v", "cool!");
+        System.out.println(arguments.findArg("-a"));
+        System.out.println(arguments.findArg("-v"));
     }
 }

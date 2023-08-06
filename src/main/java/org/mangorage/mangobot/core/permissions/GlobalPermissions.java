@@ -31,11 +31,13 @@ public class GlobalPermissions {
 
     public static final APermission.Node PLAYING = APermission.Node.of("playing");
     public static final APermission.Node TRICK_ADMIN = APermission.Node.of("trickadmin");
+    public static final APermission.Node PREFIX_ADMIN = APermission.Node.of("prefix");
 
 
     static {
         PERMISSIONS.register(PLAYING, Permission.ADMINISTRATOR);
         PERMISSIONS.register(TRICK_ADMIN, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(PREFIX_ADMIN, Permission.ADMINISTRATOR);
     }
 
     public static void init() {

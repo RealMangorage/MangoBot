@@ -26,14 +26,15 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.mangorage.mangobot.commands.PrefixCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
-import org.mangorage.mangobot.commands.TrickCommand;
 import org.mangorage.mangobot.commands.music.PauseCommand;
 import org.mangorage.mangobot.commands.music.PlayCommand;
 import org.mangorage.mangobot.commands.music.PlayingCommand;
 import org.mangorage.mangobot.commands.music.QueueCommand;
 import org.mangorage.mangobot.commands.music.StopCommand;
 import org.mangorage.mangobot.commands.music.VolumeCommand;
+import org.mangorage.mangobot.commands.tricks.TrickCommand;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
@@ -49,6 +50,7 @@ import org.mangorage.mangobotapi.core.util.MessageSettings;
 public class GlobalCommands {
     public static final CommandRegistry COMMANDS = CommandRegistry.global();
     public static final RegistryObject<CommandHolder<TrickCommand>> TRICK_COMMAND = COMMANDS.register("tricks", new TrickCommand());
+    public static final RegistryObject<CommandHolder<PrefixCommand>> PREFIX_ADMIN = COMMANDS.register("setPrefix", new PrefixCommand());
 
     static {
         COMMANDS.register("speak", new ReplyCommand("I have spoken!"));

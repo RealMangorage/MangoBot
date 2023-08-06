@@ -20,12 +20,13 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands;
+package org.mangorage.mangobot.commands.tricks;
 
 import com.google.gson.Gson;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.permissions.GlobalPermissions;
 import org.mangorage.mangobotapi.core.AbstractCommand;
 import org.mangorage.mangobotapi.core.eventbus.SubscribeEvent;
@@ -45,45 +46,24 @@ import java.util.HashMap;
 
 import static org.mangorage.mangobot.core.Bot.EVENT_BUS;
 
+// TODO: Redo Execute command entirely, make more use of Arguments.class
+@SuppressWarnings("all")
 public class TrickCommand extends AbstractCommand {
     private static final String TRICKS_DIR = "data/guilddata/tricks/";
     private static final String SAVE_PATH = "data/guilddata/tricks/%s/";
 
 
-    private final HashMap<String, HashMap<String, String>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
+    private final HashMap<String, HashMap<String, Data>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
 
     @SubscribeEvent
     public void onSaveEvent(SaveEvent event) {
         System.out.println("Saving Tricks Data!");
 
-        File saveDir = new File(TRICKS_DIR);
-        if (saveDir.exists()) {
-            for (File dir : saveDir.listFiles())
-                if (dir.isDirectory())
-                    for (File file : dir.listFiles())
-                        if (!file.isDirectory())
-                            file.delete();
-        } else {
-            saveDir.mkdirs();
-        }
-
         CONTENT.forEach((guildID, data) -> {
-            data.forEach((trickid, content) -> {
-                File dir = new File(SAVE_PATH.formatted(guildID));
-                if (!dir.exists())
-                    dir.mkdirs();
-
-                Gson gson = new Gson();
-                try {
-                    String json = gson.toJson(new Data(guildID, trickid, content));
-                    Files.writeString(Path.of((SAVE_PATH + "%s.json").formatted(guildID, trickid)), json);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            data.forEach((trickid, trick) -> {
+                trick.save();
             });
         });
-
-
     }
 
     @SubscribeEvent
@@ -103,9 +83,10 @@ public class TrickCommand extends AbstractCommand {
         Gson gson = new Gson();
         try {
             Data data = gson.fromJson(Files.readString(file.toPath()), Data.class);
+            if (data.settings == null)
+                data = data.withSettings(new TrickConfig(true));
             System.out.println("Loaded Trick: '%s'".formatted(data.trickID()));
-            if (data.content() != null && data.trickID() != null && data.guildID() != null)
-                CONTENT.computeIfAbsent(data.guildID, (k) -> new HashMap<>()).put(data.trickID(), data.content());
+            CONTENT.computeIfAbsent(data.guildID, (k) -> new HashMap<>()).put(data.trickID(), data);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,21 +102,33 @@ public class TrickCommand extends AbstractCommand {
 
     @Override
     public CommandResult execute(Message message, Arguments args) {
-        MessageSettings dMessage = MessageSettings.create().build();
+        MessageSettings dMessage = Bot.DEFAULT_SETTINGS;
         Member member = message.getMember();
         String guildID = message.getGuild().getId();
         String type = args.get(0);
         String id = args.get(1);
-        String content = args.getFrom(2);
+        // !tricks -a wow -supress false -content Wow is amazing!
+        // !tricks -a wow -content wooop!
 
-        if (type.equals("-a") && id != null && content != null) {
+        if (type.equals("-a") && id != null) {
             if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.TRICK_ADMIN))
                 return CommandResult.NO_PERMISSION;
 
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
                 dMessage.apply(message.reply("Trick '%s' already exists!".formatted(id))).queue();
             } else {
-                CONTENT.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(id, content);
+                boolean hasSupressArg = args.hasArg("-supress");
+                boolean hasContent = args.hasArg("-content");
+                if (!hasContent)
+                    return CommandResult.FAIL;
+
+                int contentIndex = args.getArgIndex("-content");
+                String content = args.getFrom(contentIndex + 1);
+
+                Data data = new Data(guildID, id, content, new TrickConfig(hasSupressArg));
+                CONTENT.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(id, data);
+
+                data.save();
                 dMessage.apply(message.reply("Added Trick: '%s'".formatted(id))).queue();
             }
             return CommandResult.PASS;
@@ -144,6 +137,7 @@ public class TrickCommand extends AbstractCommand {
                 return CommandResult.NO_PERMISSION;
 
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
+                CONTENT.get(guildID).get(id).delete();
                 CONTENT.get(guildID).remove(id);
                 dMessage.apply(message.reply("Removed trick '%s'".formatted(id))).queue();
             } else {
@@ -153,8 +147,10 @@ public class TrickCommand extends AbstractCommand {
         } else if (type.equals("-s") && id != null) {
             MessageChannelUnion channel = message.getChannel();
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
-                String response = CONTENT.get(guildID).get(id);
-                channel.sendMessage(response).setSuppressedNotifications(true).queue();
+                Data data = CONTENT.get(guildID).get(id);
+                String response = data.content();
+                boolean supressEmbeds = data.settings().supressEmbeds();
+                dMessage.apply(channel.sendMessage(response)).setSuppressEmbeds(supressEmbeds).queue();
             } else {
                 dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(id))).queue();
             }
@@ -183,6 +179,29 @@ public class TrickCommand extends AbstractCommand {
         }
     }
 
-    public record Data(String guildID, String trickID, String content) {
+    public record Data(String guildID, String trickID, String content, TrickConfig settings) {
+        public void save() {
+            File dir = new File(SAVE_PATH.formatted(guildID));
+            if (!dir.exists())
+                dir.mkdirs();
+
+            Gson gson = new Gson();
+            try {
+                String json = gson.toJson(new TrickCommand.Data(guildID, trickID, content, settings));
+                Files.writeString(Path.of((SAVE_PATH + "%s.json").formatted(guildID, trickID)), json);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void delete() {
+            File file = Path.of((SAVE_PATH + "%s.json").formatted(guildID, trickID)).toFile();
+            if (file.exists())
+                file.delete();
+        }
+
+        public Data withSettings(TrickConfig settings) {
+            return new Data(guildID, trickID, content, settings);
+        }
     }
 }
