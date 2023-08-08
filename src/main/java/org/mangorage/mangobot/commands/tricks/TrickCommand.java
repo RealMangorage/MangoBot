@@ -26,7 +26,9 @@ import com.google.gson.Gson;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.mangorage.mangobot.core.Bot;
+import org.mangorage.mangobot.core.events.ButtonInteractionWrapperEvent;
 import org.mangorage.mangobot.core.permissions.GlobalPermissions;
 import org.mangorage.mangobotapi.core.AbstractCommand;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
@@ -37,12 +39,16 @@ import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.CommandResult;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
+import org.mangorage.mangobotapi.core.util.Page;
+import org.mangorage.mangobotapi.core.util.PagedList;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.mangorage.mangobot.core.Bot.EVENT_BUS;
 
@@ -54,7 +60,7 @@ public class TrickCommand extends AbstractCommand {
 
 
     private final HashMap<String, HashMap<String, Data>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
-
+    private final HashMap<String, PagedList<String>> PAGES = new HashMap<>();
 
     public void onSaveEvent(SaveEvent event) {
         System.out.println("Saving Tricks Data!");
@@ -97,6 +103,7 @@ public class TrickCommand extends AbstractCommand {
         EVENT_BUS.addListener(LoadEvent.class, this::onLoadEvent);
         EVENT_BUS.addListener(SaveEvent.class, this::onSaveEvent);
         EVENT_BUS.addListener(CommandEvent.class, this::onCommandEvent);
+        EVENT_BUS.addListener(ButtonInteractionWrapperEvent.class, this::onButton);
     }
 
 
@@ -155,6 +162,17 @@ public class TrickCommand extends AbstractCommand {
                 dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(id))).queue();
             }
             return CommandResult.PASS;
+        } else if (type.equals("-l")) {
+            MessageChannelUnion channel = message.getChannel();
+            if (CONTENT.containsKey(guildID) && !CONTENT.get(guildID).isEmpty()) {
+                channel.sendMessage("""
+                        List of Tricks (Page %s/%s): 
+                        """).queue((m -> {
+                    updateTrickList(m, guildID);
+                }));
+
+            }
+            return CommandResult.PASS;
         }
 
         return CommandResult.FAIL;
@@ -163,6 +181,37 @@ public class TrickCommand extends AbstractCommand {
     @Override
     public boolean isGuildOnly() {
         return true;
+    }
+
+    private void updateTrickList(Message message, String guildID) {
+        PagedList<String> tricks = new PagedList<>();
+        List<String> LIST = CONTENT.get(guildID).keySet().stream().toList();
+        String[] array = (String[]) Array.newInstance(String.class, LIST.size());
+
+        int a = 0;
+        for (String s : LIST) {
+            array[a] = LIST.get(a);
+            a++;
+        }
+
+
+        tricks.rebuild(array, 5);
+        String result = "List of Tricks (%s / %s) \r".formatted(1, tricks.totalPages());
+
+        Page<String> entries = tricks.current();
+
+        int i = 0;
+        for (String entry : entries.getEntries()) {
+            i++;
+            result = result + "%s: %s \r".formatted(i, entry);
+        }
+
+        Button prev = Button.primary("prev".formatted(message.getId()), "previous");
+        Button next = Button.primary("next".formatted(message.getId()), "next");
+
+        PAGES.computeIfAbsent(message.getId(), (ib) -> tricks);
+
+        message.editMessage(result).setActionRow(prev, next).queue();
     }
 
 
@@ -176,6 +225,35 @@ public class TrickCommand extends AbstractCommand {
             // event.setHandled() insures that the command has been handled!
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(command))
                 event.setHandled(execute(message, Arguments.of("-s", command)));
+        }
+    }
+
+    public void onButton(ButtonInteractionWrapperEvent event) {
+        var interaction = event.getEvent();
+
+        Message message = interaction.getMessage();
+        String ID = message.getId();
+
+        if (PAGES.containsKey(ID)) {
+            PagedList<String> tricks = PAGES.get(ID);
+
+            switch (interaction.getButton().getId()) {
+                case "prev" -> tricks.previous();
+                case "next" -> tricks.next();
+            }
+
+            String result = "List of Tricks (%s / %s) \r".formatted(tricks.getPage(), tricks.totalPages());
+
+            Page<String> entries = tricks.current();
+
+            int i = 0;
+            for (String entry : entries.getEntries()) {
+                i++;
+                result = result + "%s: %s \r".formatted(i, entry);
+            }
+
+
+            interaction.getInteraction().editMessage(result).queue();
         }
     }
 

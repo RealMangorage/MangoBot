@@ -20,24 +20,17 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.events;
+package org.mangorage.mangobotapi.core.util;
 
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+public class Page<T> {
+    private T[] entries;
 
-
-public class EventListener {
-
-    @SubscribeEvent
-    public void messageRecieved(MessageReceivedEvent event) {
-        CommandRegistry.handleMessage(event);
+    @SuppressWarnings("unchecked")
+    public Page(T[] entries) {
+        this.entries = entries;
     }
 
-    @SubscribeEvent
-    public void interact(ButtonInteractionEvent event) {
-        Bot.EVENT_BUS.post(new ButtonInteractionWrapperEvent(event));
+    public T[] getEntries() {
+        return entries;
     }
 }

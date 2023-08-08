@@ -23,21 +23,25 @@
 package org.mangorage.mangobot.core.events;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
 
+public class ButtonInteractionWrapperEvent implements IFunctionalEvent<ButtonInteractionWrapperEvent> {
 
-public class EventListener {
+    private final ButtonInteractionEvent event;
 
-    @SubscribeEvent
-    public void messageRecieved(MessageReceivedEvent event) {
-        CommandRegistry.handleMessage(event);
+    public ButtonInteractionWrapperEvent(ButtonInteractionEvent event) {
+        this.event = event;
     }
 
-    @SubscribeEvent
-    public void interact(ButtonInteractionEvent event) {
-        Bot.EVENT_BUS.post(new ButtonInteractionWrapperEvent(event));
+    public ButtonInteractionEvent getEvent() {
+        return event;
+    }
+
+    /**
+     * @param event
+     */
+    @Override
+    public void indirectInvoke(ButtonInteractionWrapperEvent event) {
+
     }
 }
