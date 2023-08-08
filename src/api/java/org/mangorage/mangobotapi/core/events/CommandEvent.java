@@ -23,18 +23,12 @@
 package org.mangorage.mangobotapi.core.events;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobotapi.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.CommandResult;
 
-import java.util.function.Consumer;
-
-public class CommandEvent {
-    public static void addListener(EventBus bus, Consumer<CommandEvent> eventConsumer) {
-        bus.get(CommandEvent.class).addListener(eventConsumer);
-    }
-
+public class CommandEvent implements IFunctionalEvent<CommandEvent> {
     private final Message message;
     private final String command;
     private final Arguments arguments;
@@ -82,5 +76,13 @@ public class CommandEvent {
 
     public CommandRegistry getSource() {
         return source;
+    }
+
+    /**
+     * @param event
+     */
+    @Override
+    public void indirectInvoke(CommandEvent event) {
+
     }
 }

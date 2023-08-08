@@ -20,22 +20,17 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events;
+package org.mangorage.mangobotapi.core.events.impl;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 
-public record ShutdownEvent(Phase phase) implements IFunctionalEvent<ShutdownEvent> {
+public interface IPhase {
 
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(ShutdownEvent event) {
+    EventPriority getPhase();
 
-    }
+    void setPhase(EventPriority priority);
 
-    public enum Phase {
-        PRE,
-        POST
+    default boolean seenPhase(EventPriority priority) {
+        return getPhase() == priority;
     }
 }

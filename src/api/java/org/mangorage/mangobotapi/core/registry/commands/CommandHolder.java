@@ -20,16 +20,42 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.registry.commands;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.mangorage.mangobotapi.core.AbstractCommand;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.util.ArrayList;
+import java.util.List;
 
-@Retention(value = RUNTIME)
-@Target(value = METHOD)
-public @interface SubscribeEvent {
-    EventPriority priority() default EventPriority.DEFAULT;
+public class CommandHolder<T extends AbstractCommand> {
+
+    public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value) {
+        return new CommandHolder<>(id, value);
+    }
+
+    private final String id;
+    private final T value;
+    private final List<CommandAlias> aliases = new ArrayList<>();
+
+    private CommandHolder(String id, T value) {
+        this.id = id;
+        this.value = value;
+    }
+
+    public String getID() {
+        return id;
+    }
+
+    public T getCommand() {
+        return value;
+    }
+
+    public List<CommandAlias> getAliases() {
+        return aliases;
+    }
+
+    public void addAlias(CommandAlias alias) {
+        this.aliases.add(alias);
+    }
+
 }

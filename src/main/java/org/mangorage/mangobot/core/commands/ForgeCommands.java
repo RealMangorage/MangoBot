@@ -25,10 +25,10 @@ package org.mangorage.mangobot.core.commands;
 import org.mangorage.mangobot.commands.PingCommand;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobotapi.core.registry.APermission;
-import org.mangorage.mangobotapi.core.registry.CommandHolder;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.registry.RegistryObject;
+import org.mangorage.mangobotapi.core.registry.commands.CommandHolder;
 
 import static org.mangorage.mangobot.core.permissions.GlobalPermissions.TRICK_ADMIN;
 

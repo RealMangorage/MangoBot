@@ -30,6 +30,9 @@ import org.mangorage.mangobotapi.core.eventbus.EventBus;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mangobotapi.core.events.RegistryEvent;
 import org.mangorage.mangobotapi.core.events.StartupEvent;
+import org.mangorage.mangobotapi.core.registry.commands.CommandAlias;
+import org.mangorage.mangobotapi.core.registry.commands.CommandHolder;
+import org.mangorage.mangobotapi.core.registry.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.CommandResult;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
@@ -142,9 +145,9 @@ public class CommandRegistry {
     }
 
     public void register(EventBus bus) {
-        StartupEvent.addListener(bus, this::startupEvent);
-        RegistryEvent.addListener(bus, this::registryEvent);
-        CommandEvent.addListener(bus, this::commandEvent);
+        bus.addListener(StartupEvent.class, this::startupEvent);
+        bus.addListener(RegistryEvent.class, this::registryEvent);
+        bus.addListener(CommandEvent.class, this::commandEvent);
     }
 
     public <X extends AbstractCommand> RegistryObject<CommandAlias> registerAlias(CommandHolder<X> holder, CommandAlias.Builder builder) {

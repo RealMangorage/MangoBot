@@ -20,42 +20,35 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.registry;
+package org.mangorage.mangobotapi.core.events;
 
-import org.mangorage.mangobotapi.core.AbstractCommand;
+import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+import org.mangorage.mangobotapi.core.events.impl.ICancellable;
 
-import java.util.ArrayList;
-import java.util.List;
+public class TestEvent implements ICancellable, IFunctionalEvent<TestEvent> {
+    private boolean cancelled = false;
 
-public class CommandHolder<T extends AbstractCommand> {
+    /**
+     * @param event
+     */
+    @Override
+    public void indirectInvoke(TestEvent event) {
 
-    public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value) {
-        return new CommandHolder<>(id, value);
     }
 
-    private final String id;
-    private final T value;
-    private final List<CommandAlias> aliases = new ArrayList<>();
-
-    private CommandHolder(String id, T value) {
-        this.id = id;
-        this.value = value;
+    /**
+     * @param cancel
+     */
+    @Override
+    public void setCancelled(boolean cancel) {
+        this.cancelled = cancel;
     }
 
-    public String getID() {
-        return id;
+    /**
+     * @return
+     */
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
     }
-
-    public T getCommand() {
-        return value;
-    }
-
-    public List<CommandAlias> getAliases() {
-        return aliases;
-    }
-
-    public void addAlias(CommandAlias alias) {
-        this.aliases.add(alias);
-    }
-
 }

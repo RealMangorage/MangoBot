@@ -23,9 +23,9 @@
 package org.mangorage.mangobottest.core.commands;
 
 import org.mangorage.mangobot.commands.ReplyCommand;
-import org.mangorage.mangobotapi.core.registry.CommandHolder;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mangobotapi.core.registry.RegistryObject;
+import org.mangorage.mangobotapi.core.registry.commands.CommandHolder;
 import org.mangorage.mangobottest.core.Bot;
 
 public class GlobalCommands {

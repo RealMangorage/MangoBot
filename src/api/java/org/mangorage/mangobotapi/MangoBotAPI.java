@@ -22,8 +22,8 @@
 
 package org.mangorage.mangobotapi;
 
+import net.dv8tion.jda.api.JDA;
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
-import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.RegistryEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -31,6 +31,9 @@ import org.mangorage.mangobotapi.core.events.ShutdownEvent;
 import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 
 public class MangoBotAPI {
@@ -43,11 +46,13 @@ public class MangoBotAPI {
     private final EventBus EVENT_BUS;
     private final String COMMAND_PREFIX;
     private final MessageSettings DEFAULT_MESSAGE_SETTINGS;
+    private final Supplier<JDA> JDA_INSTANCE;
 
     protected MangoBotAPI(MangoBotAPIBuilder builder) {
         this.EVENT_BUS = builder.getEventBus();
         this.COMMAND_PREFIX = builder.getCommandPrefix();
         this.DEFAULT_MESSAGE_SETTINGS = builder.getDefaultMessageSettings();
+        this.JDA_INSTANCE = builder.getJDAInstance();
     }
 
     public EventBus getEventBus() {
@@ -62,10 +67,14 @@ public class MangoBotAPI {
         return DEFAULT_MESSAGE_SETTINGS;
     }
 
-    public Runnable startup() {
+    public JDA getJDA() {
+        return JDA_INSTANCE.get();
+    }
+
+    public void startup(Consumer<EventBus> busConsumer) {
         EVENT_BUS.startup();
 
-        StartupEvent.addListener(EVENT_BUS, EventPriority.HIGHEST, (event) -> {
+        EVENT_BUS.addListener(StartupEvent.class, event -> {
             switch (event.phase()) {
                 case STARTUP -> {
 
@@ -80,7 +89,7 @@ public class MangoBotAPI {
             }
         });
 
-        ShutdownEvent.addListener(EVENT_BUS, EventPriority.HIGHEST, (event -> {
+        EVENT_BUS.addListener(ShutdownEvent.class, event -> {
             switch (event.phase()) {
                 case PRE -> {
                 }
@@ -88,12 +97,11 @@ public class MangoBotAPI {
                     EVENT_BUS.post(new SaveEvent());
                 }
             }
-        }));
+        });
 
-        return () -> {
-            for (StartupEvent.Phase phase : StartupEvent.Phase.values())
-                EVENT_BUS.post(new StartupEvent(phase));
-        };
+        busConsumer.accept(EVENT_BUS);
+        for (StartupEvent.Phase phase : StartupEvent.Phase.values())
+            EVENT_BUS.post(new StartupEvent(phase));
     }
 
     public void shutdown() {

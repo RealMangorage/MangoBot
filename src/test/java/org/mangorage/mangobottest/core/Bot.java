@@ -29,17 +29,16 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.mangorage.mangobot.core.events.EventListener;
 import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.MangoBotAPIBuilder;
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
-import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.ShutdownEvent;
 import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.util.LockableReference;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 import org.mangorage.mangobottest.core.commands.GlobalCommands;
-import org.mangorage.mangobottest.core.events.EventListener;
 
 import java.util.EnumSet;
 
@@ -47,7 +46,7 @@ import static org.mangorage.mangobot.core.Constants.STARTUP_MESSAGE;
 
 public class Bot {
     private static final LockableReference<Bot> BOT_INSTANCE = new LockableReference<>();
-    public static final EventBus EVENT_BUS = EventBus.create(EventPriority.NORMAL);
+    public static final EventBus EVENT_BUS = EventBus.create();
     public static final MessageSettings DEFAULT_SETTINGS = MessageSettings.create().build();
     public static final MangoBotAPI APIHook;
 
@@ -91,14 +90,6 @@ public class Bot {
 
     public Bot(String botToken) {
         System.out.println(STARTUP_MESSAGE);
-
-        Runnable post = MangoBotAPI.getInstance().startup();
-
-        StartupEvent.addListener(EVENT_BUS, this::onStartup);
-        ShutdownEvent.addListener(EVENT_BUS, this::onShutdown);
-
-        post.run();
-
         JDABuilder builder = JDABuilder.createDefault(botToken);
 
         builder.setActivity(Activity.of(Activity.ActivityType.PLAYING, "MinecraftForge: The Awakening of Herobrine Modpack"));
@@ -132,6 +123,22 @@ public class Bot {
         builder.setEnableShutdownHook(true);
 
         this.BOT = builder.build();
+
+        BOT_INSTANCE.set(this);
+        BOT_INSTANCE.lock();
+
+        try {
+            this.BOT.awaitReady();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            System.out.println("Built the Bot. Proceeding to load everything");
+
+            MangoBotAPI.getInstance().startup((bus) -> {
+                EVENT_BUS.addListener(StartupEvent.class, this::onStartup);
+                EVENT_BUS.addListener(ShutdownEvent.class, this::onShutdown);
+            });
+        }
     }
 
     public void onStartup(StartupEvent event) {

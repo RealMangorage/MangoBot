@@ -20,22 +20,24 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events;
+package org.mangorage.mangobotapi.core.registry.commands;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+import org.mangorage.mangobotapi.MangoBotAPI;
 
-public record ShutdownEvent(Phase phase) implements IFunctionalEvent<ShutdownEvent> {
+import java.util.HashMap;
 
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(ShutdownEvent event) {
+public class CommandPrefix {
+    public static final String DEFAULT = MangoBotAPI.getInstance().getCommandPrefix();
 
+    public static final HashMap<String, String> GUILD_PREFIXES = new HashMap<>();
+
+    public static void configure(String guildID, String prefix) {
+        GUILD_PREFIXES.put(guildID, prefix);
     }
 
-    public enum Phase {
-        PRE,
-        POST
+    public static String getPrefix(String guildID) {
+        if (guildID == null)
+            return DEFAULT;
+        return GUILD_PREFIXES.getOrDefault(guildID, DEFAULT);
     }
 }

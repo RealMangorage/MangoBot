@@ -22,20 +22,16 @@
 
 package org.mangorage.mangobotapi.core.events;
 
+import org.mangorage.mangobotapi.core.eventbus.EventBuilder;
 import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
 
-public record ShutdownEvent(Phase phase) implements IFunctionalEvent<ShutdownEvent> {
+public class SampleEvent implements IFunctionalEvent<SampleEvent> {
 
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(ShutdownEvent event) {
-
+    public static EventBuilder<SampleEvent> createListener(IFunctionalEvent<SampleEvent> event) {
+        return new EventBuilder<>(SampleEvent.class, event);
     }
 
-    public enum Phase {
-        PRE,
-        POST
+    @Override
+    public void indirectInvoke(SampleEvent event) {
     }
 }

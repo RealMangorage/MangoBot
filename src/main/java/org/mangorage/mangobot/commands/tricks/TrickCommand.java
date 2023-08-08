@@ -33,6 +33,7 @@ import org.mangorage.mangobotapi.core.eventbus.SubscribeEvent;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
+import org.mangorage.mangobotapi.core.registry.GuildCache;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.CommandResult;
@@ -77,6 +78,7 @@ public class TrickCommand extends AbstractCommand {
                         if (!file.isDirectory())
                             load(file);
         }
+        System.out.println("Finished loading Tricks Data!");
     }
 
     private void load(File file) {
@@ -85,7 +87,7 @@ public class TrickCommand extends AbstractCommand {
             Data data = gson.fromJson(Files.readString(file.toPath()), Data.class);
             if (data.settings == null)
                 data = data.withSettings(new TrickConfig(true));
-            System.out.println("Loaded Trick: '%s'".formatted(data.trickID()));
+            System.out.println("Loaded Trick: '%s' for guild '%s'".formatted(data.trickID(), GuildCache.getName(data.guildID)));
             CONTENT.computeIfAbsent(data.guildID, (k) -> new HashMap<>()).put(data.trickID(), data);
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,9 +96,9 @@ public class TrickCommand extends AbstractCommand {
 
     public TrickCommand() {
         // Register listeners to Bot.EVENT_BUS
-        LoadEvent.addListener(EVENT_BUS, this::onLoadEvent);
-        SaveEvent.addListener(EVENT_BUS, this::onSaveEvent);
-        CommandEvent.addListener(EVENT_BUS, this::onCommandEvent);
+        EVENT_BUS.addListener(LoadEvent.class, this::onLoadEvent);
+        EVENT_BUS.addListener(SaveEvent.class, this::onSaveEvent);
+        EVENT_BUS.addListener(CommandEvent.class, this::onCommandEvent);
     }
 
 

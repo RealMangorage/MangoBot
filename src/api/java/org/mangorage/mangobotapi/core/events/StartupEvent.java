@@ -22,18 +22,15 @@
 
 package org.mangorage.mangobotapi.core.events;
 
-import org.mangorage.mangobotapi.core.eventbus.EventBus;
-import org.mangorage.mangobotapi.core.eventbus.EventPriority;
+import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
 
-import java.util.function.Consumer;
+public record StartupEvent(Phase phase) implements IFunctionalEvent<StartupEvent> {
+    /**
+     * @param event
+     */
+    @Override
+    public void indirectInvoke(StartupEvent event) {
 
-public record StartupEvent(Phase phase) {
-    public static void addListener(EventBus bus, Consumer<StartupEvent> startupEventConsumer) {
-        bus.get(StartupEvent.class).addListener(startupEventConsumer);
-    }
-
-    public static void addListener(EventBus bus, EventPriority priority, Consumer<StartupEvent> startupEventConsumer) {
-        bus.get(StartupEvent.class).addListener(priority, startupEventConsumer);
     }
 
     public enum Phase {

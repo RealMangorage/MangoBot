@@ -27,21 +27,5 @@ public enum EventPriority {
     HIGH,
     NORMAL,
     LOW,
-    LOWEST,
-    DEFAULT; // Dont use!
-
-    private static final EventPriority[] list;
-
-    static {
-        list = new EventPriority[5];
-        list[0] = HIGHEST;
-        list[1] = HIGH;
-        list[2] = NORMAL;
-        list[3] = LOW;
-        list[4] = LOWEST;
-    }
-
-    public static EventPriority[] get() {
-        return list;
-    }
+    LOWEST
 }

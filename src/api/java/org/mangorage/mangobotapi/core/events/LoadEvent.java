@@ -22,12 +22,15 @@
 
 package org.mangorage.mangobotapi.core.events;
 
-import org.mangorage.mangobotapi.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
 
-import java.util.function.Consumer;
+public class LoadEvent implements IFunctionalEvent<LoadEvent> {
 
-public class LoadEvent {
-    public static void addListener(EventBus bus, Consumer<LoadEvent> eventConsumer) {
-        bus.get(LoadEvent.class).addListener(eventConsumer);
+    /**
+     * @param event
+     */
+    @Override
+    public void indirectInvoke(LoadEvent event) {
+
     }
 }

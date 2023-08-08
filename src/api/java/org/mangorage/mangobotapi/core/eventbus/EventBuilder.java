@@ -20,22 +20,23 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events;
+package org.mangorage.mangobotapi.core.eventbus;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+public class EventBuilder<T> {
+    private final Class<T> classType;
+    private final IFunctionalEvent<T> event;
 
-public record ShutdownEvent(Phase phase) implements IFunctionalEvent<ShutdownEvent> {
-
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(ShutdownEvent event) {
-
+    public EventBuilder(Class<T> type, IFunctionalEvent<T> event) {
+        this.event = event;
+        this.classType = type;
     }
 
-    public enum Phase {
-        PRE,
-        POST
+    public Class<T> getClassType() {
+        return classType;
     }
+
+    public IFunctionalEvent<T> getEvent() {
+        return event;
+    }
+
 }

@@ -20,22 +20,31 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events;
+package org.mangorage.mangobotapi.core.registry;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+import org.mangorage.mangobotapi.MangoBotAPI;
 
-public record ShutdownEvent(Phase phase) implements IFunctionalEvent<ShutdownEvent> {
+import java.util.HashMap;
 
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(ShutdownEvent event) {
+public class GuildCache {
+    private static final HashMap<String, GuildCache> CACHE = new HashMap<>();
 
+    public static String getName(String guildID) {
+        GuildCache cache = CACHE.computeIfAbsent(guildID, (k) -> new GuildCache(k));
+        return cache.getName();
     }
 
-    public enum Phase {
-        PRE,
-        POST
+    private final String guildID;
+    private String name = null;
+
+    private GuildCache(String guildID) {
+        this.guildID = guildID;
+    }
+
+    public String getName() {
+        if (name != null)
+            return name;
+        name = MangoBotAPI.getInstance().getJDA().getGuildById(guildID).getName();
+        return name;
     }
 }

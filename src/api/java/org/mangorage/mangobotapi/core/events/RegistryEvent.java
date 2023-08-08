@@ -22,13 +22,15 @@
 
 package org.mangorage.mangobotapi.core.events;
 
-import org.mangorage.mangobotapi.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
-import java.util.function.Consumer;
+public record RegistryEvent(CommandRegistry.CommandType type) implements IFunctionalEvent<RegistryEvent> {
+    /**
+     * @param event
+     */
+    @Override
+    public void indirectInvoke(RegistryEvent event) {
 
-public record RegistryEvent(CommandRegistry.CommandType type) {
-    public static void addListener(EventBus bus, Consumer<RegistryEvent> eventConsumer) {
-        bus.get(RegistryEvent.class).addListener(eventConsumer);
     }
 }

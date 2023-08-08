@@ -20,24 +20,10 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.registry;
+package org.mangorage.mangobotapi.core.eventbus;
 
-import org.mangorage.mangobotapi.MangoBotAPI;
+public interface IFunctionalEventListener<T> {
+    void invoke(T event);
 
-import java.util.HashMap;
-
-public class CommandPrefix {
-    public static final String DEFAULT = MangoBotAPI.getInstance().getCommandPrefix();
-
-    public static final HashMap<String, String> GUILD_PREFIXES = new HashMap<>();
-
-    public static void configure(String guildID, String prefix) {
-        GUILD_PREFIXES.put(guildID, prefix);
-    }
-
-    public static String getPrefix(String guildID) {
-        if (guildID == null)
-            return DEFAULT;
-        return GUILD_PREFIXES.getOrDefault(guildID, DEFAULT);
-    }
+    EventPriority getPriority();
 }

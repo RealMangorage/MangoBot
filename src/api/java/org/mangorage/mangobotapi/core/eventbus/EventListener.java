@@ -20,22 +20,27 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events;
+package org.mangorage.mangobotapi.core.eventbus;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+public class EventListener<T> implements IFunctionalEventListener<T> {
+    private final IFunctionalEvent<T> eventListener;
+    private final EventPriority priority;
 
-public record ShutdownEvent(Phase phase) implements IFunctionalEvent<ShutdownEvent> {
-
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(ShutdownEvent event) {
-
+    public EventListener(EventPriority priority, IFunctionalEvent<T> eventListener) {
+        this.eventListener = eventListener;
+        this.priority = priority;
     }
 
-    public enum Phase {
-        PRE,
-        POST
+    @Override
+    public void invoke(T event) {
+        eventListener.indirectInvoke(event);
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public EventPriority getPriority() {
+        return priority;
     }
 }

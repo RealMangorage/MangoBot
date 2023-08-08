@@ -20,22 +20,15 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events;
+package org.mangorage.mangobotapi.core.eventbus;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
-
-public record ShutdownEvent(Phase phase) implements IFunctionalEvent<ShutdownEvent> {
-
+@FunctionalInterface
+public interface IFunctionalEvent<T> {
     /**
+     * Only call this from {@link IFunctionalEventListener <T>}
+     * Don't ever call it from {@link IFunctionalEvent<T>} directly, as nothing will occur.
+     *
      * @param event
      */
-    @Override
-    public void indirectInvoke(ShutdownEvent event) {
-
-    }
-
-    public enum Phase {
-        PRE,
-        POST
-    }
+    void indirectInvoke(T event);
 }

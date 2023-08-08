@@ -26,8 +26,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.AbstractCommand;
-import org.mangorage.mangobotapi.core.registry.CommandPrefix;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.registry.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.CommandResult;
 
