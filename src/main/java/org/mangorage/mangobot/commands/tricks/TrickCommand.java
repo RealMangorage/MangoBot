@@ -29,7 +29,6 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.permissions.GlobalPermissions;
 import org.mangorage.mangobotapi.core.AbstractCommand;
-import org.mangorage.mangobotapi.core.eventbus.SubscribeEvent;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -56,7 +55,7 @@ public class TrickCommand extends AbstractCommand {
 
     private final HashMap<String, HashMap<String, Data>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
 
-    @SubscribeEvent
+
     public void onSaveEvent(SaveEvent event) {
         System.out.println("Saving Tricks Data!");
 
@@ -67,7 +66,6 @@ public class TrickCommand extends AbstractCommand {
         });
     }
 
-    @SubscribeEvent
     public void onLoadEvent(LoadEvent event) {
         System.out.println("Loading Tricks Data!");
         File saveDir = new File(TRICKS_DIR);
@@ -167,7 +165,7 @@ public class TrickCommand extends AbstractCommand {
         return true;
     }
 
-    @SubscribeEvent
+
     public void onCommandEvent(CommandEvent event) {
         if (!event.isHandled()) {
             Message message = event.getMessage();

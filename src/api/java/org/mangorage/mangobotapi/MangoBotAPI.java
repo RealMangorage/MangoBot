@@ -23,7 +23,7 @@
 package org.mangorage.mangobotapi;
 
 import net.dv8tion.jda.api.JDA;
-import org.mangorage.mangobotapi.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.eventbus.IEventBus;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.RegistryEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -43,7 +43,7 @@ public class MangoBotAPI {
         return INSTANCE;
     }
 
-    private final EventBus EVENT_BUS;
+    private final IEventBus EVENT_BUS;
     private final String COMMAND_PREFIX;
     private final MessageSettings DEFAULT_MESSAGE_SETTINGS;
     private final Supplier<JDA> JDA_INSTANCE;
@@ -55,7 +55,7 @@ public class MangoBotAPI {
         this.JDA_INSTANCE = builder.getJDAInstance();
     }
 
-    public EventBus getEventBus() {
+    public IEventBus getEventBus() {
         return EVENT_BUS;
     }
 
@@ -71,7 +71,7 @@ public class MangoBotAPI {
         return JDA_INSTANCE.get();
     }
 
-    public void startup(Consumer<EventBus> busConsumer) {
+    public void startup(Consumer<IEventBus> busConsumer) {
         EVENT_BUS.startup();
 
         EVENT_BUS.addListener(StartupEvent.class, event -> {

@@ -22,13 +22,21 @@
 
 package org.mangorage.mangobotapi.core.eventbus;
 
-@FunctionalInterface
-public interface IFunctionalEventListener<T> {
 
-    /* EventBus invokes this. */
-    void invoke(T event);
+public interface IEventBus {
+    @SuppressWarnings("unchecked")
+    <T extends IFunctionalEvent<T>> void addListener(Class<T> type, IFunctionalEvent<T> event);
 
-    default EventPriority getPriority() {
-        return EventPriority.NORMAL;
-    }
+    @SuppressWarnings("unchecked")
+    <T extends IFunctionalEvent<T>> void addListener(EventPriority priority, Class<T> type, IFunctionalEvent<T> event);
+
+    @SuppressWarnings("unchecked")
+    <T extends IFunctionalEvent<T>> void addListener(EventBuilder<T> builder);
+
+    @SuppressWarnings("unchecked")
+    <T extends IFunctionalEvent<T>> T post(T event);
+
+    void startup();
+
+    void shutdown();
 }

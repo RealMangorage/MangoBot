@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events;
+package org.mangorage.mangobotapi.core.events.tests;
 
 import org.mangorage.mangobotapi.core.eventbus.EventHolder;
 import org.mangorage.mangobotapi.core.eventbus.EventPriority;
@@ -39,8 +39,8 @@ public class TestEvents {
         for (IFunctionalEventListener<TestEvent> callback : callbacks) {
             if (e.isCancelled())
                 break loop;
-            else
-                callback.invoke(e);
+
+            callback.invoke(e);
         }
     });
 

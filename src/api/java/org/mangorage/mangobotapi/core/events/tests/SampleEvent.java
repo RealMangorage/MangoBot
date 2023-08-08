@@ -20,35 +20,18 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events;
+package org.mangorage.mangobotapi.core.events.tests;
 
+import org.mangorage.mangobotapi.core.eventbus.EventBuilder;
 import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
-import org.mangorage.mangobotapi.core.events.impl.ICancellable;
 
-public class TestEvent implements ICancellable, IFunctionalEvent<TestEvent> {
-    private boolean cancelled = false;
+public class SampleEvent implements IFunctionalEvent<SampleEvent> {
 
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(TestEvent event) {
-
+    public static EventBuilder<SampleEvent> createListener(IFunctionalEvent<SampleEvent> event) {
+        return new EventBuilder<>(SampleEvent.class, event);
     }
 
-    /**
-     * @param cancel
-     */
     @Override
-    public void setCancelled(boolean cancel) {
-        this.cancelled = cancel;
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
+    public void indirectInvoke(SampleEvent event) {
     }
 }

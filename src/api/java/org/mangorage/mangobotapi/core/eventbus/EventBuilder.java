@@ -25,10 +25,20 @@ package org.mangorage.mangobotapi.core.eventbus;
 public class EventBuilder<T> {
     private final Class<T> classType;
     private final IFunctionalEvent<T> event;
+    private EventPriority priority = null;
 
     public EventBuilder(Class<T> type, IFunctionalEvent<T> event) {
         this.event = event;
         this.classType = type;
+    }
+
+    public EventBuilder<T> setPriority(EventPriority priority) {
+        this.priority = priority;
+        return this;
+    }
+
+    public EventPriority getPriority() {
+        return priority;
     }
 
     public Class<T> getClassType() {

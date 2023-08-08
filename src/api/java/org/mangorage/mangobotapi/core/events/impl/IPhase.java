@@ -28,9 +28,11 @@ public interface IPhase {
 
     EventPriority getPhase();
 
-    void setPhase(EventPriority priority);
-
-    default boolean seenPhase(EventPriority priority) {
-        return getPhase() == priority;
+    /* Always do super call to ensure this logic is ran */
+    default void setPhase(EventPriority priority) {
+        if (seenPhase(EventPriority.MONITOR))
+            throw new IllegalStateException("Cannot call Event#setCanceled() after the MONITOR phase");
     }
+
+    boolean seenPhase(EventPriority priority);
 }

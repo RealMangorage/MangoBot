@@ -23,7 +23,7 @@
 package org.mangorage.mangobotapi;
 
 import net.dv8tion.jda.api.JDA;
-import org.mangorage.mangobotapi.core.eventbus.EventBus;
+import org.mangorage.mangobotapi.core.eventbus.IEventBus;
 import org.mangorage.mangobotapi.core.util.Lockable;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
@@ -52,12 +52,12 @@ public class MangoBotAPIBuilder {
     }
 
     private final Lockable built = new Lockable();
-    private EventBus EVENT_BUS;
+    private IEventBus EVENT_BUS;
     private String COMMAND_PREFIX = "!";
     private MessageSettings DEFAULT_MESSAGE_SETTINGS;
     private Supplier<JDA> JDA_INSTANCE;
 
-    public void setEventBus(EventBus bus) {
+    public void setEventBus(IEventBus bus) {
         this.EVENT_BUS = bus;
     }
 
@@ -73,7 +73,7 @@ public class MangoBotAPIBuilder {
         this.JDA_INSTANCE = jdaSupplier;
     }
 
-    protected EventBus getEventBus() {
+    protected IEventBus getEventBus() {
         return EVENT_BUS;
     }
 

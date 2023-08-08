@@ -26,68 +26,86 @@ import org.mangorage.mangobotapi.core.events.impl.ICancellable;
 
 import java.util.HashMap;
 
-public class EventBus {
+public class EventBus implements IEventBus {
 
     public static EventBus create() {
-        return new EventBus();
+        return new EventBus(EventPriority.NORMAL);
     }
 
-    public final HashMap<Class<?>, EventHolder<? extends IFunctionalEvent<?>>> TEST = new HashMap<>();
+    private final HashMap<Class<?>, EventHolder<? extends IFunctionalEvent<?>>> EVENT_LISTENERS = new HashMap<>();
+    private final EventPriority DEFAULT_PRIORITY;
+    private boolean shutdown = true;
 
+    protected EventBus(EventPriority priority) {
+        this.DEFAULT_PRIORITY = priority;
+    }
 
     @SuppressWarnings("unchecked")
     public <T extends IFunctionalEvent<T>> void addListener(Class<T> type, IFunctionalEvent<T> event) {
-        ((EventHolder<T>) TEST.computeIfAbsent(type, id -> EventHolder.create(type, callbacks -> e -> {
+        if (shutdown)
+            throw new IllegalStateException("Unable to addListener when bus is shutdown");
+        ((EventHolder<T>) EVENT_LISTENERS.computeIfAbsent(type, id -> EventHolder.create(type, callbacks -> e -> {
             ICancellable cancellable = null;
             if (e instanceof ICancellable cancel)
                 cancellable = cancel;
 
             loop:
             for (IFunctionalEventListener<T> callback : callbacks) {
+                callback.invoke(e);
                 if (cancellable != null && cancellable.isCancelled())
                     break loop;
-                else
-                    callback.invoke(e);
             }
-        }))).addListener(event);
+
+        }))).addListener(DEFAULT_PRIORITY, event);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends IFunctionalEvent<T>> void addListener(EventPriority priority, Class<T> type, IFunctionalEvent<T> event) {
-        ((EventHolder<T>) TEST.computeIfAbsent(type, id -> EventHolder.create(type, callbacks -> e -> {
+        if (shutdown)
+            throw new IllegalStateException("Unable to addListener when bus is shutdown");
+        ((EventHolder<T>) EVENT_LISTENERS.computeIfAbsent(type, id -> EventHolder.create(type, callbacks -> e -> {
             ICancellable cancellable = null;
             if (e instanceof ICancellable cancel)
                 cancellable = cancel;
 
             loop:
             for (IFunctionalEventListener<T> callback : callbacks) {
+                callback.invoke(e);
                 if (cancellable != null && cancellable.isCancelled())
                     break loop;
-                else
-                    callback.invoke(e);
             }
         }))).addListener(priority, event);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends IFunctionalEvent<T>> void addListener(EventBuilder<T> builder) {
-        ((EventHolder<T>) TEST.get(builder.getClassType())).addListener(builder.getEvent());
-    }
-
-    public <T extends IFunctionalEvent<T>> void registerEvent(EventHolder<T> holder) {
-        if (!TEST.containsKey(holder.getClassType()))
-            TEST.put(holder.getClassType(), holder);
+        if (shutdown)
+            throw new IllegalStateException("Unable to addListener when bus is shutdown");
+        if (builder.getPriority() != null)
+            addListener(EventPriority.NORMAL, builder.getClassType(), builder.getEvent());
+        else
+            addListener(builder.getPriority(), builder.getClassType(), builder.getEvent());
     }
 
     @SuppressWarnings("unchecked")
     public <T extends IFunctionalEvent<T>> T post(T event) {
-        ((EventHolder<T>) TEST.get(event.getClass())).post(event);
+        if (shutdown)
+            throw new IllegalStateException("Unable to post event when bus is shutdown");
+        ((EventHolder<T>) EVENT_LISTENERS.get(event.getClass())).post(event);
         return event;
     }
 
     public void startup() {
+        if (!shutdown)
+            throw new IllegalStateException("Already started the EventBus");
+        System.out.println("EventBus will now recieve posts/addListeners");
+        this.shutdown = false;
     }
 
     public void shutdown() {
+        if (shutdown)
+            throw new IllegalStateException("Already shutdown the EventBus");
+        System.out.println("EventBus will now no longer recieve posts/addListeners");
+        this.shutdown = true;
     }
 }

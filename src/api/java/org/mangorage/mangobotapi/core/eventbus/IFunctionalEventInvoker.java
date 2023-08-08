@@ -24,5 +24,7 @@ package org.mangorage.mangobotapi.core.eventbus;
 
 @FunctionalInterface
 public interface IFunctionalEventInvoker<T extends IFunctionalEvent<T>> {
+
+    /* EventBus will call this to invoke the callbacks */
     void invoke(T event);
 }

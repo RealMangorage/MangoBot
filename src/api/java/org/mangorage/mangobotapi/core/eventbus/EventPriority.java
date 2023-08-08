@@ -27,5 +27,6 @@ public enum EventPriority {
     HIGH,
     NORMAL,
     LOW,
-    LOWEST
+    LOWEST,
+    MONITOR
 }
