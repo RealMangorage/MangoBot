@@ -20,16 +20,18 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.util;
+package org.mangorage.mangobotapi.core.util.extra;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class PagedList<T> {
     private Page<T>[] pages;
     private int page_id = 0;
+    private int entries = 0;
 
     public PagedList() {
-
     }
 
     public int totalPages() {
@@ -71,6 +73,8 @@ public class PagedList<T> {
         if (data.length <= 0)
             return;
 
+        this.entries = entries;
+
         Class<T> type = (Class<T>) data[0].getClass();
         int index = 0;
         int page_index = 0;
@@ -96,23 +100,32 @@ public class PagedList<T> {
                 remaining--;
             }
 
-            this.pages[page_index] = new Page<T>(entries_array);
+            this.pages[page_index] = new Page<>(type, entries_array);
             page_index++;
         }
+    }
 
-        int page_count = 0;
-        for (Page<T> page : this.pages) {
-            page_count++;
-            System.out.println("Page %s".formatted(page_count));
-            if (page != null) {
-                int entry_count = 0;
-                for (T entry : page.getEntries()) {
-                    entry_count++;
-                    System.out.println("Entry %s: %s".formatted(entry_count, entry));
+    public int getEntriesPerPage() {
+        return entries;
+    }
+
+    public static final class Page<T> {
+        private final T[] entries;
+
+        @SuppressWarnings("unchecked")
+        public Page(Class<T> type, T[] entries) {
+            this.entries = (T[]) Array.newInstance(type, (int) Arrays.stream(entries).filter(Objects::nonNull).count());
+            int index = 0;
+            for (T entry : entries) {
+                if (entry != null) {
+                    this.entries[index] = entry;
+                    index++;
                 }
             }
         }
 
-
+        public T[] getEntries() {
+            return entries;
+        }
     }
 }

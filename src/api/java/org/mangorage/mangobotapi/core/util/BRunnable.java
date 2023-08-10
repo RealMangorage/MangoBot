@@ -20,20 +20,34 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.util;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-public interface IEventBus {
-    <T extends IFunctionalEvent<T>> void addListener(Class<T> type, IFunctionalEvent<T> event);
+public class BRunnable<T> implements Runnable, Supplier<T> {
 
-    <T extends IFunctionalEvent<T>> void addListener(EventPriority priority, Class<T> type, IFunctionalEvent<T> event);
+    private final T data;
+    private final Consumer<BRunnable<T>> runnableConsumer;
 
-    <T extends IFunctionalEvent<T>> void addListener(EventBuilder<T> builder);
+    public BRunnable(T data, Consumer<BRunnable<T>> runnable) {
+        this.data = data;
+        this.runnableConsumer = runnable;
+    }
 
+    /**
+     *
+     */
+    @Override
+    public void run() {
+        this.runnableConsumer.accept(this);
+    }
 
-    <T extends IFunctionalEvent<T>> T post(T event);
-
-    void startup();
-
-    void shutdown();
+    /**
+     * @return
+     */
+    @Override
+    public T get() {
+        return data;
+    }
 }

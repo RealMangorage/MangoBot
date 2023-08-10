@@ -30,6 +30,7 @@ import java.util.function.Function;
 
 public class EventHolder<T extends IFunctionalEvent<T>> {
 
+
     public static <X extends IFunctionalEvent<X>> EventHolder<X> create(Class<X> type, Function<IFunctionalEventListener<X>[], IFunctionalEventInvoker<X>> invokerFunction) {
         return new EventHolder<>(type, invokerFunction);
     }

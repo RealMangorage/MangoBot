@@ -20,20 +20,23 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobot.gui;
+
+import net.dv8tion.jda.api.entities.Message;
+
+import javax.swing.*;
+
+public class ButtonMessage extends JButton {
+    private final Message message;
+
+    public ButtonMessage(String title, Message message) {
+        super(title);
+        this.message = message;
+    }
+
+    public Message getMessage() {
+        return message;
+    }
 
 
-public interface IEventBus {
-    <T extends IFunctionalEvent<T>> void addListener(Class<T> type, IFunctionalEvent<T> event);
-
-    <T extends IFunctionalEvent<T>> void addListener(EventPriority priority, Class<T> type, IFunctionalEvent<T> event);
-
-    <T extends IFunctionalEvent<T>> void addListener(EventBuilder<T> builder);
-
-
-    <T extends IFunctionalEvent<T>> T post(T event);
-
-    void startup();
-
-    void shutdown();
 }

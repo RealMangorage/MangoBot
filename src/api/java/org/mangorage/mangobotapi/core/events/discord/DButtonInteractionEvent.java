@@ -20,28 +20,18 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.events;
+package org.mangorage.mangobotapi.core.events.discord;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+import org.mangorage.mangobotapi.core.events.WrapperEvent;
 
-public class ButtonInteractionWrapperEvent implements IFunctionalEvent<ButtonInteractionWrapperEvent> {
+public class DButtonInteractionEvent extends WrapperEvent<DButtonInteractionEvent, ButtonInteractionEvent> {
 
-    private final ButtonInteractionEvent event;
-
-    public ButtonInteractionWrapperEvent(ButtonInteractionEvent event) {
-        this.event = event;
+    public DButtonInteractionEvent(ButtonInteractionEvent object) {
+        super(object);
     }
 
-    public ButtonInteractionEvent getEvent() {
-        return event;
-    }
-
-    /**
-     * @param event
-     */
     @Override
-    public void indirectInvoke(ButtonInteractionWrapperEvent event) {
-
+    public void indirectInvoke(DButtonInteractionEvent event) {
     }
 }

@@ -20,17 +20,13 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.util;
+package org.mangorage.mangobot.gui;
 
-public class Page<T> {
-    private T[] entries;
+import java.awt.*;
 
-    @SuppressWarnings("unchecked")
-    public Page(T[] entries) {
-        this.entries = entries;
-    }
+public abstract class Renderable {
 
-    public T[] getEntries() {
-        return entries;
-    }
+    abstract Dimension location();
+
+    abstract void paint(Graphics g);
 }

@@ -20,20 +20,11 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.util;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
-public interface IEventBus {
-    <T extends IFunctionalEvent<T>> void addListener(Class<T> type, IFunctionalEvent<T> event);
-
-    <T extends IFunctionalEvent<T>> void addListener(EventPriority priority, Class<T> type, IFunctionalEvent<T> event);
-
-    <T extends IFunctionalEvent<T>> void addListener(EventBuilder<T> builder);
-
-
-    <T extends IFunctionalEvent<T>> T post(T event);
-
-    void startup();
-
-    void shutdown();
+public class TaskScheduler {
+    public final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(100_000);
 }

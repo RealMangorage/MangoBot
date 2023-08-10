@@ -24,17 +24,18 @@ package org.mangorage.mangobot.core.music.recorder;
 
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
-import net.dv8tion.jda.api.audio.OpusPacket;
+import net.dv8tion.jda.api.audio.CombinedAudio;
 import net.dv8tion.jda.api.audio.SpeakingMode;
-import net.dv8tion.jda.api.audio.UserAudio;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.Queue;
 
+// TODO: Figure out a better system!
 public class VoiceRelay implements AudioReceiveHandler, AudioSendHandler {
     private static final HashMap<String, VoiceRelay> VOICE_RELAYS = new HashMap<>();
 
@@ -42,7 +43,7 @@ public class VoiceRelay implements AudioReceiveHandler, AudioSendHandler {
         return VOICE_RELAYS.computeIfAbsent(guildID, VoiceRelay::new);
     }
 
-    private final ByteBuffer buffer = ByteBuffer.allocate(10_000_000);
+    private final Queue<byte[]> DATA = new ArrayDeque<>();
     private final String ID;
 
     private VoiceRelay(String id) {
@@ -65,43 +66,26 @@ public class VoiceRelay implements AudioReceiveHandler, AudioSendHandler {
         audioManager.openAudioConnection(channel);
     }
 
-    /**
-     * @return
-     */
-    @Override
-    public boolean canReceiveUser() {
-        return true;
-    }
 
     /**
      * @return
      */
     @Override
     public boolean canReceiveCombined() {
-        return false;
-    }
-
-
-    /**
-     * @param packet The {@link net.dv8tion.jda.api.audio.OpusPacket}
-     */
-    @Override
-    public void handleEncodedAudio(OpusPacket packet) {
-        VOICE_RELAYS.forEach((key, value) -> {
-            if (!key.equals(ID)) {
-                value.buffer.put(packet.getAudioData(1));
-            }
-        });
+        return DATA.size() < 10;
     }
 
     /**
-     * @param userAudio The user audio data
+     * @param combinedAudio The combined audio data.
      */
     @Override
-    public void handleUserAudio(UserAudio userAudio) {
+    public void handleCombinedAudio(CombinedAudio combinedAudio) {
+        if (combinedAudio.getUsers().isEmpty())
+            return;
+
         VOICE_RELAYS.forEach((key, value) -> {
             if (!key.equals(ID)) {
-                value.buffer.put(userAudio.getAudioData(1));
+                value.DATA.add(combinedAudio.getAudioData(1));
             }
         });
     }
@@ -111,7 +95,7 @@ public class VoiceRelay implements AudioReceiveHandler, AudioSendHandler {
      */
     @Override
     public boolean canProvide() {
-        return buffer.position() > 0;
+        return !DATA.isEmpty();
     }
 
     /**
@@ -119,27 +103,10 @@ public class VoiceRelay implements AudioReceiveHandler, AudioSendHandler {
      */
     @Override
     public ByteBuffer provide20MsAudio() {
-        byte[] bytes = buffer.array();
-        short[] shorts = new short[bytes.length / 2];
-
-        ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).asShortBuffer().get(shorts);
-
-        buffer.clear();
-
-        return ByteBuffer.wrap(OpusPacket.getAudioData(shorts, 1));
+        byte[] data = DATA.poll();
+        return data == null ? null : ByteBuffer.wrap(data);
     }
 
-    /**
-     * @return
-     */
-    @Override
-    public boolean canReceiveEncoded() {
-        return true;
-    }
-
-    /**
-     * @return
-     */
     @Override
     public boolean isOpus() {
         return false;

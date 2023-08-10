@@ -20,20 +20,19 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.events;
 
+import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
 
-public interface IEventBus {
-    <T extends IFunctionalEvent<T>> void addListener(Class<T> type, IFunctionalEvent<T> event);
+// Generic !
+public abstract class WrapperEvent<T, X> implements IFunctionalEvent<T> {
+    private final X object;
 
-    <T extends IFunctionalEvent<T>> void addListener(EventPriority priority, Class<T> type, IFunctionalEvent<T> event);
+    public WrapperEvent(X object) {
+        this.object = object;
+    }
 
-    <T extends IFunctionalEvent<T>> void addListener(EventBuilder<T> builder);
-
-
-    <T extends IFunctionalEvent<T>> T post(T event);
-
-    void startup();
-
-    void shutdown();
+    public X get() {
+        return object;
+    }
 }

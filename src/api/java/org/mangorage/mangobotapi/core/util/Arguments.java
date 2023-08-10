@@ -22,6 +22,8 @@
 
 package org.mangorage.mangobotapi.core.util;
 
+import java.util.function.Function;
+
 public class Arguments {
     public static Arguments of(String... args) {
         return new Arguments(args);
@@ -60,6 +62,19 @@ public class Arguments {
         return result.toString().trim();
     }
 
+    /**
+     * finds the arg and returns its value
+     * using -> "-nodeID 10"
+     * -> find("-nodeID") returns 10
+     * <p>
+     * returns null if it doesn't have anything after, or if it's unable to find arg.
+     * Use findArgOrDefault to circumvent this!. If a value is provided but is
+     * the next argyment (e.g "-nodeID -test") it will return "-test" instead of
+     * "10" to fix this use findStrictArg(String arg, Predicate)
+     *
+     * @param arg
+     * @return
+     */
     public String findArg(String arg) {
         String result = null;
         int index = 0;
@@ -76,6 +91,45 @@ public class Arguments {
         return result;
     }
 
+    public String findArgOrDefault(String arg, String defaultValue) {
+        String result = findArg(arg);
+        return result == null ? defaultValue : result;
+    }
+
+    /**
+     * @param arg
+     * @param resolver -> This is will resolve the String into X
+     * @param <X>
+     * @return
+     */
+    public <X> X findArg(String arg, Function<String, X> resolver) {
+        String result = findArg(arg);
+        X resolved_result = null;
+
+        if (result != null) {
+            try {
+                resolved_result = resolver.apply(result);
+            } catch (Exception ignored) {
+            }
+        }
+
+        return result == null || resolved_result == null ? null : resolved_result;
+    }
+
+    public <X> X findArgOrDefault(String arg, Function<String, X> resolver, X defaultValue) {
+        String result = findArg(arg);
+        X resolved_result = null;
+
+        if (result != null) {
+            try {
+                resolved_result = resolver.apply(result);
+            } catch (Exception ignored) {
+            }
+        }
+
+        return result == null || resolved_result == null ? defaultValue : resolved_result;
+    }
+
     public boolean hasArg(String arg) {
         int index = 0;
         while (has(index)) {
@@ -86,6 +140,13 @@ public class Arguments {
         return false;
     }
 
+    /**
+     * Gets the index at where the arg begins,
+     * next index should be value for that arg
+     *
+     * @param arg
+     * @return
+     */
     public int getArgIndex(String arg) {
         int index = 0;
 
@@ -99,7 +160,7 @@ public class Arguments {
     }
 
     public static void main(String[] args) {
-        Arguments arguments = Arguments.of("-a", "value", "howdy", "okay", "eeeek!", "-v", "cool!");
+        Arguments arguments = Arguments.of("-a", "value", "howdy", "okay", "eeeek!");
         System.out.println(arguments.findArg("-a"));
         System.out.println(arguments.findArg("-v"));
     }

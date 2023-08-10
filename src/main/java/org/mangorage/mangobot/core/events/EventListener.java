@@ -26,18 +26,22 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.mangorage.mangobot.core.Bot;
+import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
+import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
 
+@SuppressWarnings("unused")
 public class EventListener {
 
     @SubscribeEvent
     public void messageRecieved(MessageReceivedEvent event) {
         CommandRegistry.handleMessage(event);
+        Bot.EVENT_BUS.post(new DMessageRecievedEvent(event));
     }
 
     @SubscribeEvent
     public void interact(ButtonInteractionEvent event) {
-        Bot.EVENT_BUS.post(new ButtonInteractionWrapperEvent(event));
+        Bot.EVENT_BUS.post(new DButtonInteractionEvent(event));
     }
 }

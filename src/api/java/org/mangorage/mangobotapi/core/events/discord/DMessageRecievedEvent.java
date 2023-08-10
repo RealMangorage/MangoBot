@@ -20,20 +20,21 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.events.discord;
 
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.mangorage.mangobotapi.core.events.WrapperEvent;
 
-public interface IEventBus {
-    <T extends IFunctionalEvent<T>> void addListener(Class<T> type, IFunctionalEvent<T> event);
+public class DMessageRecievedEvent extends WrapperEvent<DMessageRecievedEvent, MessageReceivedEvent> {
 
-    <T extends IFunctionalEvent<T>> void addListener(EventPriority priority, Class<T> type, IFunctionalEvent<T> event);
+    public DMessageRecievedEvent(MessageReceivedEvent object) {
+        super(object);
+    }
 
-    <T extends IFunctionalEvent<T>> void addListener(EventBuilder<T> builder);
-
-
-    <T extends IFunctionalEvent<T>> T post(T event);
-
-    void startup();
-
-    void shutdown();
+    /**
+     * @param event
+     */
+    @Override
+    public void indirectInvoke(DMessageRecievedEvent event) {
+    }
 }

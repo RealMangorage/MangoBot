@@ -141,6 +141,8 @@ public class Bot {
             });
         }
 
+        // If we want screen -> WIP
+        // MainScreen.createScreen(EVENT_BUS);
     }
 
     public void onStartup(StartupEvent event) {

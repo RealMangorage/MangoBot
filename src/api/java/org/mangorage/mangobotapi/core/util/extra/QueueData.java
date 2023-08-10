@@ -20,20 +20,26 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.util.extra;
 
+public class QueueData<T> {
+    private int position = 0;
+    private T data;
 
-public interface IEventBus {
-    <T extends IFunctionalEvent<T>> void addListener(Class<T> type, IFunctionalEvent<T> event);
+    public QueueData(T data) {
+        this.data = data;
+    }
 
-    <T extends IFunctionalEvent<T>> void addListener(EventPriority priority, Class<T> type, IFunctionalEvent<T> event);
+    public T getData() {
+        return data;
+    }
 
-    <T extends IFunctionalEvent<T>> void addListener(EventBuilder<T> builder);
+    public void updatePosition(int position) {
+        this.position = position;
+        System.out.println("%s was updated to index %s!".formatted(data, this.position));
+    }
 
-
-    <T extends IFunctionalEvent<T>> T post(T event);
-
-    void startup();
-
-    void shutdown();
+    public int getPosition() {
+        return position;
+    }
 }
