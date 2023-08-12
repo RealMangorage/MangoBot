@@ -22,10 +22,22 @@
 
 package org.mangorage.mangobotapi.core.events;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
-public record RegistryEvent(CommandRegistry.CommandType type) implements IFunctionalEvent<RegistryEvent> {
+public class RegistryEvent extends Event implements IEvent<RegistryEvent> {
+    private final CommandRegistry.CommandType type;
+
+    public RegistryEvent(CommandRegistry.CommandType type) {
+        this.type = type;
+    }
+
+    public CommandRegistry.CommandType type() {
+        return type;
+    }
+
+
     /**
      * @param event
      */

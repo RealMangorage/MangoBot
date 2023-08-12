@@ -20,19 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events.impl;
+package org.mangorage.mangobotapi.core.eventbus.impl;
 
-import org.mangorage.mangobotapi.core.eventbus.EventPriority;
-
-public interface IPhase {
-
-    EventPriority getPhase();
-
-    /* Always do super call to ensure this logic is ran */
-    default void setPhase(EventPriority priority) {
-        if (seenPhase(EventPriority.MONITOR))
-            throw new IllegalStateException("Cannot call Event#setCanceled() after the MONITOR phase");
-    }
-
-    boolean seenPhase(EventPriority priority);
+public interface IMainBus {
 }

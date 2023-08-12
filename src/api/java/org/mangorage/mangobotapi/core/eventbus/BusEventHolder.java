@@ -22,28 +22,35 @@
 
 package org.mangorage.mangobotapi.core.eventbus;
 
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
+import org.mangorage.mangobotapi.core.eventbus.impl.IBusEventInvoker;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 import org.mangorage.mangobotapi.core.eventbus.impl.IlEventListener;
 
-public class EventListener<T> implements IlEventListener<T> {
-    private final IEvent<T> eventListener;
-    private final EventPriority priority;
+import java.util.function.Function;
 
-    public EventListener(EventPriority priority, IEvent<T> eventListener) {
-        this.eventListener = eventListener;
-        this.priority = priority;
+public class BusEventHolder<T extends Event & IEvent<T>> extends EventHolder<T> {
+
+    public static <X extends Event & IEvent<X>> BusEventHolder<X> createHolder(Class<X> type, Function<IlEventListener<X>[], IBusEventInvoker<X>> invokerFunction) {
+        return new BusEventHolder<>(type, invokerFunction);
+    }
+
+    private final Function<IlEventListener<T>[], IBusEventInvoker<T>> invokerFactory;
+    private IBusEventInvoker<T> invoker;
+
+    protected BusEventHolder(Class<T> type, Function<IlEventListener<T>[], IBusEventInvoker<T>> invokerFactory) {
+        super(type, null);
+        this.invokerFactory = invokerFactory;
+    }
+
+
+    @Override
+    public void post(T event) {
+        invoker.invoke(event);
     }
 
     @Override
-    public void invoke(T event) {
-        eventListener.indirectInvoke(event);
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public EventPriority getPriority() {
-        return priority;
+    protected void update() {
+        this.invoker = invokerFactory.apply(getHandlers());
     }
 }

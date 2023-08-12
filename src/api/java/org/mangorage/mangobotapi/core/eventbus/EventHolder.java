@@ -22,45 +22,61 @@
 
 package org.mangorage.mangobotapi.core.eventbus;
 
+import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEventInvoker;
+import org.mangorage.mangobotapi.core.eventbus.impl.IlEventListener;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class EventHolder<T extends IFunctionalEvent<T>> {
+public class EventHolder<T extends IEvent<T>> {
 
 
-    public static <X extends IFunctionalEvent<X>> EventHolder<X> create(Class<X> type, Function<IFunctionalEventListener<X>[], IFunctionalEventInvoker<X>> invokerFunction) {
+    public static <X extends IEvent<X>> EventHolder<X> create(Class<X> type, Function<IlEventListener<X>[], IEventInvoker<X>> invokerFunction) {
         return new EventHolder<>(type, invokerFunction);
     }
 
 
-    protected volatile IFunctionalEventInvoker<T> invoker;
+    private final Function<IlEventListener<T>[], IEventInvoker<T>> invokerFactory;
+    protected volatile IEventInvoker<T> invoker;
     private final Object lock = new Object();
     public final Class<T> classType;
-    private final Function<IFunctionalEventListener<T>[], IFunctionalEventInvoker<T>> invokerFactory;
-    private IFunctionalEventListener<T>[] handlers;
+    private IlEventListener<T>[] handlers;
     private EventPriority lastPriority = null;
 
     @SuppressWarnings("unchecked")
-    protected EventHolder(Class<T> type, Function<IFunctionalEventListener<T>[], IFunctionalEventInvoker<T>> invokerFactory) {
+    private EventHolder(Class<T> type, Function<IlEventListener<T>[], IEventInvoker<T>> invokerFactory) {
         this.invokerFactory = invokerFactory;
         this.classType = type;
 
-        this.handlers = (IFunctionalEventListener<T>[]) Array.newInstance(IFunctionalEventListener.class, 0);
+        this.handlers = (IlEventListener<T>[]) Array.newInstance(IlEventListener.class, 0);
         update();
+    }
+
+    @SuppressWarnings("unchecked")
+    public EventHolder(Class<T> type) {
+        this.invokerFactory = null;
+        this.classType = type;
+
+        this.handlers = (IlEventListener<T>[]) Array.newInstance(IlEventListener.class, 0);
     }
 
     public void post(T event) {
         invoker.invoke(event);
     }
 
-    public void addListener(IFunctionalEvent<T> listener) {
+    protected IlEventListener<T>[] getHandlers() {
+        return handlers;
+    }
+
+    public void addListener(IEvent<T> listener) {
         addListener(EventPriority.NORMAL, listener);
     }
 
-    public void addListener(EventPriority priority, IFunctionalEvent<T> listener) {
+    public void addListener(EventPriority priority, IEvent<T> listener) {
         Objects.requireNonNull(listener, "Tried to register null Listener");
         Objects.requireNonNull(priority, "Tried to register with null priority");
 
@@ -79,13 +95,13 @@ public class EventHolder<T extends IFunctionalEvent<T>> {
     }
 
     @SuppressWarnings("unchecked")
-    private IFunctionalEventListener<T>[] resort() {
+    private IlEventListener<T>[] resort() {
         return Arrays.stream(handlers)
                 .sorted(Comparator.comparing(w -> w.getPriority().ordinal()))
-                .toArray(length -> (IFunctionalEventListener<T>[]) Array.newInstance(IFunctionalEventListener.class, length));
+                .toArray(length -> (IlEventListener<T>[]) Array.newInstance(IlEventListener.class, length));
     }
 
-    private void update() {
+    protected void update() {
         this.invoker = invokerFactory.apply(handlers);
     }
 }

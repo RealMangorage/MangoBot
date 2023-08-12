@@ -20,7 +20,10 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.types;
+package org.mangorage.mangobotapi.core.eventbus.base;
 
-public interface IMainBus {
+public interface ICancellable {
+    void setCancelled(boolean cancel);
+
+    boolean isCancelled();
 }

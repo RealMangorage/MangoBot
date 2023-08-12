@@ -22,11 +22,10 @@
 
 package org.mangorage.mangobotapi.core.events.tests;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
-import org.mangorage.mangobotapi.core.events.impl.ICancellable;
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 
-public class TestEvent implements ICancellable, IFunctionalEvent<TestEvent> {
-    private boolean cancelled = false;
+public class TestEvent extends Event implements IEvent<TestEvent> {
 
     /**
      * @param event
@@ -36,19 +35,8 @@ public class TestEvent implements ICancellable, IFunctionalEvent<TestEvent> {
 
     }
 
-    /**
-     * @param cancel
-     */
     @Override
-    public void setCancelled(boolean cancel) {
-        this.cancelled = cancel;
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
+    public boolean isCancellable() {
+        return true;
     }
 }

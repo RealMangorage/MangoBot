@@ -22,12 +22,20 @@
 
 package org.mangorage.mangobotapi.core.events;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 
-public record StartupEvent(Phase phase) implements IFunctionalEvent<StartupEvent> {
-    /**
-     * @param event
-     */
+public class StartupEvent extends Event implements IEvent<StartupEvent> {
+    private final Phase phase;
+
+    public StartupEvent(Phase phase) {
+        this.phase = phase;
+    }
+
+    public Phase phase() {
+        return phase;
+    }
+
     @Override
     public void indirectInvoke(StartupEvent event) {
 

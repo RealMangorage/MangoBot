@@ -23,13 +23,13 @@
 package org.mangorage.mangobotapi.core.events;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
-import org.mangorage.mangobotapi.core.eventbus.types.IMainBus;
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.CommandResult;
 
-public class CommandEvent implements IFunctionalEvent<CommandEvent>, IMainBus {
+public class CommandEvent extends Event implements IEvent<CommandEvent> {
     private final Message message;
     private final String command;
     private final Arguments arguments;
@@ -53,7 +53,7 @@ public class CommandEvent implements IFunctionalEvent<CommandEvent>, IMainBus {
         return handled;
     }
 
-    public CommandResult getResult() {
+    public CommandResult getCommandResult() {
         return result;
     }
 

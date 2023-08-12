@@ -23,7 +23,7 @@
 package org.mangorage.mangobotapi;
 
 import net.dv8tion.jda.api.JDA;
-import org.mangorage.mangobotapi.core.eventbus.IEventBus;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
 import org.mangorage.mangobotapi.core.util.Lockable;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 

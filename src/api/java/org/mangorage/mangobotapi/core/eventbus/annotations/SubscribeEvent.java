@@ -20,15 +20,19 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.eventbus.annotations;
 
-@FunctionalInterface
-public interface IFunctionalEvent<T> {
-    /**
-     * Only call this from {@link IFunctionalEventListener <T>}
-     * Don't ever call it from {@link IFunctionalEvent<T>} directly, as nothing will occur.
-     *
-     * @param event
-     */
-    void indirectInvoke(T event);
+import org.mangorage.mangobotapi.core.eventbus.EventPriority;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface SubscribeEvent {
+    EventPriority priority() default EventPriority.NORMAL;
+
+    boolean recieveCancelled() default false;
 }

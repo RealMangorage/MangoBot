@@ -20,20 +20,19 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.eventbus.base;
 
+import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 
-public interface IEventBus {
-    <T extends IFunctionalEvent<T>> void addListener(Class<T> type, IFunctionalEvent<T> event);
+public interface IPhase {
 
-    <T extends IFunctionalEvent<T>> void addListener(EventPriority priority, Class<T> type, IFunctionalEvent<T> event);
+    EventPriority getPhase();
 
-    <T extends IFunctionalEvent<T>> void addListener(EventBuilder<T> builder);
+    /* Always do super call to ensure this logic is ran */
+    default void setPhase(EventPriority priority) {
+        if (seenPhase(EventPriority.MONITOR))
+            throw new IllegalStateException("Cannot call Event#setCanceled() after the MONITOR phase");
+    }
 
-
-    <T extends IFunctionalEvent<T>> T post(T event);
-
-    void startup();
-
-    void shutdown();
+    boolean seenPhase(EventPriority priority);
 }

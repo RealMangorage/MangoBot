@@ -22,12 +22,15 @@
 
 package org.mangorage.mangobotapi.core.eventbus;
 
+import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
+
 public class EventBuilder<T> {
     private final Class<T> classType;
-    private final IFunctionalEvent<T> event;
+    private final IEvent<T> event;
     private EventPriority priority = null;
+    private boolean recieveCancelled = false;
 
-    public EventBuilder(Class<T> type, IFunctionalEvent<T> event) {
+    public EventBuilder(Class<T> type, IEvent<T> event) {
         this.event = event;
         this.classType = type;
     }
@@ -37,15 +40,24 @@ public class EventBuilder<T> {
         return this;
     }
 
+    public EventBuilder<T> setRecieveCancelled(boolean recieveCancelled) {
+        this.recieveCancelled = recieveCancelled;
+        return this;
+    }
+
     public EventPriority getPriority() {
         return priority;
+    }
+
+    public boolean canRecieveCanclled() {
+        return recieveCancelled;
     }
 
     public Class<T> getClassType() {
         return classType;
     }
 
-    public IFunctionalEvent<T> getEvent() {
+    public IEvent<T> getEvent() {
         return event;
     }
 

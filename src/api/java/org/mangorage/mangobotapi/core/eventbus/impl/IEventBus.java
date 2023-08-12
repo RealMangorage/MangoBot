@@ -20,15 +20,27 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.eventbus.impl;
 
-@FunctionalInterface
-public interface IFunctionalEventListener<T> {
 
-    /* EventBus invokes this. */
-    void invoke(T event);
+import org.mangorage.mangobotapi.core.eventbus.EventBuilder;
+import org.mangorage.mangobotapi.core.eventbus.EventPriority;
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
 
-    default EventPriority getPriority() {
-        return EventPriority.NORMAL;
-    }
+public interface IEventBus {
+    <T extends Event & IEvent<T>> void addListener(Class<T> type, IEvent<T> event);
+
+    <T extends Event & IEvent<T>> void addListener(EventPriority priority, Class<T> type, IEvent<T> event);
+
+    <T extends Event & IEvent<T>> void addListener(EventPriority priority, Class<T> type, boolean recieveCancelled, IEvent<T> event);
+
+    <T extends Event & IEvent<T>> void addListener(EventBuilder<T> builder);
+
+    <T extends Event & IEvent<T>> void addListener(Object object);
+
+    <T extends Event & IEvent<T>> T post(T event);
+
+    void startup();
+
+    void shutdown();
 }

@@ -20,17 +20,11 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events.impl;
+package org.mangorage.mangobotapi.core.eventbus.impl;
 
-public interface IResult {
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
 
-    enum Result {
-        DENY,
-        DEFAULT,
-        ALLOW
-    }
-
-    void setResult(Result result);
-
-    Result getResult();
+public interface IBusEventInvoker<T extends Event & IEvent<T>> {
+    /* EventBus will call this to invoke the callbacks */
+    void invoke(T event);
 }

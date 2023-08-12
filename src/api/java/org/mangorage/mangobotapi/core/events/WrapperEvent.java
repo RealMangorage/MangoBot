@@ -22,10 +22,11 @@
 
 package org.mangorage.mangobotapi.core.events;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 
 // Generic !
-public abstract class WrapperEvent<T, X> implements IFunctionalEvent<T> {
+public abstract class WrapperEvent<T, X> extends Event implements IEvent<T> {
     private final X object;
 
     public WrapperEvent(X object) {

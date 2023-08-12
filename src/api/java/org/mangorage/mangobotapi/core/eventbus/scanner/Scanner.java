@@ -20,11 +20,39 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.eventbus.scanner;
 
-@FunctionalInterface
-public interface IFunctionalEventInvoker<T extends IFunctionalEvent<T>> {
 
-    /* EventBus will call this to invoke the callbacks */
-    void invoke(T event);
+import org.mangorage.mangobotapi.core.eventbus.EventBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Simple utility class for scanning Classes/Objects
+ * via Java reflection.
+ * <p>
+ * Cant be extended/Intiated
+ * Can only be used as a utillity class, I.E static methods only
+ */
+
+public final class Scanner {
+
+    public static List<EventBuilder<?>> checkForListeners(Object object) {
+        final ArrayList<EventBuilder<?>> BUILDERS = new ArrayList<>();
+        boolean requireStatic = false;
+        Class<?> scanning = null;
+
+        if (object instanceof Class<?> classZ) {
+            requireStatic = true;
+            scanning = classZ;
+        } else {
+            scanning = object.getClass();
+        }
+
+        // Process scanning
+
+        return BUILDERS;
+    }
+
 }

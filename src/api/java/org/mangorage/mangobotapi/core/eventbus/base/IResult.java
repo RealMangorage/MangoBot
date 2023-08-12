@@ -20,10 +20,17 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events.impl;
+package org.mangorage.mangobotapi.core.eventbus.base;
 
-public interface ICancellable {
-    void setCancelled(boolean cancel);
+public interface IResult {
 
-    boolean isCancelled();
+    enum Result {
+        DENY,
+        DEFAULT,
+        ALLOW
+    }
+
+    void setResult(Result result);
+
+    Result getResult();
 }

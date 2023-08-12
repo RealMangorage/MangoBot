@@ -22,9 +22,10 @@
 
 package org.mangorage.mangobotapi.core.events;
 
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 
-public class LoadEvent implements IFunctionalEvent<LoadEvent> {
+public class LoadEvent extends Event implements IEvent<LoadEvent> {
 
     /**
      * @param event

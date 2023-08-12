@@ -23,11 +23,12 @@
 package org.mangorage.mangobotapi.core.events.tests;
 
 import org.mangorage.mangobotapi.core.eventbus.EventBuilder;
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEvent;
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 
-public class SampleEvent implements IFunctionalEvent<SampleEvent> {
+public class SampleEvent extends Event implements IEvent<SampleEvent> {
 
-    public static EventBuilder<SampleEvent> createListener(IFunctionalEvent<SampleEvent> event) {
+    public static EventBuilder<SampleEvent> createListener(IEvent<SampleEvent> event) {
         return new EventBuilder<>(SampleEvent.class, event);
     }
 

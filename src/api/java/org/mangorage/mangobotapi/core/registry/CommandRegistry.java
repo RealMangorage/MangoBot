@@ -83,7 +83,7 @@ public class CommandRegistry {
 
             CommandEvent commandEvent = MangoBotAPI.getInstance().getEventBus().post(new CommandEvent(event.getMessage(), command, arguments));
             if (commandEvent.isHandled()) {
-                commandEvent.getResult().accept(message);
+                commandEvent.getCommandResult().accept(message);
             } else {
                 DEFAULT_SETTINGS.apply(message.reply("Invalid Command")).queue();
             }

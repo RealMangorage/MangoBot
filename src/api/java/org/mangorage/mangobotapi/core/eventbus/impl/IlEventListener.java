@@ -20,30 +20,17 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.eventbus.impl;
 
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
-import org.mangorage.mangobotapi.core.eventbus.impl.IlEventListener;
+import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 
-public class EventListener<T> implements IlEventListener<T> {
-    private final IEvent<T> eventListener;
-    private final EventPriority priority;
+@FunctionalInterface
+public interface IlEventListener<T> {
 
-    public EventListener(EventPriority priority, IEvent<T> eventListener) {
-        this.eventListener = eventListener;
-        this.priority = priority;
-    }
+    /* EventBus invokes this. */
+    void invoke(T event);
 
-    @Override
-    public void invoke(T event) {
-        eventListener.indirectInvoke(event);
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public EventPriority getPriority() {
-        return priority;
+    default EventPriority getPriority() {
+        return EventPriority.NORMAL;
     }
 }

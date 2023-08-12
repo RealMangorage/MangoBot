@@ -24,7 +24,7 @@ package org.mangorage.mangobotapi.core.events.tests;
 
 import org.mangorage.mangobotapi.core.eventbus.EventHolder;
 import org.mangorage.mangobotapi.core.eventbus.EventPriority;
-import org.mangorage.mangobotapi.core.eventbus.IFunctionalEventListener;
+import org.mangorage.mangobotapi.core.eventbus.impl.IlEventListener;
 
 public class TestEvents {
 
@@ -36,7 +36,7 @@ public class TestEvents {
 
     public static final EventHolder<TestEvent> EVENTSA = EventHolder.create(TestEvent.class, callbacks -> (e) -> {
         loop:
-        for (IFunctionalEventListener<TestEvent> callback : callbacks) {
+        for (IlEventListener<TestEvent> callback : callbacks) {
             if (e.isCancelled())
                 break loop;
 
