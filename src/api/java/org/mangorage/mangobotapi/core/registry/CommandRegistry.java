@@ -81,7 +81,8 @@ public class CommandRegistry {
             String command = command_pre[0].replaceFirst(Prefix, "");
             Arguments arguments = Arguments.of(Arguments.of(command_pre).getFrom(1).split(" "));
 
-            CommandEvent commandEvent = MangoBotAPI.getInstance().getEventBus().post(new CommandEvent(event.getMessage(), command, arguments));
+            var commandEvent = new CommandEvent(event.getMessage(), command, arguments);
+            MangoBotAPI.getInstance().getEventBus().post(commandEvent);
             if (commandEvent.isHandled()) {
                 commandEvent.getCommandResult().accept(message);
             } else {

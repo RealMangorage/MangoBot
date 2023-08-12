@@ -38,7 +38,7 @@ public interface IEventBus {
 
     void register(Object object);
 
-    <T extends Event & IEvent<T>> T post(T event);
+    <T extends Event & IEvent<T>> boolean post(T event);
 
     void startup();
 

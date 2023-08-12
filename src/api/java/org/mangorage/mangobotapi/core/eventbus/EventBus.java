@@ -101,6 +101,9 @@ public class EventBus implements IEventBus {
         ((EventHolder<T>) EVENT_LISTENERS.computeIfAbsent(type, id -> EventHolder.create(type, callbacks -> e -> {
             for (IEventListener<T> callback : callbacks) {
                 EventListener<T> listener = (EventListener<T>) callback;
+                if (!listener.canRecieveCancelled() && (e.isCancellable() && e.isCancelled()))
+                    continue;
+
                 callback.invoke(e);
             }
         }))).addListener(priority, event);
@@ -126,7 +129,7 @@ public class EventBus implements IEventBus {
 
 
     @SuppressWarnings("unchecked")
-    public <T extends Event & IEvent<T>> T post(T event) {
+    public <T extends Event & IEvent<T>> boolean post(T event) {
         if (shutdown)
             throw new IllegalStateException("Unable to post event when bus is shutdown");
 
@@ -141,7 +144,7 @@ public class EventBus implements IEventBus {
         else
             ((EventHolder<T>) EVENT_LISTENERS.get(event.getClass())).post(event);
 
-        return event;
+        return event.isCancellable() && event.isCancelled();
     }
 
     public void startup() {
