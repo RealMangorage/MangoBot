@@ -27,10 +27,10 @@ import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
 
 public class EventListener<T> implements IEventListener<T> {
     private final IEvent<T> eventListener;
-    private final EventPriority priority;
+    private final int priority;
     private final boolean recieveCancelled;
 
-    public EventListener(EventPriority priority, boolean recieveCancelled, IEvent<T> eventListener) {
+    public EventListener(int priority, boolean recieveCancelled, IEvent<T> eventListener) {
         this.recieveCancelled = recieveCancelled;
         this.priority = priority;
         this.eventListener = eventListener;
@@ -45,7 +45,7 @@ public class EventListener<T> implements IEventListener<T> {
      * @return
      */
     @Override
-    public EventPriority getPriority() {
+    public int getPriority() {
         return priority;
     }
 

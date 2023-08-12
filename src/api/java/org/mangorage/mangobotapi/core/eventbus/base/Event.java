@@ -22,8 +22,6 @@
 
 package org.mangorage.mangobotapi.core.eventbus.base;
 
-import org.mangorage.mangobotapi.core.eventbus.EventPriority;
-
 /**
  * When overriding seenPhase()
  * Make sure to call IPhase.super.seenPhase() first always!
@@ -32,7 +30,7 @@ import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 public abstract class Event implements ICancellable, IResult, IPhase {
     private boolean cancelled = false;
     private Result result = Result.DEFAULT;
-    private EventPriority phase = EventPriority.NORMAL;
+    private int phase = 0;
 
 
     public boolean isCancellable() {
@@ -68,7 +66,7 @@ public abstract class Event implements ICancellable, IResult, IPhase {
      * @return
      */
     @Override
-    public EventPriority getPhase() {
+    public int getPhase() {
         return phase;
     }
 
@@ -77,7 +75,7 @@ public abstract class Event implements ICancellable, IResult, IPhase {
      * @return
      */
     @Override
-    public boolean seenPhase(EventPriority priority) {
+    public boolean seenPhase(int priority) {
         return phase == priority;
     }
 

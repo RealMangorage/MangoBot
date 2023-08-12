@@ -74,7 +74,7 @@ public class MangoBotAPI {
     public void startup(Consumer<IEventBus> busConsumer) {
         EVENT_BUS.startup();
 
-        EVENT_BUS.addListener(StartupEvent.class, event -> {
+        EVENT_BUS.addListener(10, StartupEvent.class, event -> {
             switch (event.phase()) {
                 case STARTUP -> {
 
@@ -89,7 +89,7 @@ public class MangoBotAPI {
             }
         });
 
-        EVENT_BUS.addListener(ShutdownEvent.class, event -> {
+        EVENT_BUS.addListener(10, ShutdownEvent.class, event -> {
             switch (event.phase()) {
                 case PRE -> {
                 }

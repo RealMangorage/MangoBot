@@ -30,13 +30,10 @@ import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
 import org.mangorage.mangobotapi.core.eventbus.scanner.EventScanner;
 import org.mangorage.mangobotapi.core.events.tests.SampleEvent;
 
-import java.util.Arrays;
 import java.util.HashMap;
 /*
     TODO: Remove EventPriority and use Integer's to determine event priority
     TODO: Change RequiredClass to Marker
-    TODO: Add a way to post to all listeners even after event has been cancelled,
-     only to those Listeners that can recieve a Cancelled event
  */
 
 public class EventBus implements IEventBus {
@@ -52,26 +49,26 @@ public class EventBus implements IEventBus {
     }
 
 
-    @SubscribeEvent(priority = EventPriority.NORMAL, recieveCancelled = true)
+    @SubscribeEvent(priority = 0, recieveCancelled = true)
     public void onEvent(SampleEvent event) {
         System.out.println("WOOOP!!!!");
     }
 
     public static EventBus create() {
-        return new EventBus(EventPriority.NORMAL, null);
+        return new EventBus(0, null);
     }
 
     public static EventBus create(Class<?> requiredClass) {
-        return new EventBus(EventPriority.NORMAL, requiredClass);
+        return new EventBus(0, requiredClass);
     }
 
 
     private final HashMap<Class<?>, EventHolder<?>> EVENT_LISTENERS = new HashMap<>();
-    private final EventPriority DEFAULT_PRIORITY;
+    private final int DEFAULT_PRIORITY;
     private final Class<?> REQUIRED_CLASS;
     private boolean shutdown = true;
 
-    protected EventBus(EventPriority priority, Class<?> requiredClass) {
+    protected EventBus(int priority, Class<?> requiredClass) {
         this.DEFAULT_PRIORITY = priority;
         this.REQUIRED_CLASS = requiredClass;
     }
@@ -82,18 +79,18 @@ public class EventBus implements IEventBus {
     }
 
     @Override
-    public <T extends Event & IEvent<T>> void addListener(EventPriority priority, Class<T> type, IEvent<T> event) {
+    public <T extends Event & IEvent<T>> void addListener(int priority, Class<T> type, IEvent<T> event) {
         addListener(priority, type, false, event);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Event & IEvent<T>> void addListener(EventPriority priority, Class<T> type, boolean recieveCancelled, IEvent<T> event) {
+    public <T extends Event & IEvent<T>> void addListener(int priority, Class<T> type, boolean recieveCancelled, IEvent<T> event) {
         if (shutdown)
             throw new IllegalStateException("Unable to addListener when bus is shutdown");
 
         if (REQUIRED_CLASS != null)
-            if (!Arrays.stream(type.getClass().getInterfaces()).toList().contains(REQUIRED_CLASS))
+            if (!REQUIRED_CLASS.isAssignableFrom(type))
                 throw new IllegalStateException(
                         "Tried to add a listener whose eventtype isnt compatible with this EventBus Must implement: %s"
                                 .formatted(REQUIRED_CLASS.getCanonicalName()));
@@ -134,7 +131,7 @@ public class EventBus implements IEventBus {
             throw new IllegalStateException("Unable to post event when bus is shutdown");
 
         if (REQUIRED_CLASS != null)
-            if (!Arrays.stream(event.getClass().getInterfaces()).toList().contains(REQUIRED_CLASS))
+            if (!REQUIRED_CLASS.isAssignableFrom(event.getClass()))
                 throw new IllegalStateException(
                         "Tried to post an event that isnt compatible with this EventBus Must implement: %s"
                                 .formatted(REQUIRED_CLASS.getCanonicalName()));

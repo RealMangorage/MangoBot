@@ -23,7 +23,6 @@
 package org.mangorage.mangobotapi.core.events.tests;
 
 import org.mangorage.mangobotapi.core.eventbus.EventHolder;
-import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
 
 public class TestEvents {
@@ -47,23 +46,23 @@ public class TestEvents {
     public static void main(String[] args) {
 
 
-        EVENTSA.addListener(EventPriority.NORMAL, (e) -> {
+        EVENTSA.addListener(0, (e) -> {
             System.out.println("Sample!");
         });
 
 
-        EVENTSA.addListener(EventPriority.HIGHEST, (e) -> {
+        EVENTSA.addListener(5, (e) -> {
             System.out.println("Sample! HIGHEST");
             e.setCancelled(true);
         });
 
 
-        EVENTSA.addListener(EventPriority.LOWEST, (e) -> {
+        EVENTSA.addListener(10, (e) -> {
             System.out.println("Sample! LOWEST");
         });
 
 
-        EVENTSA.addListener(EventPriority.LOW, (e) -> {
+        EVENTSA.addListener(-10, (e) -> {
             System.out.println("Sample! LOW");
         });
 

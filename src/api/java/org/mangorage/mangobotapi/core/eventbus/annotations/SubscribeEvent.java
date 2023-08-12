@@ -22,8 +22,6 @@
 
 package org.mangorage.mangobotapi.core.eventbus.annotations;
 
-import org.mangorage.mangobotapi.core.eventbus.EventPriority;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -34,7 +32,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Inherited
 public @interface SubscribeEvent {
-    EventPriority priority() default EventPriority.NORMAL;
+    int priority() default 0;
 
     boolean recieveCancelled() default false;
 }

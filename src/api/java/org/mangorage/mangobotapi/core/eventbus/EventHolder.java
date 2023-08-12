@@ -44,7 +44,7 @@ public class EventHolder<T extends Event & IEvent<T>> {
     private final Object lock = new Object();
     public final Class<T> classType;
     private IEventListener<T>[] handlers;
-    private EventPriority lastPriority = null;
+    private int lastPriority = 0;
 
     @SuppressWarnings("unchecked")
     private EventHolder(Class<T> type, Function<IEventListener<T>[], IEventInvoker<T>> invokerFactory) {
@@ -53,14 +53,6 @@ public class EventHolder<T extends Event & IEvent<T>> {
 
         this.handlers = (IEventListener<T>[]) Array.newInstance(IEventListener.class, 0);
         update();
-    }
-
-    @SuppressWarnings("unchecked")
-    public EventHolder(Class<T> type) {
-        this.invokerFactory = null;
-        this.classType = type;
-
-        this.handlers = (IEventListener<T>[]) Array.newInstance(IEventListener.class, 0);
     }
 
     public void post(T event) {
@@ -72,22 +64,21 @@ public class EventHolder<T extends Event & IEvent<T>> {
     }
 
     public void addListener(IEvent<T> listener) {
-        addListener(EventPriority.NORMAL, listener);
+        addListener(0, listener);
     }
 
-    public void addListener(EventPriority priority, IEvent<T> listener) {
+    public void addListener(int priority, IEvent<T> listener) {
         addListener(priority, false, listener);
     }
 
-    public void addListener(EventPriority priority, boolean recieveCancelled, IEvent<T> listener) {
+    public void addListener(int priority, boolean recieveCancelled, IEvent<T> listener) {
         Objects.requireNonNull(listener, "Tried to register null Listener");
-        Objects.requireNonNull(priority, "Tried to register with null priority");
 
         synchronized (lock) {
             handlers = Arrays.copyOf(handlers, handlers.length + 1);
             handlers[handlers.length - 1] = new EventListener<>(priority, recieveCancelled, listener);
             if (lastPriority != priority)
-                handlers = resort();
+                Arrays.sort(handlers, Comparator.<IEventListener<T>>comparingInt(IEventListener::getPriority).reversed());
             lastPriority = priority;
             update();
         }
@@ -95,13 +86,6 @@ public class EventHolder<T extends Event & IEvent<T>> {
 
     public Class<T> getClassType() {
         return classType;
-    }
-
-    @SuppressWarnings("unchecked")
-    private IEventListener<T>[] resort() {
-        return Arrays.stream(handlers)
-                .sorted(Comparator.comparing(w -> w.getPriority().ordinal()))
-                .toArray(length -> (IEventListener<T>[]) Array.newInstance(IEventListener.class, length));
     }
 
     protected void update() {

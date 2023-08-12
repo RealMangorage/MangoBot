@@ -22,7 +22,6 @@
 
 package org.mangorage.mangobotapi.core.eventbus.impl;
 
-import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 
 @FunctionalInterface
 public interface IEventListener<T> {
@@ -30,8 +29,8 @@ public interface IEventListener<T> {
     /* EventBus invokes this. */
     void invoke(T event);
 
-    default EventPriority getPriority() {
-        return EventPriority.NORMAL;
+    default int getPriority() {
+        return 0;
     }
 
     default boolean recieveCancelled() {

@@ -22,17 +22,16 @@
 
 package org.mangorage.mangobotapi.core.eventbus.base;
 
-import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 
 public interface IPhase {
 
-    EventPriority getPhase();
+    int getPhase();
 
     /* Always do super call to ensure this logic is ran */
-    default void setPhase(EventPriority priority) {
-        if (seenPhase(EventPriority.MONITOR))
+    default void setPhase(int priority) {
+        if (seenPhase(-1))
             throw new IllegalStateException("Cannot call Event#setCanceled() after the MONITOR phase");
     }
 
-    boolean seenPhase(EventPriority priority);
+    boolean seenPhase(int priority);
 }
