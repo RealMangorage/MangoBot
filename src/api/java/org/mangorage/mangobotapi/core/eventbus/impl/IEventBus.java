@@ -36,7 +36,7 @@ public interface IEventBus {
 
     <T extends Event & IEvent<T>> void addListener(EventBuilder<T> builder);
 
-    <T extends Event & IEvent<T>> void addListener(Object object);
+    void register(Object object);
 
     <T extends Event & IEvent<T>> T post(T event);
 

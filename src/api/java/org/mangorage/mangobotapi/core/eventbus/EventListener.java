@@ -23,15 +23,17 @@
 package org.mangorage.mangobotapi.core.eventbus;
 
 import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
-import org.mangorage.mangobotapi.core.eventbus.impl.IlEventListener;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
 
-public class EventListener<T> implements IlEventListener<T> {
+public class EventListener<T> implements IEventListener<T> {
     private final IEvent<T> eventListener;
     private final EventPriority priority;
+    private final boolean recieveCancelled;
 
-    public EventListener(EventPriority priority, IEvent<T> eventListener) {
-        this.eventListener = eventListener;
+    public EventListener(EventPriority priority, boolean recieveCancelled, IEvent<T> eventListener) {
+        this.recieveCancelled = recieveCancelled;
         this.priority = priority;
+        this.eventListener = eventListener;
     }
 
     @Override
@@ -45,5 +47,9 @@ public class EventListener<T> implements IlEventListener<T> {
     @Override
     public EventPriority getPriority() {
         return priority;
+    }
+
+    public boolean canRecieveCancelled() {
+        return recieveCancelled;
     }
 }

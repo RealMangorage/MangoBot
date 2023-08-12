@@ -25,7 +25,7 @@ package org.mangorage.mangobotapi.core.eventbus.impl;
 @FunctionalInterface
 public interface IEvent<T> {
     /**
-     * Only call this from {@link IlEventListener <T>}
+     * Only call this from {@link IEventListener <T>}
      * Don't ever call it from {@link IEvent <T>} directly, as nothing will occur.
      *
      * @param event

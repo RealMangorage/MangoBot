@@ -35,12 +35,12 @@ public class EventBuilder<T> {
         this.classType = type;
     }
 
-    public EventBuilder<T> setPriority(EventPriority priority) {
+    public EventBuilder setPriority(EventPriority priority) {
         this.priority = priority;
         return this;
     }
 
-    public EventBuilder<T> setRecieveCancelled(boolean recieveCancelled) {
+    public EventBuilder setRecieveCancelled(boolean recieveCancelled) {
         this.recieveCancelled = recieveCancelled;
         return this;
     }
@@ -53,11 +53,11 @@ public class EventBuilder<T> {
         return recieveCancelled;
     }
 
-    public Class<T> getClassType() {
+    public Class<?> getClassType() {
         return classType;
     }
 
-    public IEvent<T> getEvent() {
+    public IEvent<?> getEvent() {
         return event;
     }
 

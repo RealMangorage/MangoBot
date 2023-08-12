@@ -22,9 +22,10 @@
 
 package org.mangorage.mangobotapi.core.eventbus;
 
+import org.mangorage.mangobotapi.core.eventbus.base.Event;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEventInvoker;
-import org.mangorage.mangobotapi.core.eventbus.impl.IlEventListener;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -32,27 +33,25 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class EventHolder<T extends IEvent<T>> {
-
-
-    public static <X extends IEvent<X>> EventHolder<X> create(Class<X> type, Function<IlEventListener<X>[], IEventInvoker<X>> invokerFunction) {
+public class EventHolder<T extends Event & IEvent<T>> {
+    public static <X extends Event & IEvent<X>> EventHolder<X> create(Class<X> type, Function<IEventListener<X>[], IEventInvoker<X>> invokerFunction) {
         return new EventHolder<>(type, invokerFunction);
     }
 
 
-    private final Function<IlEventListener<T>[], IEventInvoker<T>> invokerFactory;
+    private final Function<IEventListener<T>[], IEventInvoker<T>> invokerFactory;
     protected volatile IEventInvoker<T> invoker;
     private final Object lock = new Object();
     public final Class<T> classType;
-    private IlEventListener<T>[] handlers;
+    private IEventListener<T>[] handlers;
     private EventPriority lastPriority = null;
 
     @SuppressWarnings("unchecked")
-    private EventHolder(Class<T> type, Function<IlEventListener<T>[], IEventInvoker<T>> invokerFactory) {
+    private EventHolder(Class<T> type, Function<IEventListener<T>[], IEventInvoker<T>> invokerFactory) {
         this.invokerFactory = invokerFactory;
         this.classType = type;
 
-        this.handlers = (IlEventListener<T>[]) Array.newInstance(IlEventListener.class, 0);
+        this.handlers = (IEventListener<T>[]) Array.newInstance(IEventListener.class, 0);
         update();
     }
 
@@ -61,14 +60,14 @@ public class EventHolder<T extends IEvent<T>> {
         this.invokerFactory = null;
         this.classType = type;
 
-        this.handlers = (IlEventListener<T>[]) Array.newInstance(IlEventListener.class, 0);
+        this.handlers = (IEventListener<T>[]) Array.newInstance(IEventListener.class, 0);
     }
 
     public void post(T event) {
         invoker.invoke(event);
     }
 
-    protected IlEventListener<T>[] getHandlers() {
+    protected IEventListener<T>[] getHandlers() {
         return handlers;
     }
 
@@ -77,12 +76,16 @@ public class EventHolder<T extends IEvent<T>> {
     }
 
     public void addListener(EventPriority priority, IEvent<T> listener) {
+        addListener(priority, false, listener);
+    }
+
+    public void addListener(EventPriority priority, boolean recieveCancelled, IEvent<T> listener) {
         Objects.requireNonNull(listener, "Tried to register null Listener");
         Objects.requireNonNull(priority, "Tried to register with null priority");
 
         synchronized (lock) {
             handlers = Arrays.copyOf(handlers, handlers.length + 1);
-            handlers[handlers.length - 1] = new EventListener<>(priority, listener);
+            handlers[handlers.length - 1] = new EventListener<>(priority, recieveCancelled, listener);
             if (lastPriority != priority)
                 handlers = resort();
             lastPriority = priority;
@@ -95,10 +98,10 @@ public class EventHolder<T extends IEvent<T>> {
     }
 
     @SuppressWarnings("unchecked")
-    private IlEventListener<T>[] resort() {
+    private IEventListener<T>[] resort() {
         return Arrays.stream(handlers)
                 .sorted(Comparator.comparing(w -> w.getPriority().ordinal()))
-                .toArray(length -> (IlEventListener<T>[]) Array.newInstance(IlEventListener.class, length));
+                .toArray(length -> (IEventListener<T>[]) Array.newInstance(IEventListener.class, length));
     }
 
     protected void update() {

@@ -20,39 +20,21 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.scanner;
+package org.mangorage.mangobotapi.core.eventbus.impl;
 
+import org.mangorage.mangobotapi.core.eventbus.EventPriority;
 
-import org.mangorage.mangobotapi.core.eventbus.EventBuilder;
+@FunctionalInterface
+public interface IEventListener<T> {
 
-import java.util.ArrayList;
-import java.util.List;
+    /* EventBus invokes this. */
+    void invoke(T event);
 
-/**
- * Simple utility class for scanning Classes/Objects
- * via Java reflection.
- * <p>
- * Cant be extended/Intiated
- * Can only be used as a utillity class, I.E static methods only
- */
-
-public final class Scanner {
-
-    public static List<EventBuilder<?>> checkForListeners(Object object) {
-        final ArrayList<EventBuilder<?>> BUILDERS = new ArrayList<>();
-        boolean requireStatic = false;
-        Class<?> scanning = null;
-
-        if (object instanceof Class<?> classZ) {
-            requireStatic = true;
-            scanning = classZ;
-        } else {
-            scanning = object.getClass();
-        }
-
-        // Process scanning
-
-        return BUILDERS;
+    default EventPriority getPriority() {
+        return EventPriority.NORMAL;
     }
 
+    default boolean recieveCancelled() {
+        return false;
+    }
 }

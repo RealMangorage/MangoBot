@@ -26,36 +26,17 @@ import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
 import org.mangorage.mangobotapi.core.eventbus.base.Event;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
-import org.mangorage.mangobotapi.core.eventbus.impl.IlEventListener;
-import org.mangorage.mangobotapi.core.events.CommandEvent;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
+import org.mangorage.mangobotapi.core.eventbus.scanner.EventScanner;
 import org.mangorage.mangobotapi.core.events.tests.SampleEvent;
 
 import java.util.Arrays;
 import java.util.HashMap;
 /*
     TODO: Remove EventPriority and use Integer's to determine event priority
-    TODO: Add a Base Class that is needed, change RequiredClass to Marker
+    TODO: Change RequiredClass to Marker
     TODO: Add a way to post to all listeners even after event has been cancelled,
      only to those Listeners that can recieve a Cancelled event
-
-    TODO: Add @SubscribeEvent scanner class that .addListener(Object) delegates to,
-        Scanner.scanForEvents() -> returns List<EventBuilder<?>>
-        .addListener() -> gets List<EventBuilder<?>> and iterates thru it to
-            .addListener(...);
-
-    TODO: Add @SubscribeEvent scanner class
-     Functionality :
-        .addListener(Object object) {
-            List<EventBuilder<?>> BUILDERS = Scanner.CheckForEvents(object);
-            Builders.forEach(builder -> addListener(builder));
-        };
-        .CheckForEvents(Object object) { // Returns List<EventBuilder<?>>
-            // If class then all Methods annotated by @SubscribeEvent,
-             must be Public and Static and Return void and have the,
-             paramter be any class which implements IEvent<paramterTypeClass>
-           // If Object then same as above except only do non Static Methods.
-
-        }
  */
 
 public class EventBus implements IEventBus {
@@ -63,16 +44,17 @@ public class EventBus implements IEventBus {
     public static void main(String[] args) {
         IEventBus bus = create();
         bus.startup();
-        bus.addListener(CommandEvent.class, e -> {
+        bus.addListener(SampleEvent.class, e -> {
             System.out.println("WOO!");
         });
-        bus.post(new CommandEvent(null, null, null));
+        bus.register(bus);
+        bus.post(new SampleEvent());
     }
 
 
     @SubscribeEvent(priority = EventPriority.NORMAL, recieveCancelled = true)
-    public static void onEvent(final SampleEvent event) {
-
+    public void onEvent(SampleEvent event) {
+        System.out.println("WOOOP!!!!");
     }
 
     public static EventBus create() {
@@ -84,7 +66,7 @@ public class EventBus implements IEventBus {
     }
 
 
-    private final HashMap<Class<?>, BusEventHolder<?>> EVENT_LISTENERS = new HashMap<>();
+    private final HashMap<Class<?>, EventHolder<?>> EVENT_LISTENERS = new HashMap<>();
     private final EventPriority DEFAULT_PRIORITY;
     private final Class<?> REQUIRED_CLASS;
     private boolean shutdown = true;
@@ -116,22 +98,30 @@ public class EventBus implements IEventBus {
                         "Tried to add a listener whose eventtype isnt compatible with this EventBus Must implement: %s"
                                 .formatted(REQUIRED_CLASS.getCanonicalName()));
 
-        ((BusEventHolder<T>) EVENT_LISTENERS.computeIfAbsent(type, id -> BusEventHolder.createHolder(type, callbacks -> e -> {
-            for (IlEventListener<T> callback : callbacks) {
-                EventListener<T> l = (EventListener<T>) callback;
+        ((EventHolder<T>) EVENT_LISTENERS.computeIfAbsent(type, id -> EventHolder.create(type, callbacks -> e -> {
+            for (IEventListener<T> callback : callbacks) {
+                EventListener<T> listener = (EventListener<T>) callback;
                 callback.invoke(e);
             }
         }))).addListener(priority, event);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public <T extends Event & IEvent<T>> void addListener(EventBuilder<T> builder) {
-        addListener(builder.getPriority() == null ? DEFAULT_PRIORITY : builder.getPriority(), builder.getClassType(), builder.getEvent());
+        addListener(
+                builder.getPriority() == null ? DEFAULT_PRIORITY : builder.getPriority(),
+                (Class) builder.getClassType(),
+                builder.canRecieveCanclled(),
+                (IEvent) builder.getEvent()
+        );
     }
 
+
+    @SuppressWarnings("unchecked")
     @Override
-    public <T extends Event & IEvent<T>> void addListener(Object object) {
-        // TODO: Finish
+    public void register(Object object) {
+        EventScanner.scan(object, this).forEach(this::addListener);
     }
 
 
