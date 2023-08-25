@@ -24,6 +24,7 @@ package org.mangorage.mangobot.core.settings;
 
 import org.mangorage.mangobotapi.misc.Setting;
 
-public class Settings {
+public class MSettings {
     public static final Setting<String> BOT_TOKEN = new EnvSetting("BOT_TOKEN");
+    public static final Setting<String> YT_TOKEN = new EnvSetting("YT_TOKEN");
 }

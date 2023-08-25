@@ -34,13 +34,6 @@ import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Util;
-import ws.schild.jave.Encoder;
-import ws.schild.jave.EncoderException;
-import ws.schild.jave.MultimediaObject;
-import ws.schild.jave.encode.AudioAttributes;
-import ws.schild.jave.encode.EncodingAttributes;
-import ws.schild.jave.info.MultimediaInfo;
-import ws.schild.jave.progress.EchoingEncoderProgressListener;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -59,7 +52,7 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
     private static final String STARTED_RECORDING_LEFT = "Started Recording for %s seconds. %s seconds left.";
     private static final String FILE_RAW_OUTPUT = "data/guilddata/vcr/%s/recordingdata/recording_raw.wav";
     private static final String FILE_COMPRESSED_OUTPUT = "data/guilddata/vcr/%s/recordingdata/recording_compressed.mp3";
-    private static final String FILE_FOLDER_OUTPUT = "data/vcr/guilddata/vcr/%s/recordingdata";
+    private static final String FILE_FOLDER_OUTPUT = "data/guilddata/vcr/%s/recordingdata";
 
     public static VoiceChatRecorder getInstance(String guildID) {
         VoiceChatRecorder recorder = RECORDERS.getOrDefault(guildID, new VoiceChatRecorder(guildID));
@@ -150,18 +143,14 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
         this.timeElapsed = -1; // We have no use for this anymore
 
         // We make sure to set recording to false and message to null after we are done needing them!
-        Util.call(() ->
-                compressFile((file) -> {
-                    botMessage.editMessage("Finished Recording!").setFiles(FileUpload.fromData(file, "VC recording.mp3")).queue((message) -> {
-                        // Delete files, no need to have them. They take space which is bad.
-                        file.delete();
-                        unCompressedFile.delete();
-                    });
+        botMessage.editMessage("Finished Recording!").setFiles(FileUpload.fromData(unCompressedFile, "VC recording.mp3")).queue((message) -> {
+            // Delete files, no need to have them. They take space which is bad.
 
-                    this.processing = false;
-                    this.message = null;
-                    this.botMessage = null;
-                }));
+            unCompressedFile.delete();
+            this.processing = false;
+            this.message = null;
+            this.botMessage = null;
+        });
 
     }
 
@@ -214,51 +203,51 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
         message.reply("working on sending file").queue((e) -> {
             this.botMessage = e;
             Util.call(() -> {
-                compressFile(fileConsumer);
+                fileConsumer.accept(new File(FILE_RAW_OUTPUT.formatted(id)));
             });
         });
     }
 
-    private void compressFile(Consumer<File> fileConsumer) {
-        File input = new File(FILE_RAW_OUTPUT.formatted(id));
-        File output = new File(FILE_COMPRESSED_OUTPUT.formatted(id));
+    /**
 
-        AudioAttributes audio = new AudioAttributes();
-        audio.setCodec("libmp3lame");
-        audio.setChannels(2);
-        audio.setBitRate(8);
-        audio.setQuality(9);
+     private void compressFile(Consumer<File> fileConsumer) {
+     File input = new File(FILE_RAW_OUTPUT.formatted(id));
+     File output = new File(FILE_COMPRESSED_OUTPUT.formatted(id));
 
-        //Encoding attributes
-        EncodingAttributes attrs = new EncodingAttributes();
-        attrs.setOutputFormat("mp3");
-        attrs.setAudioAttributes(audio);
+     AudioAttributes audio = new AudioAttributes();
+     audio.setCodec("libmp3lame");
+     audio.setChannels(2);
+     audio.setBitRate(8);
+     audio.setQuality(9);
+
+     //Encoding attributes
+     EncodingAttributes attrs = new EncodingAttributes();
+     attrs.setOutputFormat("mp3");
+     attrs.setAudioAttributes(audio);
 
 
-        Encoder encoder = new Encoder();
-        try {
-            encoder.encode(new MultimediaObject(input), output, attrs, new EchoingEncoderProgressListener() {
-                long lastTime = System.currentTimeMillis();
+     Encoder encoder = new Encoder();
+     try {
+     encoder.encode(new MultimediaObject(input), output, attrs, new EchoingEncoderProgressListener() {
+     long lastTime = System.currentTimeMillis();
 
-                @Override
-                public void progress(int permil) {
-                    if (System.currentTimeMillis() - lastTime >= 1000 || permil >= 1000) {
-                        lastTime = System.currentTimeMillis();
-                        double d = ((double) permil) / 1000D;
-                        System.out.println(permil);
-                        botMessage.editMessage("Finished Recording, Processing... %s % done".formatted(df.format(d * 100))).queue();
-                    }
-                }
+     @Override public void progress(int permil) {
+     if (System.currentTimeMillis() - lastTime >= 1000 || permil >= 1000) {
+     lastTime = System.currentTimeMillis();
+     double d = ((double) permil) / 1000D;
+     System.out.println(permil);
+     botMessage.editMessage("Finished Recording, Processing... %s % done".formatted(df.format(d * 100))).queue();
+     }
+     }
 
-                @Override
-                public void sourceInfo(MultimediaInfo info) {
-                }
-            });
-        } catch (EncoderException e) {
-            throw new RuntimeException(e);
-        }
+     @Override public void sourceInfo(MultimediaInfo info) {
+     }
+     });
+     } catch (EncoderException e) {
+     throw new RuntimeException(e);
+     }
 
-        fileConsumer.accept(output);
-    }
-
+     fileConsumer.accept(output);
+     }
+     **/
 }

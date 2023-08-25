@@ -22,7 +22,6 @@
 
 package org.mangorage.mangobottest;
 
-import org.mangorage.mangobot.core.settings.Settings;
 import org.mangorage.mangobottest.core.Bot;
 
 public class Main {

@@ -93,9 +93,6 @@ public class Bot {
         System.out.println(STARTUP_MESSAGE);
         JDABuilder builder = JDABuilder.createDefault(botToken);
 
-        builder.setActivity(Activity.of(Activity.ActivityType.PLAYING, "MinecraftForge: The Awakening of Herobrine Modpack"));
-        builder.setStatus(OnlineStatus.ONLINE);
-
         EnumSet<GatewayIntent> intents = EnumSet.of(
                 // Enables MessageReceivedEvent for guild (also known as servers)
                 GatewayIntent.GUILD_MESSAGES,
@@ -116,14 +113,19 @@ public class Bot {
                 CacheFlag.EMOJI
         );
 
+        builder.setActivity(Activity.of(Activity.ActivityType.PLAYING, "MinecraftForge: The Awakening of Herobrine Modpack"));
+        builder.setStatus(OnlineStatus.ONLINE);
+
         builder.setEnabledIntents(intents);
         builder.enableCache(cacheFlags);
 
         builder.setEventManager(new AnnotatedEventManager());
         builder.addEventListeners(new EventListener());
         builder.setEnableShutdownHook(true);
+        builder.setAutoReconnect(true);
 
         this.BOT = builder.build();
+        this.BOT.upsertCommand("test", "this is neat!").queue();
 
         BOT_INSTANCE.set(this);
         BOT_INSTANCE.lock();
@@ -134,7 +136,7 @@ public class Bot {
             throw new RuntimeException(e);
         } finally {
             System.out.println("Built the Bot. Proceeding to load everything");
-
+            System.out.println("Bot Started");
             MangoBotAPI.getInstance().startup((bus) -> {
                 EVENT_BUS.addListener(StartupEvent.class, this::onStartup);
                 EVENT_BUS.addListener(ShutdownEvent.class, this::onShutdown);

@@ -32,7 +32,6 @@ import org.mangorage.mangobotapi.core.events.tests.SampleEvent;
 
 import java.util.HashMap;
 /*
-    TODO: Remove EventPriority and use Integer's to determine event priority
     TODO: Change RequiredClass to Marker
  */
 
@@ -44,6 +43,8 @@ public class EventBus implements IEventBus {
         bus.addListener(SampleEvent.class, e -> {
             System.out.println("WOO!");
         });
+
+
         bus.register(bus);
         bus.post(new SampleEvent());
     }
@@ -105,6 +106,7 @@ public class EventBus implements IEventBus {
             }
         }))).addListener(priority, event);
     }
+
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
