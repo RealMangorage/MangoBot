@@ -36,7 +36,7 @@ public class Main {
             throw new IllegalStateException("Must set BOT_TOKEN in .env found inside of botresources to a bot token!");
 
         Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
-        // Test B
+        // Test BC
 
         Bot.initiate(MSettings.BOT_TOKEN.get());
     }
