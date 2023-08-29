@@ -37,6 +37,7 @@ public class Main {
 
         Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
 
+
         Bot.initiate(MSettings.BOT_TOKEN.get());
     }
 }
