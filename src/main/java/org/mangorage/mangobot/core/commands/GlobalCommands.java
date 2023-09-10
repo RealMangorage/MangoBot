@@ -40,8 +40,10 @@ import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
 import org.mangorage.mangobot.core.music.recorder.VoiceRelay;
+import org.mangorage.mangobot.core.permissions.GlobalPermissions;
 import org.mangorage.mangobotapi.core.AbstractCommand;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.registry.RegistryObject;
 import org.mangorage.mangobotapi.core.registry.commands.CommandHolder;
 import org.mangorage.mangobotapi.core.util.CommandResult;
@@ -76,6 +78,13 @@ public class GlobalCommands {
 
 
         COMMANDS.register("record", AbstractCommand.create((message, arg) -> {
+            var member = message.getMember();
+            if (member == null)
+                return CommandResult.FAIL;
+
+            if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.TRICK_ADMIN))
+                return CommandResult.NO_PERMISSION;
+
             String[] args = arg.getArgs();
             MessageChannelUnion channel = message.getChannel();
             if (args.length > 1) {

@@ -22,15 +22,16 @@
 
 package org.mangorage.mangobottest;
 
+import org.mangorage.mangobot.core.settings.MSettings;
 import org.mangorage.mangobottest.core.Bot;
 
 public class Main {
     public static void main(String[] args) {
-        if (Settings.BOT_TOKEN.get().equals("UNCHANGED"))
+        if (MSettings.BOT_TOKEN.get().equals("UNCHANGED"))
             throw new IllegalStateException("Must set BOT_TOKEN in .env found inside of botresources to a bot token!");
 
         Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
 
-        Bot.initiate(Settings.BOT_TOKEN.get());
+        Bot.initiate(MSettings.BOT_TOKEN.get());
     }
 }

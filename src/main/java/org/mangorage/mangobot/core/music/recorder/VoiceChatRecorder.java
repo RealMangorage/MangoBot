@@ -41,7 +41,9 @@ import javax.sound.sampled.AudioSystem;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -65,6 +67,7 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
     private final String id;
     private boolean recording = false;
     private boolean processing = false;
+    private VoiceChannel voiceChannel;
     private Message message;
     private Message botMessage;
     private int timeLeft;
@@ -111,6 +114,7 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
         this.timeLeft = seconds * 1000;
         this.seconds = seconds;
         this.timeElapsed = 0;
+        this.voiceChannel = channel;
 
         Guild guild = channel.getGuild();
         AudioManager audioManager = guild.getAudioManager();
@@ -143,7 +147,18 @@ public class VoiceChatRecorder implements AudioReceiveHandler {
         this.timeElapsed = -1; // We have no use for this anymore
 
         // We make sure to set recording to false and message to null after we are done needing them!
-        botMessage.editMessage("Finished Recording!").setFiles(FileUpload.fromData(unCompressedFile, "VC recording.mp3")).queue((message) -> {
+        // General VC 2023-09-10 22:11.mp3
+        var timestamp = Timestamp.from(Instant.now()).toLocalDateTime();
+        String fileName = "%s %s-%s-%s %s-%s%s".formatted(
+                voiceChannel.getName(),
+                timestamp.getYear(),
+                timestamp.getMonthValue(),
+                timestamp.getDayOfMonth(),
+                timestamp.getHour() > 12 ? timestamp.getHour() - 12 : timestamp.getHour(),
+                timestamp.getMinute(),
+                timestamp.getHour() > 12 ? "pm" : "am"
+        );
+        botMessage.editMessage("Finished Recording! <#%s>".formatted(voiceChannel.getIdLong())).setFiles(FileUpload.fromData(unCompressedFile, "%s.wav".formatted(fileName))).queue((message) -> {
             // Delete files, no need to have them. They take space which is bad.
 
             unCompressedFile.delete();

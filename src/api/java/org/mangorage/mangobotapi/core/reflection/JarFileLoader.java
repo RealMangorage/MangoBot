@@ -20,12 +20,24 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot;
+package org.mangorage.mangobotapi.core.reflection;
 
-public class Main {
-    public static void main(String[] args) {
-        //DependencyLoader.init();
-        System.out.println("done");
-        Core.main(args);
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+
+public class JarFileLoader extends URLClassLoader {
+    public JarFileLoader(URL[] urls) {
+        super(urls);
+    }
+
+    public void addFile(String path) throws MalformedURLException {
+        String urlPath = "jar:file://" + path + "!/";
+        addURL(new URL(urlPath));
+    }
+
+    public Class<?> loadClass(String path, boolean resolve) throws ClassNotFoundException {
+        return super.loadClass(path, resolve);
     }
 }
+

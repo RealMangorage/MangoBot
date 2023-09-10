@@ -1,18 +1,25 @@
+import proguard.gradle.ProGuardTask
+
 buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
         jcenter()
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
     }
 
     dependencies {
+        classpath 'com.guardsquare:proguard-gradle:7.3.2'
+        classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
+
     }
 }
 
-plugins {
-    id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
-}
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
 
 group 'org.mangorage'
 version "${BOT_VERSION}"
@@ -44,6 +51,9 @@ sourceSets {
         resources {
             srcDir 'resources'
         }
+
+        runtimeClasspath += sourceSets.api.output
+        compileClasspath += sourceSets.api.output
     }
 }
 
@@ -51,29 +61,31 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
-    // Bot Libraries -> Must include API's librarys
-    implementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA
+    // Libs for API
     apiImplementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA for BotAPI
-    implementation(sourceSets.api.output) // We must include our API!
+    apiImplementation("org.apache.logging.log4j:log4j-core:2.14.1")
 
+    // Libs for Bot
+    implementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA
     implementation("commons-io:commons-io:2.13.0") // Common API
     implementation("io.github.cdimascio:dotenv-java:3.0.0") // DotEnv for having local Variables, for BOT_TOKEN mainly
     implementation("com.github.walkyst:lavaplayer-fork:1.4.2") // LavaPlayer to stream audio from YT/FILES to Discord
     implementation("com.google.code.gson:gson:2.10.1")
-    //implementation("ws.schild:jave-all-deps:3.3.1")
-
-
-    // Fix these later...
-    // runtimeOnly("org.apache.logging.log4j:log4j-api:2.14.1")
-
-    // Only need this
+    implementation group: 'javax.persistence', name: 'persistence-api', version: '1.0'
+    // implementation("ws.schild:jave-all-deps:3.3.1")
     implementation("org.apache.logging.log4j:log4j-core:2.14.1")
-    apiImplementation("org.apache.logging.log4j:log4j-core:2.14.1")
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
+    // runtimeOnly("org.apache.logging.log4j:log4j-api:2.14.1")
+}
+
+task copyRuntimeLibs(type: Copy) {
+    into "lib"
+
+    from sourceSets.main.runtimeClasspath
 }
 
 
-task runBot(type: JavaExec) {
+tasks.register('runBot', JavaExec) {
     group "bot tasks"
     description "Runs the bot"
     args "-dev"
@@ -81,7 +93,7 @@ task runBot(type: JavaExec) {
     mainClass = 'org.mangorage.mangobot.Main'
 }
 
-task runTestBot(type: JavaExec) {
+tasks.register('runTestBot', JavaExec) {
     group "bot tasks"
     description "Runs the test bot"
     args "-dev"
@@ -89,7 +101,7 @@ task runTestBot(type: JavaExec) {
     mainClass = 'org.mangorage.mangobottest.Main'
 }
 
-task buildBotJar(type: Jar) {
+tasks.register('buildBotJar', Jar) {
     group "bot tasks"
     description "Build the Bot Jar with API included"
 
@@ -109,7 +121,7 @@ task buildBotJar(type: Jar) {
     }
 }
 
-task buildAPIJar(type: Jar) {
+tasks.register('buildAPIJar', Jar) {
     group "bot tasks"
     description "Build the bot API jar"
 
@@ -124,10 +136,46 @@ task buildAPIJar(type: Jar) {
     from sourceSets.api.resources
 }
 
+tasks.register("proguard", ProGuardTask) {
+    group "bot tasks"
+
+    configuration file('proguard.pro')
+
+    injars(
+            "build/libs/pre-minimized.jar"
+    )
+
+    outjars "build/libs/minimized-secure.jar"
+}
+
 test {
     useJUnitPlatform()
 }
 
+shadowJar {
+    // Optionally, configure the JAR name (if needed)
+    archiveFileName.set("pre-minimized.jar")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // Include the custom JAR contents and resources
+    from sourceSets.main.output, sourceSets.api.output
+
+    // Optionally, exclude any specific dependencies from the fat JAR
+    exclude(
+            'META-INF/*.RSA',
+            'META-INF/*.SF',
+            'META-INF/*.DSA',
+            'natives/linux-aarch32/*.so',
+            'natives/linux-aarch64/*.so',
+            'natives/linux-arm/*.so',
+            'natives/linux-armhf/*.so',
+            'natives/linux-musl-aarch64/*.so',
+            'natives/linux-musl-x86-64/*.so',
+            'natives/linux-x86/*.so',
+            'natives/linux-x86-64/*.so'
+    )
+
+}
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -137,13 +185,4 @@ jar {
     }
 }
 
-shadowJar {
-    // Optionally, configure the JAR name (if needed)
-    archiveFileName.set("my-application-all.jar")
-
-    // Include the custom JAR contents and resources
-    from buildBotJar
-
-    // Optionally, exclude any specific dependencies from the fat JAR
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
-}
+shadowJar.finalizedBy(proguard)

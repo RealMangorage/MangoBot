@@ -141,6 +141,32 @@ public class TrickCommand extends AbstractCommand {
                 dMessage.apply(message.reply("Added Trick: '%s'".formatted(id))).queue();
             }
             return CommandResult.PASS;
+        } else if (type.equals("-e")) {
+            if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.TRICK_ADMIN))
+                return CommandResult.NO_PERMISSION;
+
+            if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
+                CONTENT.get(guildID).remove(id);
+            } else {
+                dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(id))).queue();
+                return CommandResult.FAIL;
+            }
+
+            boolean hasSupressArg = args.hasArg("-supress");
+            boolean hasContent = args.hasArg("-content");
+            if (!hasContent)
+                return CommandResult.FAIL;
+
+            int contentIndex = args.getArgIndex("-content");
+            String content = args.getFrom(contentIndex + 1);
+
+            Data data = new Data(guildID, id, content, new TrickConfig(hasSupressArg));
+            CONTENT.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(id, data);
+
+            data.save();
+            dMessage.apply(message.reply("Modfied Trick: '%s'".formatted(id))).queue();
+
+            return CommandResult.PASS;
         } else if (type.equals("-r") && id != null) {
             if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.TRICK_ADMIN))
                 return CommandResult.NO_PERMISSION;
