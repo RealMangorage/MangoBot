@@ -43,6 +43,9 @@ import org.mangorage.mangobotapi.core.util.MessageSettings;
 import org.mangorage.mangobotapi.core.util.TaskScheduler;
 import org.mangorage.mangobotapi.core.util.extra.PagedList;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -57,6 +60,11 @@ import static org.mangorage.mangobot.core.Bot.EVENT_BUS;
 // TODO: Redo Execute command entirely, make more use of Arguments.class
 @SuppressWarnings("all")
 public class TrickCommand extends AbstractCommand {
+    public enum Type {
+        DEFAULT,
+        CODE
+    }
+
     private static final String TRICKS_DIR = "data/guilddata/tricks/";
     private static final String SAVE_PATH = "data/guilddata/tricks/%s/";
 
@@ -128,13 +136,15 @@ public class TrickCommand extends AbstractCommand {
             } else {
                 boolean hasSupressArg = args.hasArg("-supress");
                 boolean hasContent = args.hasArg("-content");
+                Type trickType = args.hasArg("-code") ? Type.CODE : Type.DEFAULT;
+
                 if (!hasContent)
                     return CommandResult.FAIL;
 
                 int contentIndex = args.getArgIndex("-content");
                 String content = args.getFrom(contentIndex + 1);
 
-                Data data = new Data(guildID, id, content, new TrickConfig(hasSupressArg));
+                Data data = new Data(guildID, id, member.getId(), trickType, content, new TrickConfig(hasSupressArg));
                 CONTENT.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(id, data);
 
                 data.save();
@@ -154,13 +164,14 @@ public class TrickCommand extends AbstractCommand {
 
             boolean hasSupressArg = args.hasArg("-supress");
             boolean hasContent = args.hasArg("-content");
+            Type trickType = args.hasArg("-code") ? Type.CODE : Type.DEFAULT;
             if (!hasContent)
                 return CommandResult.FAIL;
 
             int contentIndex = args.getArgIndex("-content");
             String content = args.getFrom(contentIndex + 1);
 
-            Data data = new Data(guildID, id, content, new TrickConfig(hasSupressArg));
+            Data data = new Data(guildID, id, member.getId(), trickType, content, new TrickConfig(hasSupressArg));
             CONTENT.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(id, data);
 
             data.save();
@@ -184,8 +195,12 @@ public class TrickCommand extends AbstractCommand {
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
                 Data data = CONTENT.get(guildID).get(id);
                 String response = data.content();
-                boolean supressEmbeds = data.settings().supressEmbeds();
-                dMessage.apply(channel.sendMessage(response)).setSuppressEmbeds(supressEmbeds).queue();
+                if (data.trickType == Type.DEFAULT) {
+                    boolean supressEmbeds = data.settings().supressEmbeds();
+                    dMessage.apply(channel.sendMessage(response)).setSuppressEmbeds(supressEmbeds).queue();
+                } else {
+                    executeScript(message, args.getFrom(2).split(" "), response);
+                }
             } else {
                 dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(id))).queue();
             }
@@ -211,6 +226,20 @@ public class TrickCommand extends AbstractCommand {
         }
 
         return CommandResult.FAIL;
+    }
+
+    private void executeScript(Message message, String[] args, String script) {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("rhino");
+
+        engine.put("message", message);
+        engine.put("args", args);
+
+        try {
+            engine.eval(script);
+        } catch (ScriptException e) {
+            message.reply(e.getMessage()).setSuppressedNotifications(true).queue();
+        }
     }
 
     @Override
@@ -277,11 +306,12 @@ public class TrickCommand extends AbstractCommand {
             Message message = event.getMessage();
             String guildID = message.getGuild().getId();
             String command = event.getCommand();
+            String args = event.getArguments().getFrom(0);
 
             // We have found something that works, make sure we do this so that "Invalid Command" doesn't occur
             // event.setHandled() insures that the command has been handled!
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(command))
-                event.setHandled(execute(message, Arguments.of("-s", command)));
+                event.setHandled(execute(message, Arguments.of("-s", command, args)));
         }
     }
 
@@ -297,7 +327,8 @@ public class TrickCommand extends AbstractCommand {
         }
     }
 
-    public record Data(String guildID, String trickID, String content, TrickConfig settings) {
+    public record Data(String guildID, String trickID, String ownerID, Type trickType, String content,
+                       TrickConfig settings) {
         public void save() {
             File dir = new File(SAVE_PATH.formatted(guildID));
             if (!dir.exists())
@@ -305,7 +336,7 @@ public class TrickCommand extends AbstractCommand {
 
             Gson gson = new Gson();
             try {
-                String json = gson.toJson(new TrickCommand.Data(guildID, trickID, content, settings));
+                String json = gson.toJson(this);
                 Files.writeString(Path.of((SAVE_PATH + "%s.json").formatted(guildID, trickID)), json);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -319,7 +350,7 @@ public class TrickCommand extends AbstractCommand {
         }
 
         public Data withSettings(TrickConfig settings) {
-            return new Data(guildID, trickID, content, settings);
+            return new Data(guildID, trickID, ownerID, trickType, content, settings);
         }
     }
 }
