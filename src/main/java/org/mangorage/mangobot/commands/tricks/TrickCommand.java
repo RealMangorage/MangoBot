@@ -36,6 +36,7 @@ import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
 import org.mangorage.mangobotapi.core.registry.GuildCache;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.script.ScriptParser;
 import org.mangorage.mangobotapi.core.util.Arguments;
 import org.mangorage.mangobotapi.core.util.BRunnable;
 import org.mangorage.mangobotapi.core.util.CommandResult;
@@ -43,8 +44,8 @@ import org.mangorage.mangobotapi.core.util.MessageSettings;
 import org.mangorage.mangobotapi.core.util.TaskScheduler;
 import org.mangorage.mangobotapi.core.util.extra.PagedList;
 
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +53,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -127,7 +129,7 @@ public class TrickCommand extends AbstractCommand {
         // !tricks -a wow -supress false -content Wow is amazing!
         // !tricks -a wow -content wooop!
 
-        if (type.equals("-a") && id != null) {
+        if ((type.equals("-a") || type.equals("-add")) && id != null) {
             if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.TRICK_ADMIN))
                 return CommandResult.NO_PERMISSION;
 
@@ -151,7 +153,7 @@ public class TrickCommand extends AbstractCommand {
                 dMessage.apply(message.reply("Added Trick: '%s'".formatted(id))).queue();
             }
             return CommandResult.PASS;
-        } else if (type.equals("-e")) {
+        } else if ((type.equals("-e") || type.equals("-edit")) & id != null) {
             if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.TRICK_ADMIN))
                 return CommandResult.NO_PERMISSION;
 
@@ -178,7 +180,7 @@ public class TrickCommand extends AbstractCommand {
             dMessage.apply(message.reply("Modfied Trick: '%s'".formatted(id))).queue();
 
             return CommandResult.PASS;
-        } else if (type.equals("-r") && id != null) {
+        } else if ((type.equals("-r") || type.equals("-remove")) && id != null) {
             if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.TRICK_ADMIN))
                 return CommandResult.NO_PERMISSION;
 
@@ -190,7 +192,7 @@ public class TrickCommand extends AbstractCommand {
                 dMessage.apply(message.reply("Trick '%s' does not exist.")).queue();
             }
             return CommandResult.PASS;
-        } else if (type.equals("-s") && id != null) {
+        } else if ((type.equals("-s") || type.equals("show")) && id != null) {
             MessageChannelUnion channel = message.getChannel();
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
                 Data data = CONTENT.get(guildID).get(id);
@@ -205,7 +207,7 @@ public class TrickCommand extends AbstractCommand {
                 dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(id))).queue();
             }
             return CommandResult.PASS;
-        } else if (type.equals("-l")) {
+        } else if (type.equals("-l") || type.equals("-list")) {
             MessageChannelUnion channel = message.getChannel();
             if (CONTENT.containsKey(guildID) && !CONTENT.get(guildID).isEmpty()) {
 
@@ -223,21 +225,51 @@ public class TrickCommand extends AbstractCommand {
                 );
             }
             return CommandResult.PASS;
-        }
+        } else if ((type.equals("-i") || type.equals("-info")) && id != null) {
+            MessageChannelUnion channel = message.getChannel();
+            if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
+                Data data = CONTENT.get(guildID).get(id);
+                StringJoiner builder = new StringJoiner("\n");
+                builder.add("Trick Info:");
+                builder.add("-----------");
+                builder.add("Owner: <@%s>".formatted(data.ownerID()));
+                builder.add("TrickType: %s".formatted(data.trickType()));
+                builder.add("ID: %s".formatted(data.trickID()));
+                builder.add("Content:".formatted());
+                builder.add(data.content());
 
+                message.reply(builder.toString()).setSuppressEmbeds(true).setSuppressedNotifications(true).queue();
+            } else {
+                dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(id))).queue();
+            }
+            return CommandResult.PASS;
+        }
         return CommandResult.FAIL;
     }
 
     private void executeScript(Message message, String[] args, String script) {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("rhino");
+        System.out.println(script);
+        String[] strArr = script.split("\\n");
 
-        engine.put("message", message);
-        engine.put("args", args);
+        if (strArr[0].startsWith("```")) {
+            strArr[0] = "";
+            strArr[strArr.length - 1] = "";
+        }
+
+        StringJoiner scriptHandled = new StringJoiner("\n");
+        for (int i = 0; i < strArr.length; i++) {
+            scriptHandled.add(strArr[i]);
+        }
+
+        System.out.println("cool -> %s".formatted(scriptHandled.toString()));
+
+        ScriptEngine engine = ScriptParser.get();
 
         try {
-            engine.eval(script);
-        } catch (ScriptException e) {
+            engine.eval(scriptHandled.toString());
+            Invocable inv = (Invocable) engine;
+            inv.invokeFunction("main", message, args);
+        } catch (ScriptException | NoSuchMethodException e) {
             message.reply(e.getMessage()).setSuppressedNotifications(true).queue();
         }
     }

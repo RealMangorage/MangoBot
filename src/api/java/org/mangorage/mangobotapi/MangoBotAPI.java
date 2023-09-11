@@ -30,6 +30,7 @@ import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.ShutdownEvent;
 import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobotapi.core.script.ScriptParser;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 import java.util.function.Consumer;
@@ -77,7 +78,7 @@ public class MangoBotAPI {
         EVENT_BUS.addListener(10, StartupEvent.class, event -> {
             switch (event.phase()) {
                 case STARTUP -> {
-
+                    ScriptParser.init();
                 }
                 case REGISTRATION -> {
                     EVENT_BUS.post(new RegistryEvent(CommandRegistry.CommandType.COMMAND));

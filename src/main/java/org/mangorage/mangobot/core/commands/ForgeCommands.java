@@ -45,6 +45,8 @@ public class ForgeCommands {
         PERMISSIONS.register(TRICK_ADMIN, APermission.of("1129067881842360381"));
         // Moderators Role
         PERMISSIONS.register(TRICK_ADMIN, APermission.of("1129070272302022656"));
+        // Mango Bot Tester Role
+        PERMISSIONS.register(TRICK_ADMIN, APermission.of("1150880910745538631"));
 
         // Admin Role
         PERMISSIONS.register(RECORD_ADMIN, APermission.of("1129067881842360381"));

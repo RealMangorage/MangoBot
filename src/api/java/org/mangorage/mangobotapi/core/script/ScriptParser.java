@@ -20,16 +20,20 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobottest.core.events;
+package org.mangorage.mangobotapi.core.script;
 
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
+public class ScriptParser {
+    private static final ScriptEngineManager manager = new ScriptEngineManager();
+    private static final ScriptEngine engine = manager.getEngineByName("rhino");
 
-public class EventListener {
-    @SubscribeEvent
-    public void messageRecieved(MessageReceivedEvent event) {
-        CommandRegistry.handleMessage(event);
+    public static ScriptEngine get() {
+        return engine;
+    }
+
+    public static void init() {
+        engine.put("GLOBAL", new Global());
     }
 }

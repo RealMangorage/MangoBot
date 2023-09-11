@@ -22,10 +22,14 @@
 
 package org.mangorage.mangobot;
 
+import org.mangorage.mangobotapi.core.script.Global;
+import org.mangorage.mangobotapi.core.script.ScriptParser;
+
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Test {
     public static class a {
@@ -36,19 +40,33 @@ public class Test {
         public AtomicBoolean getBool() {
             return new AtomicBoolean();
         }
+
+        public AtomicInteger get() {
+            return new AtomicInteger(100);
+        }
     }
 
     public static void main(String[] args) {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("rhino");
+        ScriptParser.init();
+        ScriptEngine engine = ScriptParser.get();
 
         engine.put("handle", new a());
+        engine.put("GLOBAL", new Global());
 
+        String ev = """
+                function f() {
+                    handle.print("woop!");
+                }
+                """;
+
+        var aa = engine.getFactory().getMethodCallSyntax(ev, "f");
         try {
-            engine.eval("""
-                    handle.print(handle.getBool().get())
-                    """);
-        } catch (ScriptException e) {
+            engine.eval(ev);
+            Invocable inv = (Invocable) engine;
+            inv.invokeFunction("f");
+            System.out.println("OUTPUT -> %s".formatted(aa));
+            ;
+        } catch (ScriptException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
 
