@@ -22,7 +22,6 @@
 
 package org.mangorage.mangobot;
 
-import org.apache.logging.log4j.core.layout.YamlLayout;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.settings.MSettings;
 
@@ -33,7 +32,6 @@ import org.mangorage.mangobot.core.settings.MSettings;
 public class Core {
 
     public static void main(String[] args) {
-        org.apache.logging.log4j.core.layout.YamlLayout.Builder builder = new YamlLayout.Builder();
         if (MSettings.BOT_TOKEN.get().equals("UNCHANGED"))
             throw new IllegalStateException("Must set BOT_TOKEN in .env found inside of botresources to a bot token!");
 

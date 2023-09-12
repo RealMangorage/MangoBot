@@ -26,5 +26,6 @@ import org.mangorage.mangobotapi.misc.Setting;
 
 public class MSettings {
     public static final Setting<String> BOT_TOKEN = new EnvSetting("BOT_TOKEN");
-    public static final Setting<String> YT_TOKEN = new EnvSetting("YT_TOKEN");
+    public static final Setting<String> YT_EMAIL = new EnvSetting("YT_EMAIL");
+    public static final Setting<String> YT_PW = new EnvSetting("YT_PASSWORD");
 }

@@ -30,11 +30,4 @@ public class DMessageRecievedEvent extends WrapperEvent<DMessageRecievedEvent, M
     public DMessageRecievedEvent(MessageReceivedEvent object) {
         super(object);
     }
-
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(DMessageRecievedEvent event) {
-    }
 }

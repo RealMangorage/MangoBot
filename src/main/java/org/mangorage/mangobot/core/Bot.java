@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.mangobot.core.commands.ForgeCommands;
 import org.mangorage.mangobot.core.commands.GlobalCommands;
 import org.mangorage.mangobot.core.events.EventListener;
+import org.mangorage.mangobot.core.events.Listeners;
 import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.MangoBotAPIBuilder;
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
@@ -140,6 +141,7 @@ public class Bot {
             MangoBotAPI.getInstance().startup((bus) -> {
                 EVENT_BUS.addListener(StartupEvent.class, this::onStartup);
                 EVENT_BUS.addListener(ShutdownEvent.class, this::onShutdown);
+                Listeners.init(EVENT_BUS);
             });
         }
 

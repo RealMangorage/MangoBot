@@ -30,8 +30,4 @@ public class DButtonInteractionEvent extends WrapperEvent<DButtonInteractionEven
     public DButtonInteractionEvent(ButtonInteractionEvent object) {
         super(object);
     }
-
-    @Override
-    public void indirectInvoke(DButtonInteractionEvent event) {
-    }
 }

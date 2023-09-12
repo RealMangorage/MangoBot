@@ -64,7 +64,8 @@ import static org.mangorage.mangobot.core.Bot.EVENT_BUS;
 public class TrickCommand extends AbstractCommand {
     public enum Type {
         DEFAULT,
-        CODE
+        CODE,
+        ALIAS
     }
 
     private static final String TRICKS_DIR = "data/guilddata/tricks/";
@@ -138,7 +139,7 @@ public class TrickCommand extends AbstractCommand {
             } else {
                 boolean hasSupressArg = args.hasArg("-supress");
                 boolean hasContent = args.hasArg("-content");
-                Type trickType = args.hasArg("-code") ? Type.CODE : Type.DEFAULT;
+                Type trickType = getTrickType(args);
 
                 if (!hasContent)
                     return CommandResult.FAIL;
@@ -157,8 +158,9 @@ public class TrickCommand extends AbstractCommand {
             if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.TRICK_ADMIN))
                 return CommandResult.NO_PERMISSION;
 
+            Data oldData;
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
-                CONTENT.get(guildID).remove(id);
+                oldData = CONTENT.get(guildID).remove(id);
             } else {
                 dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(id))).queue();
                 return CommandResult.FAIL;
@@ -166,14 +168,14 @@ public class TrickCommand extends AbstractCommand {
 
             boolean hasSupressArg = args.hasArg("-supress");
             boolean hasContent = args.hasArg("-content");
-            Type trickType = args.hasArg("-code") ? Type.CODE : Type.DEFAULT;
+            Type trickType = getTrickType(args);
             if (!hasContent)
                 return CommandResult.FAIL;
 
             int contentIndex = args.getArgIndex("-content");
             String content = args.getFrom(contentIndex + 1);
 
-            Data data = new Data(guildID, id, member.getId(), trickType, content, new TrickConfig(hasSupressArg));
+            Data data = new Data(guildID, oldData.trickID(), oldData.ownerID(), trickType, content, new TrickConfig(hasSupressArg));
             CONTENT.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(id, data);
 
             data.save();
@@ -197,12 +199,7 @@ public class TrickCommand extends AbstractCommand {
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
                 Data data = CONTENT.get(guildID).get(id);
                 String response = data.content();
-                if (data.trickType == Type.DEFAULT) {
-                    boolean supressEmbeds = data.settings().supressEmbeds();
-                    dMessage.apply(channel.sendMessage(response)).setSuppressEmbeds(supressEmbeds).queue();
-                } else {
-                    executeScript(message, args.getFrom(2).split(" "), response);
-                }
+                return executeTrick(data, channel, message, args);
             } else {
                 dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(id))).queue();
             }
@@ -245,6 +242,48 @@ public class TrickCommand extends AbstractCommand {
             return CommandResult.PASS;
         }
         return CommandResult.FAIL;
+    }
+
+    private Type getTrickType(Arguments args) {
+        if (args.hasArg("-code"))
+            return Type.CODE;
+        if (args.hasArg("-alias"))
+            return Type.ALIAS;
+        return Type.DEFAULT;
+    }
+
+    private CommandResult executeTrick(Data data, MessageChannelUnion channel, Message message, Arguments args) {
+        MessageSettings dMessage = Bot.DEFAULT_SETTINGS;
+        String response = data.content();
+        String guildID = data.guildID;
+
+        switch (data.trickType()) {
+            case DEFAULT -> {
+                boolean supressEmbeds = data.settings().supressEmbeds();
+                dMessage.apply(channel.sendMessage(response)).setSuppressEmbeds(supressEmbeds).queue();
+            }
+            case CODE -> {
+                executeScript(message, args.getFrom(2).split(" "), response);
+            }
+            case ALIAS -> {
+                String defer = data.content();
+                if (CONTENT.get(guildID).containsKey(defer)) {
+                    var tData = CONTENT.get(guildID).get(defer);
+                    if (tData.trickType() == Type.ALIAS) {
+                        // Cant do it because its an alias
+                        return CommandResult.FAIL;
+                    } else {
+                        executeTrick(tData, channel, message, args);
+                        return CommandResult.PASS;
+                    }
+                } else {
+                    // Cant find the trick?
+                    return CommandResult.FAIL;
+                }
+            }
+        }
+
+        return CommandResult.PASS;
     }
 
     private void executeScript(Message message, String[] args, String script) {
@@ -368,7 +407,7 @@ public class TrickCommand extends AbstractCommand {
 
             Gson gson = new Gson();
             try {
-                String json = gson.toJson(this);
+                String json = gson.toJson(new Data(guildID, trickID, ownerID, trickType, content, new TrickConfig(settings.supressEmbeds())));
                 Files.writeString(Path.of((SAVE_PATH + "%s.json").formatted(guildID, trickID)), json);
             } catch (IOException e) {
                 throw new RuntimeException(e);

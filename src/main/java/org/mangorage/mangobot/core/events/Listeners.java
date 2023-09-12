@@ -22,33 +22,38 @@
 
 package org.mangorage.mangobot.core.events;
 
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
 import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
+public class Listeners {
+    public static void init(IEventBus bus) {
+        bus.addListener(DMessageRecievedEvent.class, e -> {
+            var event = e.get();
+            var message = event.getMessage();
+            var user = event.getAuthor();
+            var userID = user.getId();
+            if (Bot.getJDAInstance().getSelfUser().getId().equals(userID))
+                message.addReaction(Emoji.fromCustom("trash", 1150898672897359983L, false)).queue();
+        });
+        bus.addListener(DReactionEvent.class, e -> {
+            var event = e.get();
+            var messageid = event.getMessageId();
+            var emoji = event.getReaction().getEmoji();
 
-@SuppressWarnings("unused")
-public class EventListener {
+            System.out.println(emoji.getAsReactionCode());
+            if (event.getUserId().equals(Bot.getJDAInstance().getSelfUser().getId()))
+                return;
 
-    @SubscribeEvent
-    public void messageRecieved(MessageReceivedEvent event) {
-        CommandRegistry.handleMessage(event);
-        Bot.EVENT_BUS.post(new DMessageRecievedEvent(event));
-    }
+            if (emoji.getAsReactionCode().equals("trash:1150898672897359983")) {
+                event.getGuildChannel().retrieveMessageById(messageid).queue(m -> {
+                    if (Bot.getJDAInstance().getSelfUser().getId().equals(m.getAuthor().getId()))
+                        m.delete().queue();
+                });
+            }
 
-    @SubscribeEvent
-    public void messageReact(MessageReactionAddEvent event) {
-        Bot.EVENT_BUS.post(new DReactionEvent(event));
-    }
-
-    @SubscribeEvent
-    public void interact(ButtonInteractionEvent event) {
-        Bot.EVENT_BUS.post(new DButtonInteractionEvent(event));
+        });
     }
 }

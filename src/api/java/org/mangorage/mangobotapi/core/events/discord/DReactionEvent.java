@@ -20,35 +20,13 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.events;
+package org.mangorage.mangobotapi.core.events.discord;
 
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
-import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
-import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobotapi.core.events.WrapperEvent;
 
-
-@SuppressWarnings("unused")
-public class EventListener {
-
-    @SubscribeEvent
-    public void messageRecieved(MessageReceivedEvent event) {
-        CommandRegistry.handleMessage(event);
-        Bot.EVENT_BUS.post(new DMessageRecievedEvent(event));
-    }
-
-    @SubscribeEvent
-    public void messageReact(MessageReactionAddEvent event) {
-        Bot.EVENT_BUS.post(new DReactionEvent(event));
-    }
-
-    @SubscribeEvent
-    public void interact(ButtonInteractionEvent event) {
-        Bot.EVENT_BUS.post(new DButtonInteractionEvent(event));
+public class DReactionEvent extends WrapperEvent<DReactionEvent, MessageReactionAddEvent> {
+    public DReactionEvent(MessageReactionAddEvent object) {
+        super(object);
     }
 }

@@ -36,4 +36,8 @@ public abstract class WrapperEvent<T, X> extends Event implements IEvent<T> {
     public X get() {
         return object;
     }
+
+    @Override
+    public void indirectInvoke(T event) {
+    }
 }
