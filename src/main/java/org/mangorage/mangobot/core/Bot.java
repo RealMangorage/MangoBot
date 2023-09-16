@@ -65,8 +65,15 @@ public class Bot {
         APIHook = MangoBotAPI.getInstance();
     }
 
-    public static void initiate(String botToken) {
-        new Bot(botToken);
+    @SuppressWarnings("all")
+    public static Bot initiate(String botToken) {
+        if (BOT_INSTANCE.get() != null)
+            throw new IllegalStateException("Attempted to initiate bot, however Bot is already initiated...");
+
+        var bot = new Bot(botToken);
+        BOT_INSTANCE.set(bot);
+        BOT_INSTANCE.lock();
+        return bot;
     }
 
     public static JDA getJDAInstance() {
@@ -94,6 +101,9 @@ public class Bot {
 
     public Bot(String botToken) {
         System.out.println(STARTUP_MESSAGE);
+
+        // ****** Builder Start *********
+
         JDABuilder builder = JDABuilder.createDefault(botToken);
 
         EnumSet<GatewayIntent> intents = EnumSet.of(
@@ -128,11 +138,10 @@ public class Bot {
         builder.setAutoReconnect(true);
 
         this.BOT = builder.build();
-        this.BOT.upsertCommand("test", "this is neat!").queue();
+        // ****** Builder End *********
 
-        BOT_INSTANCE.set(this);
-        BOT_INSTANCE.lock();
 
+        // ****** Get Bot connected Start *********
         try {
             this.BOT.awaitReady();
         } catch (InterruptedException e) {
@@ -147,8 +156,7 @@ public class Bot {
             });
         }
 
-        // If we want screen -> WIP
-        // MainScreen.createScreen(EVENT_BUS);
+        // ****** Get Bot connected End *********
     }
 
     public void onStartup(StartupEvent event) {
@@ -162,6 +170,7 @@ public class Bot {
         }
     }
 
+    @SuppressWarnings("all")
     public void onShutdown(ShutdownEvent event) {
         switch (event.phase()) {
             case PRE -> {
