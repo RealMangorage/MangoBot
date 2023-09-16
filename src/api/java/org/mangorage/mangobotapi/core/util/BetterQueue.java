@@ -20,29 +20,12 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.util.extra;
+package org.mangorage.mangobotapi.core.util;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
 public class BetterQueue<T> {
-    public static void main(String[] args) {
-        BetterQueue<String> PLAYER_QUEUE = new BetterQueue<>();
-        System.out.println("Is empty: %s".formatted(PLAYER_QUEUE.isEmpty()));
-        PLAYER_QUEUE.add("Test A"); // 0
-        PLAYER_QUEUE.add("Test B"); // 1
-        var C = PLAYER_QUEUE.add("Test C"); // 2
-        PLAYER_QUEUE.add("Test D"); // 3
-        PLAYER_QUEUE.add(C);
-
-        System.out.println("finished");
-
-        System.out.println("removing");
-        var a = PLAYER_QUEUE.remove(C);
-        System.out.println("Sucess : " + a);
-
-    }
-
     private QueueData<T>[] QUEUE;
 
     public BetterQueue() {

@@ -22,13 +22,11 @@
 
 package org.mangorage.mangobotapi.core.eventbus;
 
-import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
 import org.mangorage.mangobotapi.core.eventbus.base.Event;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
 import org.mangorage.mangobotapi.core.eventbus.scanner.EventScanner;
-import org.mangorage.mangobotapi.core.events.tests.SampleEvent;
 
 import java.util.HashMap;
 /*
@@ -36,25 +34,6 @@ import java.util.HashMap;
  */
 
 public class EventBus implements IEventBus {
-
-    public static void main(String[] args) {
-        IEventBus bus = create();
-        bus.startup();
-        bus.addListener(SampleEvent.class, e -> {
-            System.out.println("WOO!");
-        });
-
-
-        bus.register(bus);
-        bus.post(new SampleEvent());
-    }
-
-
-    @SubscribeEvent(priority = 0, recieveCancelled = true)
-    public void onEvent(SampleEvent event) {
-        System.out.println("WOOOP!!!!");
-    }
-
     public static EventBus create() {
         return new EventBus(0, null);
     }

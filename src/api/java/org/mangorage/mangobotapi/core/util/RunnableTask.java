@@ -20,12 +20,34 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.settings;
+package org.mangorage.mangobotapi.core.util;
 
-import org.mangorage.mangobotapi.misc.Setting;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-public class MSettings {
-    public static final Setting<String> BOT_TOKEN = new EnvSetting("BOT_TOKEN");
-    public static final Setting<String> YT_EMAIL = new EnvSetting("YT_EMAIL");
-    public static final Setting<String> YT_PW = new EnvSetting("YT_PASSWORD");
+public class RunnableTask<T> implements Runnable, Supplier<T> {
+
+    private final T data;
+    private final Consumer<RunnableTask<T>> runnableConsumer;
+
+    public RunnableTask(T data, Consumer<RunnableTask<T>> runnable) {
+        this.data = data;
+        this.runnableConsumer = runnable;
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void run() {
+        this.runnableConsumer.accept(this);
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public T get() {
+        return data;
+    }
 }

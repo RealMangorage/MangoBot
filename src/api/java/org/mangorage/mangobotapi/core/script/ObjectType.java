@@ -20,9 +20,37 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.music;
+package org.mangorage.mangobotapi.core.script;
 
-/* Handles Audio Input and converts it into a file which can then be processed */
-@Deprecated
-public class AudioBuffer {
+import java.util.Objects;
+import java.util.function.Predicate;
+
+public enum ObjectType {
+    INTEGER(o -> o instanceof Integer),
+    DOUBLE(o -> o instanceof Double),
+    FLOAT(o -> o instanceof Float),
+    LONG(o -> o instanceof Long),
+    NUMBER(o -> o instanceof Number),
+    BOOLEAN(o -> o instanceof Boolean),
+    STRING(o -> o instanceof String),
+    OBJECT(o -> !Objects.isNull(o)),
+    NULL(Objects::isNull),
+    UNDEFINED(o -> false);
+
+    public static ObjectType typeOf(Object o) {
+        for (ObjectType type : ObjectType.values())
+            if (type.is(o))
+                return type;
+        return UNDEFINED;
+    }
+
+    private final Predicate<Object> predicate;
+
+    ObjectType(Predicate<Object> predicate) {
+        this.predicate = predicate;
+    }
+
+    public boolean is(Object o) {
+        return predicate.test(o);
+    }
 }

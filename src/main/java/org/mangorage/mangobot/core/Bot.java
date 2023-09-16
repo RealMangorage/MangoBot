@@ -46,6 +46,8 @@ import java.util.EnumSet;
 
 import static org.mangorage.mangobot.core.Constants.STARTUP_MESSAGE;
 
+
+// TODO: Rewrite this class slightly....
 public class Bot {
     private static final LockableReference<Bot> BOT_INSTANCE = new LockableReference<>();
     public static final EventBus EVENT_BUS = EventBus.create();
@@ -141,7 +143,7 @@ public class Bot {
             MangoBotAPI.getInstance().startup((bus) -> {
                 EVENT_BUS.addListener(StartupEvent.class, this::onStartup);
                 EVENT_BUS.addListener(ShutdownEvent.class, this::onShutdown);
-                Listeners.init(EVENT_BUS);
+                EVENT_BUS.register(Listeners.class);
             });
         }
 

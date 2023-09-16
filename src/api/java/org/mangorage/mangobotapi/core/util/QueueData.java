@@ -20,23 +20,26 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.keys;
+package org.mangorage.mangobotapi.core.util;
 
-import java.awt.*;
-import java.util.List;
+public class QueueData<T> {
+    private int position = 0;
+    private T data;
 
-public class KeyPress implements IRobotExecutable {
-    private final List<Integer> keys;
-
-    public KeyPress(Integer... keys) {
-        this.keys = List.of(keys);
+    public QueueData(T data) {
+        this.data = data;
     }
 
-    public List<Integer> getKeys() {
-        return keys;
+    public T getData() {
+        return data;
     }
 
-    public void execute(Robot robot) {
-        keys.forEach(robot::keyPress);
+    public void updatePosition(int position) {
+        this.position = position;
+        System.out.println("%s was updated to index %s!".formatted(data, this.position));
+    }
+
+    public int getPosition() {
+        return position;
     }
 }

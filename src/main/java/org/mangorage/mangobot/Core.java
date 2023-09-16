@@ -23,7 +23,12 @@
 package org.mangorage.mangobot;
 
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.core.settings.MSettings;
+import org.mangorage.mangobot.core.BotSettings;
+
+import javax.swing.*;
+import java.io.BufferedReader;
+import java.io.Console;
+import java.io.InputStreamReader;
 
 
 /**
@@ -32,12 +37,31 @@ import org.mangorage.mangobot.core.settings.MSettings;
 public class Core {
 
     public static void main(String[] args) {
-        if (MSettings.BOT_TOKEN.get().equals("UNCHANGED"))
-            throw new IllegalStateException("Must set BOT_TOKEN in .env found inside of botresources to a bot token!");
+        if (BotSettings.BOT_TOKEN.get().equalsIgnoreCase("empty")) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+            System.out.println("Please enter your Discord Bot's Token:");
+
+            final String token;
+            final String message = "Enter Bot Token";
+            if (System.console() == null) {
+                final JPasswordField pf = new JPasswordField();
+                token = JOptionPane.showConfirmDialog(null, pf, message,
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION
+                        ? new String(pf.getPassword()) : "";
+
+            } else {
+                Console c = System.console();
+                char[] chars = c.readPassword("Enter Bot Token:");
+                token = String.valueOf(chars);
+            }
+
+            BotSettings.BOT_TOKEN.set(token);
+            System.out.println("Configured the Bot Token. Proceeding to init Bot.");
+        }
+
 
         Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
-        // Test BCD
-
-        Bot.initiate(MSettings.BOT_TOKEN.get());
+        Bot.initiate(BotSettings.BOT_TOKEN.get());
     }
 }

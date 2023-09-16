@@ -29,8 +29,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.core.music.MusicPlayer;
 import org.mangorage.mangobotapi.core.AbstractCommand;
-import org.mangorage.mangobotapi.core.util.Arguments;
-import org.mangorage.mangobotapi.core.util.CommandResult;
+import org.mangorage.mangobotapi.core.registry.commands.Arguments;
+import org.mangorage.mangobotapi.core.registry.commands.CommandResult;
 
 public class QueueCommand extends AbstractCommand {
     @Override

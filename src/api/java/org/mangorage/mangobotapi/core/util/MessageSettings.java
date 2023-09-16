@@ -30,7 +30,6 @@ public class MessageSettings {
     }
 
     public MessageSettings(Builder builder) {
-
     }
 
     public MessageCreateAction apply(MessageCreateAction action) {

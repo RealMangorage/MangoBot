@@ -22,42 +22,23 @@
 
 package org.mangorage.mangobotapi.core.script;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
+import java.io.PrintStream;
 import java.util.HashMap;
 
 public class Global {
-    private final HashMap<Class<?>, HashMap<String, Object>> VARIABLES = new HashMap<>();
+    private final HashMap<String, Object> VARIABLES = new HashMap<>();
 
+    public PrintStream out = System.out;
 
-    @SuppressWarnings("unchecked")
-    public <X> X get(Class<X> type, String id) {
-        if (VARIABLES.containsKey(type) && VARIABLES.get(type).containsKey(id)) {
-            return (X) VARIABLES.get(type).get(id);
-        }
-
-        return null;
+    public void set(String ID, Object object) {
+        VARIABLES.put(ID, object);
     }
 
-    public <X> void put(Class<X> type, String id, X value) {
-        VARIABLES.computeIfAbsent(type, (a) -> new HashMap<>()).put(id, value);
+    public Object get(String ID) {
+        return VARIABLES.get(ID);
     }
 
-    public Class<?> getClassByName(String name) {
-        try {
-            return Class.forName(name);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Object createObjectByClass(Class<?> oClass, Object... params) {
-        Class<?>[] paramtypes = (Class<?>[]) Arrays.stream(params).map(Object::getClass).toArray();
-        try {
-            return oClass.getConstructor(paramtypes).newInstance(params);
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
-                 IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    public ObjectType typeOf(Object o) {
+        return ObjectType.typeOf(o);
     }
 }

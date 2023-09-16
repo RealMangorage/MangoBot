@@ -27,12 +27,12 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.AbstractCommand;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.registry.commands.Arguments;
 import org.mangorage.mangobotapi.core.registry.commands.CommandPrefix;
-import org.mangorage.mangobotapi.core.util.Arguments;
-import org.mangorage.mangobotapi.core.util.CommandResult;
+import org.mangorage.mangobotapi.core.registry.commands.CommandResult;
 
 import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
-import static org.mangorage.mangobot.core.permissions.GlobalPermissions.PREFIX_ADMIN;
+import static org.mangorage.mangobot.core.commands.permissions.GlobalPermissions.PREFIX_ADMIN;
 
 public class PrefixCommand extends AbstractCommand {
     @Override

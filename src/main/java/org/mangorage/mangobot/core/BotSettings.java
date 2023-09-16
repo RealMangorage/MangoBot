@@ -20,28 +20,13 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.permissions;
+package org.mangorage.mangobot.core;
 
-import net.dv8tion.jda.api.Permission;
-import org.mangorage.mangobotapi.core.registry.APermission;
-import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.config.Config;
+import org.mangorage.mangobotapi.core.config.ConfigSetting;
+import org.mangorage.mangobotapi.core.config.ISetting;
 
-public class GlobalPermissions {
-    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.global();
-
-    public static final APermission.Node PLAYING = APermission.Node.of("playing");
-    public static final APermission.Node TRICK_ADMIN = APermission.Node.of("trickadmin");
-    public static final APermission.Node PREFIX_ADMIN = APermission.Node.of("prefix");
-    public static final APermission.Node RECORD_ADMIN = APermission.Node.of("record");
-
-
-    static {
-        PERMISSIONS.register(PLAYING, Permission.ADMINISTRATOR);
-        PERMISSIONS.register(TRICK_ADMIN, Permission.ADMINISTRATOR);
-        PERMISSIONS.register(PREFIX_ADMIN, Permission.ADMINISTRATOR);
-        PERMISSIONS.register(RECORD_ADMIN, Permission.ADMINISTRATOR);
-    }
-
-    public static void init() {
-    }
+public class BotSettings {
+    private final static Config CONFIG = new Config("botresources/", ".env");
+    public static final ISetting<String> BOT_TOKEN = ConfigSetting.create(CONFIG, "BOT_TOKEN", "empty");
 }

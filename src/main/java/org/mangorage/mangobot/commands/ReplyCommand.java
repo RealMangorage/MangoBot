@@ -24,8 +24,8 @@ package org.mangorage.mangobot.commands;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.AbstractCommand;
-import org.mangorage.mangobotapi.core.util.Arguments;
-import org.mangorage.mangobotapi.core.util.CommandResult;
+import org.mangorage.mangobotapi.core.registry.commands.Arguments;
+import org.mangorage.mangobotapi.core.registry.commands.CommandResult;
 
 import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
 

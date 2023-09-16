@@ -20,26 +20,10 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.util.extra;
+package org.mangorage.mangobot.test.keys;
 
-public class QueueData<T> {
-    private int position = 0;
-    private T data;
+import java.awt.*;
 
-    public QueueData(T data) {
-        this.data = data;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void updatePosition(int position) {
-        this.position = position;
-        System.out.println("%s was updated to index %s!".formatted(data, this.position));
-    }
-
-    public int getPosition() {
-        return position;
-    }
+public interface IRobotExecutable {
+    void execute(Robot robot);
 }

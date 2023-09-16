@@ -20,21 +20,28 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.keys;
+package org.mangorage.mangobotapi.core.config;
 
-import java.awt.*;
+import static org.mangorage.mangobotapi.core.config.Transformer.create;
 
-public class KeyRelease extends KeyPress {
+public class Transformers {
+    public static final Transformer<String, String> STRING = create(v -> v, v -> v);
+    public static final Transformer<Boolean, String> BOOLEAN = create(
+            v -> {
+                if (v.equalsIgnoreCase("false"))
+                    return false;
+                if (v.equalsIgnoreCase("true"))
+                    return true;
+                return null;
+            }, Object::toString);
 
-    public KeyRelease(Integer... keys) {
-        super(keys);
-    }
+    public static final Transformer<Integer, String> INTEGER = create(
+            v -> {
+                try {
+                    return Integer.parseInt(v);
+                } catch (NumberFormatException ignored) {
+                }
 
-    /**
-     * @param robot
-     */
-    @Override
-    public void execute(Robot robot) {
-        getKeys().forEach(robot::keyRelease);
-    }
+                return null;
+            }, Object::toString);
 }

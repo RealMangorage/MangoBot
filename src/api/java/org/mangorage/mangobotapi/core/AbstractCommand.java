@@ -23,8 +23,8 @@
 package org.mangorage.mangobotapi.core;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobotapi.core.util.Arguments;
-import org.mangorage.mangobotapi.core.util.CommandResult;
+import org.mangorage.mangobotapi.core.registry.commands.Arguments;
+import org.mangorage.mangobotapi.core.registry.commands.CommandResult;
 
 public abstract class AbstractCommand {
     public static AbstractCommand create(ICommand command, boolean isGuild) {

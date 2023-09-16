@@ -28,7 +28,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.core.permissions.GlobalPermissions;
+import org.mangorage.mangobot.core.commands.permissions.GlobalPermissions;
 import org.mangorage.mangobotapi.core.AbstractCommand;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
@@ -36,13 +36,13 @@ import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
 import org.mangorage.mangobotapi.core.registry.GuildCache;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.registry.commands.Arguments;
+import org.mangorage.mangobotapi.core.registry.commands.CommandResult;
 import org.mangorage.mangobotapi.core.script.ScriptParser;
-import org.mangorage.mangobotapi.core.util.Arguments;
-import org.mangorage.mangobotapi.core.util.BRunnable;
-import org.mangorage.mangobotapi.core.util.CommandResult;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
+import org.mangorage.mangobotapi.core.util.PagedList;
+import org.mangorage.mangobotapi.core.util.RunnableTask;
 import org.mangorage.mangobotapi.core.util.TaskScheduler;
-import org.mangorage.mangobotapi.core.util.extra.PagedList;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -215,9 +215,9 @@ public class TrickCommand extends AbstractCommand {
                 channel.sendMessage("""
                         Getting Tricks List... 
                         """).queue((m -> {
-                            PAGES.put(m.getId(), tricks);
-                            TaskScheduler.executor.schedule(new BRunnable<>(m, (d) -> removeTricksList(d.get())), 10, TimeUnit.MINUTES);
-                            updateTrickListMessage(tricks, m, true);
+                    PAGES.put(m.getId(), tricks);
+                    TaskScheduler.executor.schedule(new RunnableTask<>(m, (d) -> removeTricksList(d.get())), 10, TimeUnit.MINUTES);
+                    updateTrickListMessage(tricks, m, true);
                         })
                 );
             }

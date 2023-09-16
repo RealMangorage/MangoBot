@@ -20,23 +20,27 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events.tests;
+package org.mangorage.mangobotapi.core.registry.commands;
 
-import org.mangorage.mangobotapi.core.eventbus.base.Event;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
+import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobotapi.MangoBotAPI;
+import org.mangorage.mangobotapi.core.util.MessageSettings;
 
-public class TestEvent extends Event implements IEvent<TestEvent> {
 
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(TestEvent event) {
+public record CommandResult(String string) {
+    public static final MessageSettings DEFAULT_SETTINGS = MangoBotAPI.getInstance().getDefaultMessageSettings();
 
+    public static CommandResult of(String string) {
+        return new CommandResult(string);
     }
 
-    @Override
-    public boolean isCancellable() {
-        return true;
+    public static final CommandResult PASS = of(null);
+    public static final CommandResult FAIL = of("An error occured while executing this command");
+    public static final CommandResult NO_PERMISSION = of("You dont have permission to use this command!");
+    public static final CommandResult UNDER_MAINTENANCE = of("This is currently under maintenance! Please try again later!");
+
+    public void accept(Message message) {
+        if (string() != null)
+            DEFAULT_SETTINGS.apply(message.reply(string)).queue();
     }
 }

@@ -20,10 +20,26 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.misc;
+package org.mangorage.mangobotapi.core.config;
 
-public interface IFile {
-    void save();
+public class Transformer<T, X> {
+    public static <T, X> Transformer<T, X> create(ITransformer<T, X> transformer, ITransformer<X, T> transformerReversed) {
+        return new Transformer<>(transformer, transformerReversed);
+    }
 
-    void delete();
+    private final ITransformer<T, X> transformer;
+    private final ITransformer<X, T> transformerReversed;
+
+    private Transformer(ITransformer<T, X> transformer, ITransformer<X, T> transformerReversed) {
+        this.transformer = transformer;
+        this.transformerReversed = transformerReversed;
+    }
+
+    public ITransformer<T, X> getTransformer() {
+        return transformer;
+    }
+
+    public ITransformer<X, T> getTransformerReversed() {
+        return transformerReversed;
+    }
 }

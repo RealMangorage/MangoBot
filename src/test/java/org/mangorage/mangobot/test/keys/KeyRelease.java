@@ -20,14 +20,21 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.events.tests;
+package org.mangorage.mangobot.test.keys;
 
-import org.mangorage.mangobotapi.core.eventbus.base.Event;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
+import java.awt.*;
 
-public class SampleEvent extends Event implements IEvent<SampleEvent> {
+public class KeyRelease extends KeyPress {
 
+    public KeyRelease(Integer... keys) {
+        super(keys);
+    }
+
+    /**
+     * @param robot
+     */
     @Override
-    public void indirectInvoke(SampleEvent event) {
+    public void execute(Robot robot) {
+        getKeys().forEach(robot::keyRelease);
     }
 }

@@ -20,19 +20,10 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.keys;
+package org.mangorage.mangobotapi.core.config;
 
-import java.awt.*;
+public interface ISetting<X> {
+    void set(X value);
 
-public class RobotDelay implements IRobotExecutable {
-    private final int delay;
-
-    public RobotDelay(int delay) {
-        this.delay = delay;
-    }
-
-    @Override
-    public void execute(Robot robot) {
-        robot.delay(delay);
-    }
+    X get();
 }

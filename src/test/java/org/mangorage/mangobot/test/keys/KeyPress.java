@@ -20,24 +20,23 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.reflection;
+package org.mangorage.mangobot.test.keys;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.awt.*;
+import java.util.List;
 
-public class JarFileLoader extends URLClassLoader {
-    public JarFileLoader(URL[] urls) {
-        super(urls);
+public class KeyPress implements IRobotExecutable {
+    private final List<Integer> keys;
+
+    public KeyPress(Integer... keys) {
+        this.keys = List.of(keys);
     }
 
-    public void addFile(String path) throws MalformedURLException {
-        String urlPath = "jar:file://" + path + "!/";
-        addURL(new URL(urlPath));
+    public List<Integer> getKeys() {
+        return keys;
     }
 
-    public Class<?> loadClass(String path, boolean resolve) throws ClassNotFoundException {
-        return super.loadClass(path, resolve);
+    public void execute(Robot robot) {
+        keys.forEach(robot::keyPress);
     }
 }
-

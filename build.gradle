@@ -65,13 +65,17 @@ dependencies {
     apiImplementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA for BotAPI
     apiImplementation("org.apache.logging.log4j:log4j-core:2.14.1")
 
+    // Libs for test
+    testImplementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA for BotAPI
+    testImplementation("org.apache.logging.log4j:log4j-core:2.14.1")
+    testImplementation(sourceSets.api.output)
+
     // Libs for Bot
     implementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA
     implementation("commons-io:commons-io:2.13.0") // Common API
-    implementation("io.github.cdimascio:dotenv-java:3.0.0") // DotEnv for having local Variables, for BOT_TOKEN mainly
     implementation("com.github.walkyst:lavaplayer-fork:1.4.3") // LavaPlayer to stream audio from YT/FILES to Discord
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation group: 'javax.persistence', name: 'persistence-api', version: '1.0'
+
     // implementation("ws.schild:jave-all-deps:3.3.1")
     implementation("org.apache.logging.log4j:log4j-core:2.14.1")
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
