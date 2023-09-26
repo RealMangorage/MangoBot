@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group 'org.mangorage'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://m2.dv8tion.net/releases'
+    }
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+    implementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA for BotAPI
+    implementation("org.apache.logging.log4j:log4j-core:2.14.1")
+}
+
+test {
+    useJUnitPlatform()
+}
