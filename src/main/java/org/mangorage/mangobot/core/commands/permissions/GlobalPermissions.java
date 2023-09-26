@@ -23,16 +23,16 @@
 package org.mangorage.mangobot.core.commands.permissions;
 
 import net.dv8tion.jda.api.Permission;
-import org.mangorage.mangobotapi.core.registry.APermission;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.registry.UserPermission;
 
 public class GlobalPermissions {
     public static final PermissionRegistry PERMISSIONS = PermissionRegistry.global();
 
-    public static final APermission.Node PLAYING = APermission.Node.of("playing");
-    public static final APermission.Node TRICK_ADMIN = APermission.Node.of("trickadmin");
-    public static final APermission.Node PREFIX_ADMIN = APermission.Node.of("prefix");
-    public static final APermission.Node RECORD_ADMIN = APermission.Node.of("record");
+    public static final UserPermission.Node PLAYING = UserPermission.Node.of("playing");
+    public static final UserPermission.Node TRICK_ADMIN = UserPermission.Node.of("trickadmin");
+    public static final UserPermission.Node PREFIX_ADMIN = UserPermission.Node.of("prefix");
+    public static final UserPermission.Node RECORD_ADMIN = UserPermission.Node.of("record");
 
 
     static {

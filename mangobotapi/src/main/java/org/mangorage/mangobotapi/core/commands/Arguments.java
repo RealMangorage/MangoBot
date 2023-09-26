@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.registry.commands;
+package org.mangorage.mangobotapi.core.commands;
 
 import java.util.function.Function;
 

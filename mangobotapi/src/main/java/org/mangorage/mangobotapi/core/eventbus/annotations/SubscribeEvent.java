@@ -20,24 +20,18 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.registry.commands;
+package org.mangorage.mangobotapi.core.eventbus.annotations;
 
-import org.mangorage.mangobotapi.MangoBotAPI;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-import java.util.HashMap;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-public class CommandPrefix {
-    public static final String DEFAULT = MangoBotAPI.getInstance().getCommandPrefix();
+@Retention(value = RUNTIME)
+@Target(value = METHOD)
+public @interface SubscribeEvent {
+    int priority() default 0;
 
-    public static final HashMap<String, String> GUILD_PREFIXES = new HashMap<>();
-
-    public static void configure(String guildID, String prefix) {
-        GUILD_PREFIXES.put(guildID, prefix);
-    }
-
-    public static String getPrefix(String guildID) {
-        if (guildID == null)
-            return DEFAULT;
-        return GUILD_PREFIXES.getOrDefault(guildID, DEFAULT);
-    }
+    boolean recieveCancelled() default false;
 }

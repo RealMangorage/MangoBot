@@ -23,8 +23,6 @@
 package org.mangorage.mangobotapi.core.eventbus.scanner;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mangorage.mangobotapi.core.eventbus.EventBuilder;
 import org.mangorage.mangobotapi.core.eventbus.EventBus;
 import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
@@ -36,6 +34,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Simple utility class for scanning Classes/Objects
@@ -46,7 +45,7 @@ import java.util.List;
  */
 
 public final class EventScanner {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = Logger.getLogger("test");
 
     public static List<EventBuilder> scan(Object object, EventBus bus) {
         final ArrayList<EventBuilder> BUILDERS = new ArrayList<>();

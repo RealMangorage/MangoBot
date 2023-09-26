@@ -41,12 +41,12 @@ import org.mangorage.mangobot.core.Util;
 import org.mangorage.mangobot.core.commands.permissions.GlobalPermissions;
 import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
 import org.mangorage.mangobot.core.music.recorder.VoiceRelay;
-import org.mangorage.mangobotapi.core.AbstractCommand;
+import org.mangorage.mangobotapi.core.commands.AbstractCommand;
+import org.mangorage.mangobotapi.core.commands.CommandHolder;
+import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.registry.RegistryObject;
-import org.mangorage.mangobotapi.core.registry.commands.CommandHolder;
-import org.mangorage.mangobotapi.core.registry.commands.CommandResult;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 public class GlobalCommands {

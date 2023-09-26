@@ -20,40 +20,24 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core;
+package org.mangorage.mangobotapi.core.commands;
 
-import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobotapi.core.registry.commands.Arguments;
-import org.mangorage.mangobotapi.core.registry.commands.CommandResult;
+import org.mangorage.mangobotapi.MangoBotAPI;
 
-public abstract class AbstractCommand {
-    public static AbstractCommand create(ICommand command, boolean isGuild) {
-        if (command == null)
-            throw new IllegalStateException("Command cannot be null");
-        return new AbstractCommand() {
-            @Override
-            public CommandResult execute(Message message, Arguments args) {
-                return command.execute(message, args);
-            }
+import java.util.HashMap;
 
-            /**
-             * @return
-             */
-            @Override
-            public boolean isGuildOnly() {
-                return isGuild;
-            }
-        };
+public class CommandPrefix {
+    public static final String DEFAULT = MangoBotAPI.getInstance().getCommandPrefix();
+
+    public static final HashMap<String, String> GUILD_PREFIXES = new HashMap<>();
+
+    public static void configure(String guildID, String prefix) {
+        GUILD_PREFIXES.put(guildID, prefix);
     }
 
-    public abstract CommandResult execute(Message message, Arguments args);
-
-    public boolean isGuildOnly() {
-        return true;
-    }
-
-    @FunctionalInterface
-    public interface ICommand {
-        CommandResult execute(Message message, Arguments args);
+    public static String getPrefix(String guildID) {
+        if (guildID == null)
+            return DEFAULT;
+        return GUILD_PREFIXES.getOrDefault(guildID, DEFAULT);
     }
 }

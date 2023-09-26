@@ -20,30 +20,25 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.registry;
+package org.mangorage.mangobotapi.core.util;
 
-import java.util.HashMap;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 
-public class APermission {
-    public static APermission of(String id) {
-        return new APermission(id);
-    }
-
-    private final String ID;
-
-    private APermission(String roleID) {
-        this.ID = roleID;
-    }
-
-    public String getID() {
-        return ID;
-    }
-
-    public record Node(String id) {
-        private static final HashMap<String, Node> NODES = new HashMap<>();
-
-        public static Node of(String id) {
-            return NODES.computeIfAbsent(id, key -> new Node(id));
+public class BotUtil {
+    public static boolean isValidBotToken(String token) {
+        var bot = JDABuilder.createDefault(token);
+        JDA jda = null;
+        try {
+            jda = bot.build();
+        } catch (InvalidTokenException e) {
+            return false;
+        } finally {
+            if (jda != null && jda.getStatus() != JDA.Status.DISCONNECTED)
+                jda.shutdownNow();
         }
+
+        return true;
     }
 }

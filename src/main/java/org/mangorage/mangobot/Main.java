@@ -22,10 +22,61 @@
 
 package org.mangorage.mangobot;
 
+import org.mangorage.mangobot.core.Bot;
+import org.mangorage.mangobot.core.BotSettings;
+import org.mangorage.mangobotapi.core.util.BotUtil;
+
+import javax.swing.*;
+import java.io.Console;
+
+
 public class Main {
+    public Main() {
+        main(new String[]{});
+    }
+
     public static void main(String[] args) {
-        //DependencyLoader.init();
-        System.out.println("done");
-        Core.main(args);
+        var currentToken = BotSettings.BOT_TOKEN.get();
+        if (currentToken.equalsIgnoreCase("empty"))
+            requestBotToken(false);
+        if (!BotUtil.isValidBotToken(currentToken))
+            requestBotToken(true);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
+        Bot.initiate(BotSettings.BOT_TOKEN.get());
+
+    }
+
+    private static void requestBotToken(boolean wasInvalid) {
+        String message = "Enter your Bot Token";
+        if (wasInvalid) {
+            System.out.println("Current Bot Token detected as invalid...");
+            System.out.println("Please re-enter your Discord Bot's Token:");
+            message = "Re-Enter your Bot Token";
+        } else {
+            System.out.println("Please enter your Discord Bot's Token:");
+        }
+
+
+        final String token;
+        if (System.console() == null) {
+            final JPasswordField pf = new JPasswordField();
+            pf.setEchoChar('#');
+            token = JOptionPane.showConfirmDialog(null, pf, message,
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION
+                    ? new String(pf.getPassword()) : "";
+
+        } else {
+            Console c = System.console();
+            char[] chars = c.readPassword("Enter Bot Token:");
+            token = String.valueOf(chars);
+        }
+
+        if (BotUtil.isValidBotToken(token)) {
+            BotSettings.BOT_TOKEN.set(token);
+            System.out.println("Configured the Bot Token. Proceeding to init Bot.");
+        } else {
+            requestBotToken(true);
+        }
     }
 }

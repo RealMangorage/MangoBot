@@ -22,52 +22,10 @@
 
 package org.mangorage.mangobot.test;
 
-import org.mangorage.mangobotapi.core.script.Global;
-import org.mangorage.mangobotapi.core.script.ScriptParser;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-import java.util.function.Function;
-
 public class Test {
-    public static <X, Y> Function<X, Y> createFunc(Class<X> typeX, Class<Y> retY, Function<X, Y> func) {
-        return func;
-    }
 
 
     public static void main(String[] args) {
-        ScriptParser.init();
-        ScriptEngine engine = ScriptParser.get();
 
-        engine.put("GLOBAL", new Global());
-        engine.put("DOUBLE", createFunc(Long.class, Double.class, e -> {
-            return (double) e;
-        }));
-        engine.put("INTEGER", createFunc(Long.class, Integer.class, Long::intValue));
-
-        engine.put("FLOAT", createFunc(Long.class, Float.class, e -> {
-            return (float) e;
-        }));
-
-        engine.put("toString", createFunc(Object.class, String.class, Object::toString));
-
-        String ev = """
-                function f() {
-                    GLOBAL.out.println(GLOBAL.typeOf(GLOBAL.get("Test")));
-                    GLOBAL.out.println(GLOBAL.get("Test").getClass());
-                }
-                """;
-
-        var aa = engine.getFactory().getMethodCallSyntax(ev, "f");
-
-        try {
-            engine.eval(ev);
-            Invocable inv = (Invocable) engine;
-            inv.invokeFunction("f");
-            System.out.println("OUTPUT -> %s".formatted(aa));
-        } catch (ScriptException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

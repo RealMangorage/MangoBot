@@ -20,42 +20,30 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.registry.commands;
+package org.mangorage.mangobotapi.core.registry;
 
-import org.mangorage.mangobotapi.core.AbstractCommand;
+import java.util.HashMap;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CommandHolder<T extends AbstractCommand> {
-
-    public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value) {
-        return new CommandHolder<>(id, value);
+public class UserPermission {
+    public static UserPermission of(String id) {
+        return new UserPermission(id);
     }
 
-    private final String id;
-    private final T value;
-    private final List<CommandAlias> aliases = new ArrayList<>();
+    private final String ID;
 
-    private CommandHolder(String id, T value) {
-        this.id = id;
-        this.value = value;
+    private UserPermission(String roleID) {
+        this.ID = roleID;
     }
 
     public String getID() {
-        return id;
+        return ID;
     }
 
-    public T getCommand() {
-        return value;
-    }
+    public record Node(String id) {
+        private static final HashMap<String, Node> NODES = new HashMap<>();
 
-    public List<CommandAlias> getAliases() {
-        return aliases;
+        public static Node of(String id) {
+            return NODES.computeIfAbsent(id, key -> new Node(id));
+        }
     }
-
-    public void addAlias(CommandAlias alias) {
-        this.aliases.add(alias);
-    }
-
 }

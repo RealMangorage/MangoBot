@@ -20,19 +20,38 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands;
+package org.mangorage.mangobotapi.core.commands;
 
-import org.mangorage.mangobot.commands.PingCommand;
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobotapi.core.commands.CommandHolder;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
-import org.mangorage.mangobotapi.core.registry.RegistryObject;
+import net.dv8tion.jda.api.entities.Message;
 
-public class ForgeCommands {
-    public static final CommandRegistry COMMANDS = CommandRegistry.guild("1129059589325852724");
-    public static final RegistryObject<CommandHolder<PingCommand>> PING = COMMANDS.register("pings", new PingCommand());
+public abstract class AbstractCommand {
+    public static AbstractCommand create(ICommand command, boolean isGuild) {
+        if (command == null)
+            throw new IllegalStateException("Command cannot be null");
+        return new AbstractCommand() {
+            @Override
+            public CommandResult execute(Message message, Arguments args) {
+                return command.execute(message, args);
+            }
 
-    public static void init() {
-        COMMANDS.register(Bot.EVENT_BUS);
+            /**
+             * @return
+             */
+            @Override
+            public boolean isGuildOnly() {
+                return isGuild;
+            }
+        };
+    }
+
+    public abstract CommandResult execute(Message message, Arguments args);
+
+    public boolean isGuildOnly() {
+        return true;
+    }
+
+    @FunctionalInterface
+    public interface ICommand {
+        CommandResult execute(Message message, Arguments args);
     }
 }

@@ -46,15 +46,15 @@ public class PermissionRegistry {
         return REGISTRY.computeIfAbsent(guildID, PermissionRegistry::new);
     }
 
-    public static boolean hasNeededPermission(Member member, APermission.Node node) {
+    public static boolean hasNeededPermission(Member member, UserPermission.Node node) {
         if (guild(member.getGuild().getId()).hasPermission(member, node))
             return true;
 
         return global().hasPermission(member, node);
     }
 
-    private final HashMap<APermission.Node, ArrayList<APermission>> PERMISSIONS = new HashMap<>();
-    private final HashMap<APermission.Node, ArrayList<Permission>> DISCORD_PERMISSIONS = new HashMap<>(); // Global only
+    private final HashMap<UserPermission.Node, ArrayList<UserPermission>> PERMISSIONS = new HashMap<>();
+    private final HashMap<UserPermission.Node, ArrayList<Permission>> DISCORD_PERMISSIONS = new HashMap<>(); // Global only
     private final String guildID;
 
     private PermissionRegistry(String guildID) {
@@ -65,21 +65,21 @@ public class PermissionRegistry {
         this(null);
     }
 
-    public void register(APermission.Node node, Permission... permissions) {
+    public void register(UserPermission.Node node, Permission... permissions) {
         if (guildID != null)
             throw new IllegalStateException("Unable to register permissions on a GUILD level, this is for Global permissions only...");
         DISCORD_PERMISSIONS.computeIfAbsent(node, (key) -> new ArrayList<>());
         DISCORD_PERMISSIONS.get(node).addAll(Arrays.asList(permissions));
     }
 
-    public void register(APermission.Node node, APermission... permissions) {
+    public void register(UserPermission.Node node, UserPermission... permissions) {
         if (guildID == null)
             throw new IllegalStateException("Unable to register permissions on a GLOBAL level, this is for guilds only...");
         PERMISSIONS.computeIfAbsent(node, (key) -> new ArrayList<>());
         PERMISSIONS.get(node).addAll(Arrays.asList(permissions));
     }
 
-    public boolean hasPermission(Member member, APermission.Node node) {
+    public boolean hasPermission(Member member, UserPermission.Node node) {
         // Check for Guild Perms first -> Discord Perms
         if (guildID == null) {
             ArrayList<Permission> permissions = DISCORD_PERMISSIONS.get(node);
@@ -90,13 +90,13 @@ public class PermissionRegistry {
 
             return memberPerms.stream().anyMatch(permissions::contains);
         } else {
-            ArrayList<APermission> permissions = PERMISSIONS.get(node);
+            ArrayList<UserPermission> permissions = PERMISSIONS.get(node);
             List<String> rolesIDs = member.getRoles().stream().map(ISnowflake::getId).toList();
 
             if (permissions == null)
                 return false;
 
-            return rolesIDs.stream().anyMatch(permissions.stream().map(APermission::getID).toList()::contains);
+            return rolesIDs.stream().anyMatch(permissions.stream().map(UserPermission::getID).toList()::contains);
         }
     }
 

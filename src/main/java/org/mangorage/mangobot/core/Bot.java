@@ -31,6 +31,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.mangobot.core.commands.ForgeCommands;
 import org.mangorage.mangobot.core.commands.GlobalCommands;
+import org.mangorage.mangobot.core.commands.permissions.ForgePermissions;
+import org.mangorage.mangobot.core.commands.permissions.GlobalPermissions;
 import org.mangorage.mangobot.core.events.EventListener;
 import org.mangorage.mangobot.core.events.Listeners;
 import org.mangorage.mangobotapi.MangoBotAPI;
@@ -43,6 +45,7 @@ import org.mangorage.mangobotapi.core.util.LockableReference;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 import java.util.EnumSet;
+import java.util.function.Consumer;
 
 import static org.mangorage.mangobot.core.Constants.STARTUP_MESSAGE;
 
@@ -70,9 +73,11 @@ public class Bot {
         if (BOT_INSTANCE.get() != null)
             throw new IllegalStateException("Attempted to initiate bot, however Bot is already initiated...");
 
-        var bot = new Bot(botToken);
-        BOT_INSTANCE.set(bot);
-        BOT_INSTANCE.lock();
+        var bot = new Bot(botToken, b -> {
+            BOT_INSTANCE.set(b);
+            BOT_INSTANCE.lock();
+        });
+
         return bot;
     }
 
@@ -99,7 +104,7 @@ public class Bot {
 
     private final JDA BOT;
 
-    public Bot(String botToken) {
+    public Bot(String botToken, Consumer<Bot> finalizer) {
         System.out.println(STARTUP_MESSAGE);
 
         // ****** Builder Start *********
@@ -138,6 +143,7 @@ public class Bot {
         builder.setAutoReconnect(true);
 
         this.BOT = builder.build();
+        finalizer.accept(this);
         // ****** Builder End *********
 
 
@@ -164,6 +170,9 @@ public class Bot {
             case STARTUP -> {
                 GlobalCommands.init();
                 ForgeCommands.init();
+
+                GlobalPermissions.init();
+                ForgePermissions.init();
             }
             case FINISHED -> {
             }

@@ -20,19 +20,40 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.annotations;
+package org.mangorage.mangobotapi.core.commands;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.List;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-@Inherited
-public @interface SubscribeEvent {
-    int priority() default 0;
+public class CommandHolder<T extends AbstractCommand> {
 
-    boolean recieveCancelled() default false;
+    public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value) {
+        return new CommandHolder<>(id, value);
+    }
+
+    private final String id;
+    private final T value;
+    private final List<CommandAlias> aliases = new ArrayList<>();
+
+    private CommandHolder(String id, T value) {
+        this.id = id;
+        this.value = value;
+    }
+
+    public String getID() {
+        return id;
+    }
+
+    public T getCommand() {
+        return value;
+    }
+
+    public List<CommandAlias> getAliases() {
+        return aliases;
+    }
+
+    public void addAlias(CommandAlias alias) {
+        this.aliases.add(alias);
+    }
+
 }

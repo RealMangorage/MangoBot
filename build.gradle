@@ -1,5 +1,3 @@
-import proguard.gradle.ProGuardTask
-
 buildscript {
     repositories {
         mavenLocal()
@@ -35,15 +33,6 @@ repositories {
 }
 
 sourceSets {
-    api {
-        java {
-            srcDir 'java'
-        }
-        resources {
-            srcDir 'resources'
-        }
-    }
-
     main {
         java {
             srcDir 'java'
@@ -51,41 +40,20 @@ sourceSets {
         resources {
             srcDir 'resources'
         }
-
-        runtimeClasspath += sourceSets.api.output
-        compileClasspath += sourceSets.api.output
     }
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-
-    // Libs for API
-    apiImplementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA for BotAPI
-    apiImplementation("org.apache.logging.log4j:log4j-core:2.14.1")
-
-    // Libs for test
-    testImplementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA for BotAPI
-    testImplementation("org.apache.logging.log4j:log4j-core:2.14.1")
-    testImplementation(sourceSets.api.output)
-
     // Libs for Bot
     implementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA
-    implementation("commons-io:commons-io:2.13.0") // Common API
     implementation("com.github.walkyst:lavaplayer-fork:1.4.3") // LavaPlayer to stream audio from YT/FILES to Discord
     implementation("com.google.code.gson:gson:2.10.1")
-
-    // implementation("ws.schild:jave-all-deps:3.3.1")
     implementation("org.apache.logging.log4j:log4j-core:2.14.1")
+
+    implementation project(path: ':mangobotapi')
+
+
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
-    // runtimeOnly("org.apache.logging.log4j:log4j-api:2.14.1")
-}
-
-task copyRuntimeLibs(type: Copy) {
-    into "lib"
-
-    from sourceSets.main.runtimeClasspath
 }
 
 
@@ -115,7 +83,6 @@ tasks.register('buildBotJar', Jar) {
 
     // Include classes from the main source set
     from sourceSets.main.output
-    from sourceSets.api.output
 
     // Include resources from the main source set
     from sourceSets.main.resources
@@ -125,61 +92,10 @@ tasks.register('buildBotJar', Jar) {
     }
 }
 
-tasks.register('buildAPIJar', Jar) {
-    group "bot tasks"
-    description "Build the bot API jar"
-
-    baseName = 'mangobotapi'
-    version = "${BOT_API_VERSION}"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    // Include classes from the main source set
-    from sourceSets.api.output
-
-    // Include resources from the main source set
-    from sourceSets.api.resources
-}
-
-tasks.register("proguard", ProGuardTask) {
-    group "bot tasks"
-
-    configuration file('proguard.pro')
-
-    injars(
-            "build/libs/pre-minimized.jar"
-    )
-
-    outjars "build/libs/minimized-secure.jar"
-}
-
 test {
     useJUnitPlatform()
 }
 
-shadowJar {
-    // Optionally, configure the JAR name (if needed)
-    archiveFileName.set("pre-minimized.jar")
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    // Include the custom JAR contents and resources
-    from sourceSets.main.output, sourceSets.api.output
-
-    // Optionally, exclude any specific dependencies from the fat JAR
-    exclude(
-            'META-INF/*.RSA',
-            'META-INF/*.SF',
-            'META-INF/*.DSA',
-            'natives/linux-aarch32/*.so',
-            'natives/linux-aarch64/*.so',
-            'natives/linux-arm/*.so',
-            'natives/linux-armhf/*.so',
-            'natives/linux-musl-aarch64/*.so',
-            'natives/linux-musl-x86-64/*.so',
-            'natives/linux-x86/*.so',
-            'natives/linux-x86-64/*.so'
-    )
-
-}
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -188,5 +104,3 @@ jar {
         attributes 'Main-Class': 'org.mangorage.mangobot.Main'
     }
 }
-
-shadowJar.finalizedBy(proguard)

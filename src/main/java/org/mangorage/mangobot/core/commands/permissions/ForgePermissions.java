@@ -22,8 +22,8 @@
 
 package org.mangorage.mangobot.core.commands.permissions;
 
-import org.mangorage.mangobotapi.core.registry.APermission;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.registry.UserPermission;
 
 import static org.mangorage.mangobot.core.commands.ForgeCommands.COMMANDS;
 import static org.mangorage.mangobot.core.commands.permissions.GlobalPermissions.RECORD_ADMIN;
@@ -35,17 +35,20 @@ public class ForgePermissions {
 
     static {
         // Admin Role
-        PERMISSIONS.register(TRICK_ADMIN, APermission.of("1129067881842360381"));
+        PERMISSIONS.register(TRICK_ADMIN, UserPermission.of("1129067881842360381"));
         // Moderators Role
-        PERMISSIONS.register(TRICK_ADMIN, APermission.of("1129070272302022656"));
+        PERMISSIONS.register(TRICK_ADMIN, UserPermission.of("1129070272302022656"));
         // Mango Bot Tester Role
-        PERMISSIONS.register(TRICK_ADMIN, APermission.of("1150880910745538631"));
+        PERMISSIONS.register(TRICK_ADMIN, UserPermission.of("1150880910745538631"));
 
         // Admin Role
-        PERMISSIONS.register(RECORD_ADMIN, APermission.of("1129067881842360381"));
+        PERMISSIONS.register(RECORD_ADMIN, UserPermission.of("1129067881842360381"));
         // Moderator Role
-        PERMISSIONS.register(RECORD_ADMIN, APermission.of("1130506065381957642"));
+        PERMISSIONS.register(RECORD_ADMIN, UserPermission.of("1130506065381957642"));
         // Moderators Role
-        PERMISSIONS.register(RECORD_ADMIN, APermission.of("1129070272302022656"));
+        PERMISSIONS.register(RECORD_ADMIN, UserPermission.of("1129070272302022656"));
+    }
+
+    public static void init() {
     }
 }
