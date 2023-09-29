@@ -20,14 +20,11 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.scanner;
+package org.mangorage.mangobotapi.core.eventbus.base;
 
 
-import org.mangorage.mangobotapi.core.eventbus.EventBuilder;
-import org.mangorage.mangobotapi.core.eventbus.EventBus;
 import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -45,37 +42,45 @@ import java.util.logging.Logger;
  */
 
 public final class EventScanner {
-    private static final Logger LOGGER = Logger.getLogger("test");
+    private static final Logger LOGGER = Logger.getLogger(EventScanner.class.getName());
 
-    public static List<EventBuilder> scan(Object object, EventBus bus) {
+    @SuppressWarnings("rawtypes")
+    public static List<EventBuilder> scan(Object object) {
         final ArrayList<EventBuilder> BUILDERS = new ArrayList<>();
-        boolean requireStatic = false;
-        Class<?> scanning = null;
+        boolean requireStatic = object instanceof Class<?>;
+        Class<?> scanning = requireStatic ? (Class<?>) object : object.getClass();
+        String name = scanning.getName();
 
-        if (object instanceof Class<?> classZ) {
-            requireStatic = true;
-            scanning = classZ;
-        } else {
-            scanning = object.getClass();
-        }
-
-        // Process scanning
-        if (scanning == null)
-            throw new IllegalStateException("Unable to scan object for event listeners");
+        // Handle scanning
 
         for (Method method : scanning.getMethods()) {
             SubscribeEvent se = method.getAnnotation(SubscribeEvent.class);
             int modfiers = method.getModifiers();
             if (se != null) {
-                if (!Modifier.isStatic(modfiers) && requireStatic)
-                    continue; // Cant, TODO: Log
-                if (!Modifier.isPublic(modfiers))
-                    continue; // Cant TODO: Log
-                if (method.getParameterCount() == 0 || method.getParameterCount() > 1)
-                    continue; // Cant TODO: Log
+                if (!Modifier.isStatic(modfiers) && requireStatic) {
+                    LOGGER.warning("Unable to register %s. Register as Object and not Class to fix. Or make it a static func".formatted(method.getName()));
+                    continue;
+                }
+                if (!Modifier.isPublic(modfiers)) {
+                    LOGGER.warning("Unable to register %s. Cant register private listeners");
+                    continue;
+                }
+                if (method.getParameterCount() == 0 || method.getParameterCount() > 1) {
+                    LOGGER.warning("Unable to register %s. Invalid listener".formatted(method.getName()));
+                    continue;
+                }
 
-                LOGGER.info("Registering listener...");
                 Parameter parameter = method.getParameters()[0];
+                LOGGER.info("""
+                        Registering Listener:
+                        Object/Class: %s
+                        Method: %s
+                        Type: %s
+                        """.formatted(
+                        name,
+                        method.getName(),
+                        parameter.getType().getName()
+                ));
                 if (IEvent.class.isAssignableFrom(parameter.getType())) {
                     BUILDERS.add(new EventBuilder<>(parameter.getType(), e -> {
                         try {
@@ -90,23 +95,4 @@ public final class EventScanner {
 
         return BUILDERS;
     }
-
-    public static class WrappedListener<T> implements IEventListener<T> {
-
-        private Method method;
-
-        private WrappedListener(Method method) {
-            this.method = method;
-        }
-
-
-        /**
-         * @param event
-         */
-        @Override
-        public void invoke(T event) {
-
-        }
-    }
-
 }

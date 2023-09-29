@@ -23,10 +23,13 @@
 package org.mangorage.mangobotapi.core.eventbus;
 
 import org.mangorage.mangobotapi.core.eventbus.base.Event;
+import org.mangorage.mangobotapi.core.eventbus.base.EventBuilder;
+import org.mangorage.mangobotapi.core.eventbus.base.EventHolder;
+import org.mangorage.mangobotapi.core.eventbus.base.EventListener;
+import org.mangorage.mangobotapi.core.eventbus.base.EventScanner;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
-import org.mangorage.mangobotapi.core.eventbus.scanner.EventScanner;
 
 import java.util.HashMap;
 /*
@@ -102,7 +105,7 @@ public class EventBus implements IEventBus {
     @SuppressWarnings("unchecked")
     @Override
     public void register(Object object) {
-        EventScanner.scan(object, this).forEach(this::addListener);
+        EventScanner.scan(object).forEach(this::addListener);
     }
 
 

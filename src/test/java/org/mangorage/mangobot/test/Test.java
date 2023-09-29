@@ -26,6 +26,17 @@ public class Test {
 
 
     public static void main(String[] args) {
+        int pointsPerDay = 30;
+        int pointsPerDollar = 100 / 5;
+        int days = 30;
 
+        int potentialEarnedPoints = pointsPerDay * days;
+        int earnedPoints = 529;
+
+        int potentialTotalIncome = potentialEarnedPoints / pointsPerDollar;
+        int totalIncome = earnedPoints / pointsPerDollar;
+
+        System.out.println("Estimated Income: %s".formatted(potentialTotalIncome));
+        System.out.println("Earned Income: %s".formatted(totalIncome));
     }
 }

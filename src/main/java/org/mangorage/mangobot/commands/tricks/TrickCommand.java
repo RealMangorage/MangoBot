@@ -375,6 +375,7 @@ public class TrickCommand extends AbstractCommand {
     public void onCommandEvent(CommandEvent event) {
         if (!event.isHandled()) {
             Message message = event.getMessage();
+            if (!message.isFromGuild()) return;
             String guildID = message.getGuild().getId();
             String command = event.getCommand();
             String args = event.getArguments().getFrom(0);

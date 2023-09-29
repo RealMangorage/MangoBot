@@ -23,8 +23,8 @@
 package org.mangorage.mangobotapi.core.eventbus.impl;
 
 
-import org.mangorage.mangobotapi.core.eventbus.EventBuilder;
 import org.mangorage.mangobotapi.core.eventbus.base.Event;
+import org.mangorage.mangobotapi.core.eventbus.base.EventBuilder;
 
 public interface IEventBus {
     <T extends Event & IEvent<T>> void addListener(Class<T> type, IEvent<T> event);

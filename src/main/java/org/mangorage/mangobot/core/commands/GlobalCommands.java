@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.mangorage.mangobot.commands.ModMail;
 import org.mangorage.mangobot.commands.PrefixCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
 import org.mangorage.mangobot.commands.music.PauseCommand;
@@ -52,7 +53,9 @@ import org.mangorage.mangobotapi.core.util.MessageSettings;
 public class GlobalCommands {
     public static final CommandRegistry COMMANDS = CommandRegistry.global();
     public static final RegistryObject<CommandHolder<TrickCommand>> TRICK_COMMAND = COMMANDS.register("tricks", new TrickCommand());
+    public static final RegistryObject<CommandHolder<ModMail>> MOD_MAIL_COMMAND = COMMANDS.register("mail", new ModMail());
     public static final RegistryObject<CommandHolder<PrefixCommand>> PREFIX_ADMIN = COMMANDS.register("setPrefix", new PrefixCommand());
+
 
     static {
         COMMANDS.register("speak", new ReplyCommand("I have spoken!"));

@@ -20,45 +20,36 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.eventbus.base;
 
 import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
 
-public class EventBuilder<T> {
-    private final Class<T> classType;
-    private final IEvent<T> event;
-    private Integer priority = null;
-    private boolean recieveCancelled = false;
+public class EventListener<T> implements IEventListener<T> {
+    private final IEvent<T> eventListener;
+    private final int priority;
+    private final boolean recieveCancelled;
 
-    public EventBuilder(Class<T> type, IEvent<T> event) {
-        this.event = event;
-        this.classType = type;
-    }
-
-    public EventBuilder<T> setPriority(int priority) {
-        this.priority = priority;
-        return this;
-    }
-
-    public EventBuilder<T> setRecieveCancelled(boolean recieveCancelled) {
+    public EventListener(int priority, boolean recieveCancelled, IEvent<T> eventListener) {
         this.recieveCancelled = recieveCancelled;
-        return this;
+        this.priority = priority;
+        this.eventListener = eventListener;
     }
 
-    public Integer getPriority() {
+    @Override
+    public void invoke(T event) {
+        eventListener.indirectInvoke(event);
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public int getPriority() {
         return priority;
     }
 
-    public boolean canRecieveCanclled() {
+    public boolean canRecieveCancelled() {
         return recieveCancelled;
     }
-
-    public Class<T> getClassType() {
-        return classType;
-    }
-
-    public IEvent<T> getEvent() {
-        return event;
-    }
-
 }

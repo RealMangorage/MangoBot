@@ -33,6 +33,7 @@ public class GlobalPermissions {
     public static final UserPermission.Node TRICK_ADMIN = UserPermission.Node.of("trickadmin");
     public static final UserPermission.Node PREFIX_ADMIN = UserPermission.Node.of("prefix");
     public static final UserPermission.Node RECORD_ADMIN = UserPermission.Node.of("record");
+    public static final UserPermission.Node MOD_MAIL = UserPermission.Node.of("mod_mail");
 
 
     static {
@@ -40,6 +41,7 @@ public class GlobalPermissions {
         PERMISSIONS.register(TRICK_ADMIN, Permission.ADMINISTRATOR);
         PERMISSIONS.register(PREFIX_ADMIN, Permission.ADMINISTRATOR);
         PERMISSIONS.register(RECORD_ADMIN, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(MOD_MAIL, Permission.ADMINISTRATOR);
     }
 
     public static void init() {

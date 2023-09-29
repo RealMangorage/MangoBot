@@ -71,6 +71,7 @@ public class CommandRegistry {
     }
 
     public static void handleMessage(MessageReceivedEvent event) {
+        if (event.getAuthor().isBot()) return;
         // Handle Message and prefix
         String Prefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : CommandPrefix.DEFAULT;
 
@@ -220,7 +221,7 @@ public class CommandRegistry {
         if (commandHolder == null)
             return;
 
-        if (guildID == null && commandHolder.getCommand().isGuildOnly() && !message.isFromGuild())
+        if (guildID == null || (commandHolder.getCommand().isGuildOnly() && !message.isFromGuild()))
             return;
 
 
@@ -232,6 +233,5 @@ public class CommandRegistry {
 
         if (result != null)
             result.accept(message);
-
     }
 }

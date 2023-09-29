@@ -20,9 +20,8 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mangobotapi.core.eventbus.base;
 
-import org.mangorage.mangobotapi.core.eventbus.base.Event;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEventInvoker;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;

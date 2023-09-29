@@ -29,8 +29,10 @@ import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
 
 public class Listeners {
+    private static final boolean TRASH = false;
     @SubscribeEvent
     public static void onMessage(DMessageRecievedEvent e) {
+        if (!TRASH) return;
         var event = e.get();
         var message = event.getMessage();
         var user = event.getAuthor();
@@ -41,6 +43,7 @@ public class Listeners {
 
     @SubscribeEvent
     public static void onReaction(DReactionEvent e) {
+        if (!TRASH) return;
         var event = e.get();
         var messageid = event.getMessageId();
         var emoji = event.getReaction().getEmoji();
