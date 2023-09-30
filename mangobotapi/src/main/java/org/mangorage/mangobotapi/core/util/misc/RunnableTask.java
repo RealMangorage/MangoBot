@@ -20,26 +20,34 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.util;
+package org.mangorage.mangobotapi.core.util.misc;
 
-public class QueueData<T> {
-    private int position = 0;
-    private T data;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-    public QueueData(T data) {
+public class RunnableTask<T> implements Runnable, Supplier<T> {
+
+    private final T data;
+    private final Consumer<RunnableTask<T>> runnableConsumer;
+
+    public RunnableTask(T data, Consumer<RunnableTask<T>> runnable) {
         this.data = data;
+        this.runnableConsumer = runnable;
     }
 
-    public T getData() {
+    /**
+     *
+     */
+    @Override
+    public void run() {
+        this.runnableConsumer.accept(this);
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public T get() {
         return data;
-    }
-
-    public void updatePosition(int position) {
-        this.position = position;
-        System.out.println("%s was updated to index %s!".formatted(data, this.position));
-    }
-
-    public int getPosition() {
-        return position;
     }
 }

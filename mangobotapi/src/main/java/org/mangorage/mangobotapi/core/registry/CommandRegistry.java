@@ -70,26 +70,34 @@ public class CommandRegistry {
         return GLOBAL;
     }
 
-    public static void handleMessage(MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;
+
+    // Returns true if it was a command...
+    public static boolean handleMessage(MessageReceivedEvent event) {
         // Handle Message and prefix
         String Prefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : CommandPrefix.DEFAULT;
 
         Message message = event.getMessage();
         String rawMessage = message.getContentRaw();
+
         if (rawMessage.startsWith(Prefix)) {
+            if (event.getAuthor().isBot()) return true;
             String[] command_pre = rawMessage.split(" ");
             String command = command_pre[0].replaceFirst(Prefix, "");
             Arguments arguments = Arguments.of(Arguments.of(command_pre).getFrom(1).split(" "));
 
             var commandEvent = new CommandEvent(event.getMessage(), command, arguments);
             MangoBotAPI.getInstance().getEventBus().post(commandEvent);
+
             if (commandEvent.isHandled()) {
                 commandEvent.getCommandResult().accept(message);
             } else {
                 DEFAULT_SETTINGS.apply(message.reply("Invalid Command")).queue();
             }
+
+            return true;
         }
+
+        return false;
     }
 
     private final String guildID;

@@ -33,18 +33,19 @@ import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.util.MessageSettings;
 
-public class ModMail extends AbstractCommand {
+public class ModMailCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
-
+        MessageSettings messageSettings = Bot.DEFAULT_SETTINGS;
 
         if (message.isFromGuild()) {
             Member member = message.getMember();
             if (member == null)
                 return CommandResult.FAIL;
 
-            if (args.hasArg("-close")) {
+            if (args.hasArg("close")) {
                 ModMailHandler.close(message.getGuildChannel().getId());
                 return CommandResult.PASS;
             }
@@ -53,31 +54,38 @@ public class ModMail extends AbstractCommand {
             String guildID = guild.getId();
             if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.MOD_MAIL))
                 return CommandResult.NO_PERMISSION;
-            if (!args.hasArg("-categoryID") || args.findArgOrDefault("-categoryID", "null").equals("null"))
+            if (!args.hasArg("categoryID") || args.findArgOrDefault("categoryID", "null").equals("null"))
                 return CommandResult.FAIL;
 
-            String categoryID = args.findArg("-categoryID");
+            String categoryID = args.findArg("categoryID");
             try {
                 Category category = guild.getCategoryById(categoryID);
                 if (category == null) return CommandResult.FAIL;
                 ModMailHandler.configure(guildID, categoryID);
-                Bot.DEFAULT_SETTINGS.apply(message.reply("ModMail for this server has been configured")).queue();
+                Bot.DEFAULT_SETTINGS.apply(message.reply("ModMailCommand for this server has been configured")).queue();
             } catch (Exception e) {
                 return CommandResult.FAIL;
             }
-        } else if (args.hasArg("-join")) {
-            String guildJoinID = args.findArgOrDefault("-join", "null");
+        } else if (args.hasArg("join")) {
+            if (message.isFromGuild()) return CommandResult.NO_PERMISSION;
+            String guildJoinID = args.findArgOrDefault("join", "null");
             if (guildJoinID.equals("null")) return CommandResult.FAIL;
-            ModMailHandler.join(message.getAuthor(), guildJoinID);
-            message.reply("Set chat to guildID %s".formatted(guildJoinID)).queue();
+            var result = ModMailHandler.join(message, message.getAuthor(), guildJoinID);
+            switch (result) {
+                case 1 -> messageSettings.apply(message.reply("GuildID is incorrect / guild doesn't exist")).queue();
+                case 2 ->
+                        messageSettings.apply(message.reply("Guild Exists. ModMail for this server hasnt been configured")).queue();
+                case 3 ->
+                        messageSettings.apply(message.reply("Cannot be in more then 1 ModMail ticket at a time !mail leave to leave current one")).queue();
+            }
+        } else if (args.hasArg("leave")) {
+            if (message.isFromGuild()) return CommandResult.NO_PERMISSION;
+            ModMailHandler.leave(message.getChannel().asPrivateChannel(), message.getAuthor());
         }
 
         return CommandResult.PASS;
     }
 
-    /**
-     * @return
-     */
     @Override
     public boolean isGuildOnly() {
         return false;

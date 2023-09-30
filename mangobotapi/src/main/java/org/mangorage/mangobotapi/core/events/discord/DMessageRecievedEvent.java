@@ -26,8 +26,14 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.mangobotapi.core.events.WrapperEvent;
 
 public class DMessageRecievedEvent extends WrapperEvent<DMessageRecievedEvent, MessageReceivedEvent> {
+    private final boolean isCommand;
 
-    public DMessageRecievedEvent(MessageReceivedEvent object) {
+    public DMessageRecievedEvent(MessageReceivedEvent object, boolean isCommand) {
         super(object);
+        this.isCommand = isCommand;
+    }
+
+    public boolean isCommand() {
+        return isCommand;
     }
 }

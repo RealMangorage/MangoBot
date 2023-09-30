@@ -37,6 +37,7 @@ import java.util.HashMap;
  */
 
 public class EventBus implements IEventBus {
+    public static final boolean verbose = true;
     public static EventBus create() {
         return new EventBus(0, null);
     }
@@ -120,7 +121,7 @@ public class EventBus implements IEventBus {
                         "Tried to post an event that isnt compatible with this EventBus Must implement: %s"
                                 .formatted(REQUIRED_CLASS.getCanonicalName()));
 
-        if (!EVENT_LISTENERS.containsKey(event.getClass()))
+        if (!EVENT_LISTENERS.containsKey(event.getClass()) && verbose)
             System.out.println("Attemped to post %s to the event bus however there are no listeners, skipping!".formatted(event.getClass()));
         else
             ((EventHolder<T>) EVENT_LISTENERS.get(event.getClass())).post(event);

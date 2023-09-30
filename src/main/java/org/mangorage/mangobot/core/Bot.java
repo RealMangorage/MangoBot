@@ -42,8 +42,8 @@ import org.mangorage.mangobotapi.core.eventbus.EventBus;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.ShutdownEvent;
 import org.mangorage.mangobotapi.core.events.StartupEvent;
-import org.mangorage.mangobotapi.core.util.LockableReference;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
+import org.mangorage.mangobotapi.core.util.misc.LockableReference;
 
 import java.util.EnumSet;
 import java.util.function.Consumer;
@@ -139,7 +139,7 @@ public class Bot {
         builder.enableCache(cacheFlags);
 
         builder.setEventManager(new AnnotatedEventManager());
-        builder.addEventListeners(new EventListener());
+        builder.addEventListeners(new EventListener(EVENT_BUS));
         builder.setEnableShutdownHook(true);
         builder.setAutoReconnect(true);
 

@@ -23,6 +23,9 @@
 package org.mangorage.mangobot.core;
 
 
+import com.google.gson.Gson;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -38,6 +41,36 @@ public class Util {
         } catch (NumberFormatException ignored) {
         }
         return res;
+    }
+
+    public static void saveObjectToFile(Object object, String directory, String fileName) {
+        try {
+            Gson gson = new Gson();
+            String jsonData = gson.toJson(object);
+
+            File dirs = new File(directory);
+            if (!dirs.exists() && !dirs.mkdirs()) return;
+            Files.writeString(Path.of("%s/%s".formatted(directory, fileName)), jsonData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void deleteFile(String directory, String fileName) {
+        try {
+            Files.delete(Path.of("%s/%s".formatted(directory, fileName)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T loadJsonToObject(String file, Class<T> cls) {
+        try {
+            Gson gson = new Gson();
+            return gson.fromJson(Files.readString(Path.of(file)), cls);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // execute runnable on a thread

@@ -23,32 +23,46 @@
 package org.mangorage.mangobot.core.events;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.mangobot.core.Bot;
+import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
+import org.mangorage.mangobotapi.core.events.discord.DMessageDeleteEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
+import org.mangorage.mangobotapi.core.events.discord.DMessageUpdateEvent;
 import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
 
 @SuppressWarnings("unused")
-public class EventListener {
+public record EventListener(IEventBus bus) {
 
     @SubscribeEvent
     public void messageRecieved(MessageReceivedEvent event) {
-        CommandRegistry.handleMessage(event);
-        Bot.EVENT_BUS.post(new DMessageRecievedEvent(event));
+        var isCommand = CommandRegistry.handleMessage(event);
+        bus.post(new DMessageRecievedEvent(event, isCommand));
     }
 
     @SubscribeEvent
     public void messageReact(MessageReactionAddEvent event) {
-        Bot.EVENT_BUS.post(new DReactionEvent(event));
+        bus.post(new DReactionEvent(event));
     }
 
     @SubscribeEvent
     public void interact(ButtonInteractionEvent event) {
-        Bot.EVENT_BUS.post(new DButtonInteractionEvent(event));
+        bus.post(new DButtonInteractionEvent(event));
+    }
+
+    @SubscribeEvent
+    public void messageUpdate(MessageUpdateEvent event) {
+        bus.post(new DMessageUpdateEvent(event));
+    }
+
+    @SubscribeEvent
+    public void messageDelete(MessageDeleteEvent event) {
+        bus.post(new DMessageDeleteEvent(event));
     }
 }

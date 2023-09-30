@@ -20,37 +20,23 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.util;
+package org.mangorage.mangobotapi.core.util.misc;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.exceptions.InvalidTokenException;
+import org.mangorage.mangobotapi.core.util.Lockable;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
+import java.util.function.Supplier;
 
-public class BotUtil {
-    public static boolean isValidBotToken(String token) {
-        var bot = JDABuilder.createDefault(token);
-        JDA jda = null;
-        try {
-            jda = bot.build();
-        } catch (InvalidTokenException e) {
-            return false;
-        } finally {
-            if (jda != null && jda.getStatus() != JDA.Status.DISCONNECTED)
-                jda.shutdownNow();
-        }
+public class LockableReference<T> extends Lockable implements Supplier<T> {
+    private T object;
 
-        return true;
+    public void set(T object) {
+        if (isLocked())
+            throw new IllegalStateException("Attempted to set value on a locked reference");
+        this.object = object;
     }
 
-    @SuppressWarnings("all")
-    public static List<File> getFilesInDir(String dir) {
-        File file = new File(dir);
-        if (file.isDirectory() && file.listFiles() != null)
-            return Arrays.asList(file.listFiles());
-        return List.of();
+    @Override
+    public T get() {
+        return object;
     }
 }

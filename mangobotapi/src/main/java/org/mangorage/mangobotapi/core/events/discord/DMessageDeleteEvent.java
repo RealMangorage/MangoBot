@@ -20,21 +20,13 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.util;
+package org.mangorage.mangobotapi.core.events.discord;
 
-import java.util.function.Supplier;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import org.mangorage.mangobotapi.core.events.WrapperEvent;
 
-public class LockableReference<T> extends Lockable implements Supplier<T> {
-    private T object;
-
-    public void set(T object) {
-        if (isLocked())
-            throw new IllegalStateException("Attempted to set value on a locked reference");
-        this.object = object;
-    }
-
-    @Override
-    public T get() {
-        return object;
+public class DMessageDeleteEvent extends WrapperEvent<DMessageDeleteEvent, MessageDeleteEvent> {
+    public DMessageDeleteEvent(MessageDeleteEvent object) {
+        super(object);
     }
 }

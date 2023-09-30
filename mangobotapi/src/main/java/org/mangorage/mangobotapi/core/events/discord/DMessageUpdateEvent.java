@@ -20,37 +20,13 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.util;
+package org.mangorage.mangobotapi.core.events.discord;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.exceptions.InvalidTokenException;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
+import org.mangorage.mangobotapi.core.events.WrapperEvent;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
-public class BotUtil {
-    public static boolean isValidBotToken(String token) {
-        var bot = JDABuilder.createDefault(token);
-        JDA jda = null;
-        try {
-            jda = bot.build();
-        } catch (InvalidTokenException e) {
-            return false;
-        } finally {
-            if (jda != null && jda.getStatus() != JDA.Status.DISCONNECTED)
-                jda.shutdownNow();
-        }
-
-        return true;
-    }
-
-    @SuppressWarnings("all")
-    public static List<File> getFilesInDir(String dir) {
-        File file = new File(dir);
-        if (file.isDirectory() && file.listFiles() != null)
-            return Arrays.asList(file.listFiles());
-        return List.of();
+public class DMessageUpdateEvent extends WrapperEvent<DMessageUpdateEvent, MessageUpdateEvent> {
+    public DMessageUpdateEvent(MessageUpdateEvent object) {
+        super(object);
     }
 }

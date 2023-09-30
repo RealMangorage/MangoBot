@@ -40,9 +40,9 @@ import org.mangorage.mangobotapi.core.registry.GuildCache;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.script.ScriptParser;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
-import org.mangorage.mangobotapi.core.util.PagedList;
-import org.mangorage.mangobotapi.core.util.RunnableTask;
 import org.mangorage.mangobotapi.core.util.TaskScheduler;
+import org.mangorage.mangobotapi.core.util.misc.PagedList;
+import org.mangorage.mangobotapi.core.util.misc.RunnableTask;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
