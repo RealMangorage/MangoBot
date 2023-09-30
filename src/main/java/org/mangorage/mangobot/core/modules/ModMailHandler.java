@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobot.core.modules;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -47,7 +48,10 @@ public class ModMailHandler {
     @Nullable
     public static ModMailInstance findByChannelID(String channelID) {
         if (MOD_MAIL_INSTANCE.size() == 0) return null;
-        return MOD_MAIL_INSTANCE.values().stream().filter(inst -> inst.channelID.equals(channelID)).findAny().get();
+        var result = MOD_MAIL_INSTANCE.values().stream().filter(inst -> inst.channelID.equals(channelID)).findAny();
+        if (result.isPresent())
+            return result.get();
+        return null;
     }
 
 
@@ -107,6 +111,8 @@ public class ModMailHandler {
         }
     }
 
+    public record Settings(String categoryID, String transcriptsChannelID) {
+    }
 
     public record ModMailInstance(String guildID, String channelID, String userID) {
 
@@ -124,8 +130,15 @@ public class ModMailHandler {
             // user being the Moderator in this case
             Bot.getJDAInstance().retrieveUserById(userID).queue(DM -> {
                 if (DM == null) return;
+                EmbedBuilder builder = new EmbedBuilder();
+
+                builder.setAuthor(user.getEffectiveName(), null, user.getEffectiveAvatarUrl());
+                builder.setDescription(message.getContentRaw());
+                builder.setFooter("UserID: %s".formatted(user.getId()));
+
+
                 DM.openPrivateChannel().queue(pc -> {
-                    pc.sendMessage(message.getContentRaw()).queue();
+                    pc.sendMessageEmbeds(builder.build()).queue();
                 });
             });
         }
@@ -137,8 +150,15 @@ public class ModMailHandler {
             if (guild == null) return;
             TextChannel channel = guild.getTextChannelById(channelID);
             if (channel == null) return;
-            channel.sendMessage(
-                    message.getContentRaw()
+
+            EmbedBuilder builder = new EmbedBuilder();
+
+            builder.setAuthor(user.getEffectiveName(), null, user.getEffectiveAvatarUrl());
+            builder.setDescription(message.getContentRaw());
+            builder.setFooter("UserID: %s".formatted(user.getId()));
+
+            channel.sendMessageEmbeds(
+                    builder.build()
             ).queue();
         }
     }

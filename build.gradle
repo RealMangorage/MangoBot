@@ -9,9 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.guardsquare:proguard-gradle:7.3.2'
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-
     }
 }
 
@@ -21,6 +19,12 @@ apply plugin: 'java'
 
 group 'org.mangorage'
 version "${BOT_VERSION}"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 repositories {
     mavenCentral()
@@ -61,6 +65,7 @@ tasks.register('runBot', JavaExec) {
     group "bot tasks"
     description "Runs the bot"
     args "-dev"
+
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'org.mangorage.mangobot.Main'
 }
@@ -69,6 +74,7 @@ tasks.register('runTestBot', JavaExec) {
     group "bot tasks"
     description "Runs the test bot"
     args "-dev"
+
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'org.mangorage.mangobottest.Main'
 }
@@ -78,13 +84,8 @@ tasks.register('buildBotJar', Jar) {
     description "Build the Bot Jar with API included"
 
 
-    baseName = 'mangobot'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    // Include classes from the main source set
     from sourceSets.main.output
-
-    // Include resources from the main source set
     from sourceSets.main.resources
 
     manifest {

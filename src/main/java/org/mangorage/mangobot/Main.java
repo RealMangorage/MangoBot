@@ -44,8 +44,8 @@ public class Main {
 
         Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
         Bot.initiate(BotSettings.BOT_TOKEN.get());
-
     }
+
 
     private static void requestBotToken(boolean wasInvalid) {
         String message = "Enter your Bot Token";
