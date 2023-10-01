@@ -26,10 +26,9 @@ import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.eventbus.base.Event;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
-public class CommandEvent extends Event implements IEvent<CommandEvent> {
+public class CommandEvent extends Event<CommandEvent> {
     private final Message message;
     private final String command;
     private final Arguments arguments;
@@ -77,13 +76,5 @@ public class CommandEvent extends Event implements IEvent<CommandEvent> {
 
     public CommandRegistry getSource() {
         return source;
-    }
-
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(CommandEvent event) {
-
     }
 }

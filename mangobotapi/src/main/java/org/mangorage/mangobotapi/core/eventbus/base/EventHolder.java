@@ -32,8 +32,8 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class EventHolder<T extends Event & IEvent<T>> {
-    public static <X extends Event & IEvent<X>> EventHolder<X> create(Class<X> type, Function<IEventListener<X>[], IEventInvoker<X>> invokerFunction) {
+public class EventHolder<T extends IEvent<T>> {
+    public static <X extends IEvent<X>> EventHolder<X> create(Class<X> type, Function<IEventListener<X>[], IEventInvoker<X>> invokerFunction) {
         return new EventHolder<>(type, invokerFunction);
     }
 

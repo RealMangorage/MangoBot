@@ -23,15 +23,6 @@
 package org.mangorage.mangobotapi.core.events;
 
 import org.mangorage.mangobotapi.core.eventbus.base.Event;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 
-public class LoadEvent extends Event implements IEvent<LoadEvent> {
-
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(LoadEvent event) {
-
-    }
+public class LoadEvent extends Event<LoadEvent> {
 }

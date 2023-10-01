@@ -58,18 +58,18 @@ public class EventBus implements IEventBus {
     }
 
     @Override
-    public <T extends Event & IEvent<T>> void addListener(Class<T> type, IEvent<T> event) {
+    public <T extends Event<T>> void addListener(Class<T> type, IEvent<T> event) {
         addListener(DEFAULT_PRIORITY, type, event);
     }
 
     @Override
-    public <T extends Event & IEvent<T>> void addListener(int priority, Class<T> type, IEvent<T> event) {
+    public <T extends Event<T>> void addListener(int priority, Class<T> type, IEvent<T> event) {
         addListener(priority, type, false, event);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Event & IEvent<T>> void addListener(int priority, Class<T> type, boolean recieveCancelled, IEvent<T> event) {
+    public <T extends Event<T>> void addListener(int priority, Class<T> type, boolean recieveCancelled, IEvent<T> event) {
         if (shutdown)
             throw new IllegalStateException("Unable to addListener when bus is shutdown");
 
@@ -93,7 +93,7 @@ public class EventBus implements IEventBus {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
-    public <T extends Event & IEvent<T>> void addListener(EventBuilder<T> builder) {
+    public <T extends Event<T>> void addListener(EventBuilder<T> builder) {
         addListener(
                 builder.getPriority() == null ? DEFAULT_PRIORITY : builder.getPriority(),
                 (Class) builder.getClassType(),
@@ -111,7 +111,7 @@ public class EventBus implements IEventBus {
 
 
     @SuppressWarnings("unchecked")
-    public <T extends Event & IEvent<T>> boolean post(T event) {
+    public <T extends Event<T>> boolean post(T event) {
         if (shutdown)
             throw new IllegalStateException("Unable to post event when bus is shutdown");
 

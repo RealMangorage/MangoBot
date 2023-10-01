@@ -23,11 +23,6 @@
 package org.mangorage.mangobotapi.core.events;
 
 import org.mangorage.mangobotapi.core.eventbus.base.Event;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 
-public class SaveEvent extends Event implements IEvent<SaveEvent> {
-
-    @Override
-    public void indirectInvoke(SaveEvent event) {
-    }
+public class SaveEvent extends Event<SaveEvent> {
 }

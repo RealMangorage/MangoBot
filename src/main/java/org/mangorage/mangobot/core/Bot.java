@@ -59,6 +59,7 @@ public class Bot {
     public static final MangoBotAPI APIHook;
 
     static {
+
         MangoBotAPIBuilder.hook((builder) -> {
             builder.setEventBus(EVENT_BUS);
             builder.setPrefix("!");

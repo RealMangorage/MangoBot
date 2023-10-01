@@ -23,9 +23,8 @@
 package org.mangorage.mangobotapi.core.events;
 
 import org.mangorage.mangobotapi.core.eventbus.base.Event;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 
-public class StartupEvent extends Event implements IEvent<StartupEvent> {
+public class StartupEvent extends Event<StartupEvent> {
     private final Phase phase;
 
     public StartupEvent(Phase phase) {
@@ -34,11 +33,6 @@ public class StartupEvent extends Event implements IEvent<StartupEvent> {
 
     public Phase phase() {
         return phase;
-    }
-
-    @Override
-    public void indirectInvoke(StartupEvent event) {
-
     }
 
     public enum Phase {

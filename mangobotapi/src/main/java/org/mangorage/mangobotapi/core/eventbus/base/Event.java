@@ -22,12 +22,14 @@
 
 package org.mangorage.mangobotapi.core.eventbus.base;
 
+import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
+
 /**
  * When overriding seenPhase()
  * Make sure to call IPhase.super.seenPhase() first always!
  */
 
-public abstract class Event implements ICancellable, IResult, IPhase {
+public abstract class Event<EventType> implements ICancellable, IResult, IPhase, IEvent<EventType> {
     private boolean cancelled = false;
     private Result result = Result.DEFAULT;
     private int phase = 0;
@@ -93,5 +95,10 @@ public abstract class Event implements ICancellable, IResult, IPhase {
     @Override
     public Result getResult() {
         return result;
+    }
+
+    @Override
+    public void indirectInvoke(EventType event) {
+        // Do nothing!
     }
 }

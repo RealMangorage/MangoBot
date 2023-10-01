@@ -61,7 +61,7 @@ public class ModMailHandler {
 
 
     public static ModMailInstance findByGuildAndUserID(String guildID, String userID) {
-        if (MOD_MAIL_INSTANCE_ID.size() == 0) return null;
+        if (MOD_MAIL_INSTANCE_ID.isEmpty()) return null;
         var result = MOD_MAIL_INSTANCE_ID.stream().filter(inst -> inst.guildID().equals(guildID) && inst.userID().equals(userID)).findAny();
         return result.orElse(null);
     }
@@ -306,6 +306,8 @@ public class ModMailHandler {
 
         public void sendToServer(Message message, User user) { // Sending from Private DM -> Guild Channel
             // User being the person sending messages to Server
+
+
             Guild guild = Bot.getJDAInstance().getGuildById(guildID);
             if (guild == null) return;
             TextChannel channel = guild.getTextChannelById(channelID);

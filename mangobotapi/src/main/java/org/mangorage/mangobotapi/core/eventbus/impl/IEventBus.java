@@ -27,17 +27,17 @@ import org.mangorage.mangobotapi.core.eventbus.base.Event;
 import org.mangorage.mangobotapi.core.eventbus.base.EventBuilder;
 
 public interface IEventBus {
-    <T extends Event & IEvent<T>> void addListener(Class<T> type, IEvent<T> event);
+    <T extends Event<T>> void addListener(Class<T> type, IEvent<T> event);
 
-    <T extends Event & IEvent<T>> void addListener(int priority, Class<T> type, IEvent<T> event);
+    <T extends Event<T>> void addListener(int priority, Class<T> type, IEvent<T> event);
 
-    <T extends Event & IEvent<T>> void addListener(int priority, Class<T> type, boolean recieveCancelled, IEvent<T> event);
+    <T extends Event<T>> void addListener(int priority, Class<T> type, boolean recieveCancelled, IEvent<T> event);
 
-    <T extends Event & IEvent<T>> void addListener(EventBuilder<T> builder);
+    <T extends Event<T>> void addListener(EventBuilder<T> builder);
 
     void register(Object object);
 
-    <T extends Event & IEvent<T>> boolean post(T event);
+    <T extends Event<T>> boolean post(T event);
 
     void startup();
 

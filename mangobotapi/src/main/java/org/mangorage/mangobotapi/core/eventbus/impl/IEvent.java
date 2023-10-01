@@ -22,7 +22,6 @@
 
 package org.mangorage.mangobotapi.core.eventbus.impl;
 
-@FunctionalInterface
 public interface IEvent<T> {
     /**
      * Only call this from {@link IEventListener <T>}

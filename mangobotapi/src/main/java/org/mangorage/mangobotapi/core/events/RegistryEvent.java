@@ -23,10 +23,9 @@
 package org.mangorage.mangobotapi.core.events;
 
 import org.mangorage.mangobotapi.core.eventbus.base.Event;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
-public class RegistryEvent extends Event implements IEvent<RegistryEvent> {
+public class RegistryEvent extends Event<RegistryEvent> {
     private final CommandRegistry.CommandType type;
 
     public RegistryEvent(CommandRegistry.CommandType type) {
@@ -35,14 +34,5 @@ public class RegistryEvent extends Event implements IEvent<RegistryEvent> {
 
     public CommandRegistry.CommandType type() {
         return type;
-    }
-
-
-    /**
-     * @param event
-     */
-    @Override
-    public void indirectInvoke(RegistryEvent event) {
-
     }
 }
