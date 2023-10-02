@@ -32,6 +32,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Util;
 import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
@@ -39,10 +41,12 @@ import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageUpdateEvent;
+import org.mangorage.mangobotapi.core.events.discord.DStringSelectInteractionEvent;
 import org.mangorage.mangobotapi.core.util.BotUtil;
 
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,6 +63,9 @@ public class ModMailHandler {
     private static final HashMap<String, ModMailInstance> MOD_MAIL_INSTANCE_CHANNEL = new HashMap<>(); // ChannelID -> Inst
     private static final HashSet<ModMailInstance> MOD_MAIL_INSTANCE_ID = new HashSet<>();
 
+    private static final HashMap<String, List<String>> CHOICES = new HashMap<>(); // GuildID's
+
+
 
     public static ModMailInstance findByGuildAndUserID(String guildID, String userID) {
         if (MOD_MAIL_INSTANCE_ID.isEmpty()) return null;
@@ -71,13 +78,47 @@ public class ModMailHandler {
         bus.addListener(LoadEvent.class, ModMailHandler::onLoad);
         bus.addListener(DMessageRecievedEvent.class, ModMailHandler::onMessage);
         bus.addListener(DMessageUpdateEvent.class, ModMailHandler::onMessageEdit);
+        bus.addListener(DStringSelectInteractionEvent.class, ModMailHandler::onSelectMenu);
     }
 
-    public static void configure(String guildID, String categoryID) {
+    public static void configure(String guildID, String categoryID, String guildName) {
         if (!GUILD_SETTINGS.containsKey(guildID)) {
-            var settings = new Settings(guildID, categoryID);
+            var settings = new Settings(guildID, categoryID, guildName);
             GUILD_SETTINGS.put(guildID, settings);
             settings.save();
+        }
+    }
+
+    public static void showChoices(Message message, User user) {
+        List<SelectOption> OPTIONS = new ArrayList<>();
+        GUILD_SETTINGS.forEach((key, setting) -> {
+            OPTIONS.add(SelectOption.of(setting.getGuildName(), setting.getGuildID()));
+        });
+
+        StringSelectMenu.Builder menu = StringSelectMenu.create("mangobot:modmail");
+        menu.addOptions(OPTIONS);
+
+        message.reply("Select a ModMail to join").setActionRow(menu.build()).queue();
+    }
+
+    @SubscribeEvent
+    public static void onSelectMenu(DStringSelectInteractionEvent event) {
+        var dEvent = event.get();
+        if (!dEvent.isFromGuild()) {
+            var interaction = dEvent.getInteraction();
+            if (!interaction.getComponentId().equals("mangobot:modmail")) return;
+
+            var guildID = interaction.getValues().get(0);
+            var result = join(interaction.getMessage(), interaction.getUser(), guildID);
+
+            switch (result) {
+                case 0 -> interaction.reply("Opening Ticket Soon.").setEphemeral(true).queue();
+                case 1 -> interaction.reply("GuildID is incorrect / guild doesn't exist").setEphemeral(true).queue();
+                case 2 ->
+                        interaction.reply("Guild Exists. ModMail for this server hasnt been configured").setEphemeral(true).queue();
+                case 3 ->
+                        interaction.reply("Cannot be in more then 1 ModMail ticket at a time !mail leave to leave current one").setEphemeral(true).queue();
+            }
         }
     }
 
@@ -152,6 +193,11 @@ public class ModMailHandler {
                     // Load
                     Settings settingsObj = Util.loadJsonToObject(settings.getAbsolutePath(), Settings.class);
                     GUILD_SETTINGS.put(settingsObj.guildID, settingsObj);
+                    if (settingsObj.guildName == null) {
+                        var guild = Bot.getJDAInstance().getGuildById(settingsObj.guildID);
+                        if (guild == null) return;
+                        settingsObj.guildName = guild.getName();
+                    }
                 }
             }
         });
@@ -203,14 +249,20 @@ public class ModMailHandler {
     public static class Settings {
         private final String guildID;
         private String categoryID = "none";
-        private String transcriptChannelID = "none";
-        private String joinMessage = """
+        private final String transcriptChannelID = "none";
+        private final String joinMessage = """
                 The %s ModMail Team will be with you shortly!
                 """;
+        private String guildName;
 
-        public Settings(String guildID, String categoryID) {
+        public Settings(String guildID, String categoryID, String guildName) {
             this.guildID = guildID;
             this.categoryID = categoryID;
+            this.guildName = guildName;
+        }
+
+        public String getGuildID() {
+            return guildID;
         }
 
         public String getCategoryID() {
@@ -219,6 +271,10 @@ public class ModMailHandler {
 
         public String getJoinMessage() {
             return joinMessage;
+        }
+
+        public String getGuildName() {
+            return guildName;
         }
 
         public void save() {

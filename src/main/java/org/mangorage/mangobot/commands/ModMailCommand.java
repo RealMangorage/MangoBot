@@ -61,23 +61,14 @@ public class ModMailCommand extends AbstractCommand {
             try {
                 Category category = guild.getCategoryById(categoryID);
                 if (category == null) return CommandResult.FAIL;
-                ModMailHandler.configure(guildID, categoryID);
+                ModMailHandler.configure(guildID, categoryID, guild.getName());
                 Bot.DEFAULT_SETTINGS.apply(message.reply("ModMailCommand for this server has been configured")).queue();
             } catch (Exception e) {
                 return CommandResult.FAIL;
             }
         } else if (args.hasArg("join")) {
             if (message.isFromGuild()) return CommandResult.NO_PERMISSION;
-            String guildJoinID = args.findArgOrDefault("join", "null");
-            if (guildJoinID.equals("null")) return CommandResult.FAIL;
-            var result = ModMailHandler.join(message, message.getAuthor(), guildJoinID);
-            switch (result) {
-                case 1 -> messageSettings.apply(message.reply("GuildID is incorrect / guild doesn't exist")).queue();
-                case 2 ->
-                        messageSettings.apply(message.reply("Guild Exists. ModMail for this server hasnt been configured")).queue();
-                case 3 ->
-                        messageSettings.apply(message.reply("Cannot be in more then 1 ModMail ticket at a time !mail leave to leave current one")).queue();
-            }
+            ModMailHandler.showChoices(message, message.getAuthor());
         } else if (args.hasArg("leave")) {
             if (message.isFromGuild()) return CommandResult.NO_PERMISSION;
             ModMailHandler.leave(message.getChannel().asPrivateChannel(), message.getAuthor());

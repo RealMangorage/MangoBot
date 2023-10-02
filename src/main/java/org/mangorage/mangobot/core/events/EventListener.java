@@ -23,6 +23,7 @@
 package org.mangorage.mangobot.core.events;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
@@ -34,6 +35,7 @@ import org.mangorage.mangobotapi.core.events.discord.DMessageDeleteEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageUpdateEvent;
 import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
+import org.mangorage.mangobotapi.core.events.discord.DStringSelectInteractionEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
 
@@ -64,5 +66,10 @@ public record EventListener(IEventBus bus) {
     @SubscribeEvent
     public void messageDelete(MessageDeleteEvent event) {
         bus.post(new DMessageDeleteEvent(event));
+    }
+
+    @SubscribeEvent
+    public void messageStringSelect(StringSelectInteractionEvent event) {
+        bus.post(new DStringSelectInteractionEvent(event));
     }
 }
