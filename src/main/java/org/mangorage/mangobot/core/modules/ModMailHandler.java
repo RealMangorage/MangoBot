@@ -185,6 +185,7 @@ public class ModMailHandler {
     }
 
     public static void onLoad(LoadEvent event) {
+        System.out.println("Loading ModMailHandler Data Stage 1...");
         List<File> DATA_DIR = BotUtil.getFilesInDir(SAVEDIR_GUILDS_DIR);
         DATA_DIR.forEach(file -> {
             if (file.isDirectory()) {
@@ -202,6 +203,10 @@ public class ModMailHandler {
             }
         });
 
+        System.out.println("Loading ModMailHandler Data Stage 1 -> Completed");
+
+        System.out.println("Loading ModMailHandler Data Stage 2...");
+
         List<File> USERS_DIR = BotUtil.getFilesInDir(SAVEDIR_USERS_DIR);
         USERS_DIR.forEach(file -> {
             if (file.isDirectory()) {
@@ -217,6 +222,8 @@ public class ModMailHandler {
                 }
             }
         });
+
+        System.out.println("Loading ModMailHandler Data Stage 2 -> Completed");
     }
 
     @SubscribeEvent

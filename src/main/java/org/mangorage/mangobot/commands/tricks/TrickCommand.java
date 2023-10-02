@@ -260,7 +260,8 @@ public class TrickCommand extends AbstractCommand {
         switch (data.trickType()) {
             case DEFAULT -> {
                 boolean supressEmbeds = data.settings().supressEmbeds();
-                dMessage.apply(channel.sendMessage(response)).setSuppressEmbeds(supressEmbeds).queue();
+                var mData = dMessage.apply(channel.sendMessage(response)).setSuppressEmbeds(supressEmbeds);
+                dMessage.withDeletion(mData, message.getAuthor()).queue();
             }
             case CODE -> {
                 executeScript(message, args.getFrom(2).split(" "), response);
@@ -377,7 +378,7 @@ public class TrickCommand extends AbstractCommand {
             Message message = event.getMessage();
             if (!message.isFromGuild()) return;
             String guildID = message.getGuild().getId();
-            String command = event.getCommand();
+            String command = event.getCommand().toLowerCase();
             String args = event.getArguments().getFrom(0);
 
             // We have found something that works, make sure we do this so that "Invalid Command" doesn't occur

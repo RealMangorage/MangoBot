@@ -49,15 +49,16 @@ sourceSets {
 
 dependencies {
     // Libs for Bot
-    implementation("net.dv8tion:JDA:5.0.0-beta.12") // JDA
-    implementation("com.github.walkyst:lavaplayer-fork:1.4.3") // LavaPlayer to stream audio from YT/FILES to Discord
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("org.apache.logging.log4j:log4j-core:2.14.1")
+    implementation("net.dv8tion:JDA:$JDA_VERSION") // JDA
+    implementation("com.github.walkyst:lavaplayer-fork:$LAVA_VERSION")
+    // LavaPlayer to stream audio from YT/FILES to Discord
+    implementation("com.google.code.gson:gson:$GSON_VERSION")
+    implementation("org.apache.logging.log4j:log4j-core:$LOG4J_VERSION")
 
     implementation project(path: ':mangobotapi')
 
 
-    runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
+    runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$LOG4J_VERSION")
 }
 
 

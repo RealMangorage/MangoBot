@@ -133,7 +133,8 @@ public class Bot {
                 CacheFlag.EMOJI
         );
 
-        builder.setActivity(Activity.of(Activity.ActivityType.PLAYING, "MinecraftForge: The Awakening of Herobrine Modpack"));
+        builder.setActivity(Activity.of(Activity.ActivityType.CUSTOM_STATUS, "!mail join to open a ModMail ticket", "https://www.minecraftforge.net/"));
+
         builder.setStatus(OnlineStatus.ONLINE);
 
         builder.setEnabledIntents(intents);

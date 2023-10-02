@@ -22,40 +22,23 @@
 
 package org.mangorage.mangobot.core.events;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
-import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
-import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
+import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
 
 public class Listeners {
-    private static final boolean TRASH = false;
-    @SubscribeEvent
-    public static void onMessage(DMessageRecievedEvent e) {
-        if (!TRASH) return;
-        var event = e.get();
-        var message = event.getMessage();
-        var user = event.getAuthor();
-        var userID = user.getId();
-        if (Bot.getJDAInstance().getSelfUser().getId().equals(userID))
-            message.addReaction(Emoji.fromCustom("trash", 1150898672897359983L, false)).queue();
-    }
 
     @SubscribeEvent
-    public static void onReaction(DReactionEvent e) {
-        if (!TRASH) return;
-        var event = e.get();
-        var messageid = event.getMessageId();
-        var emoji = event.getReaction().getEmoji();
-
-        if (event.getUserId().equals(Bot.getJDAInstance().getSelfUser().getId()))
-            return;
-
-        if (emoji.getAsReactionCode().equals("trash:1150898672897359983")) {
-            event.getGuildChannel().retrieveMessageById(messageid).queue(m -> {
-                if (Bot.getJDAInstance().getSelfUser().getId().equals(m.getAuthor().getId()))
-                    m.delete().queue();
-            });
+    public static void onButtonInteraction(DButtonInteractionEvent event) {
+        var dEvent = event.get();
+        var interaction = dEvent.getInteraction();
+        if (interaction.getComponentId().startsWith("mangobot:trash:")) {
+            String userId = interaction.getComponentId().split(":")[2];
+            var userClick = dEvent.getUser().getId();
+            if (userClick.equals(userId)) {
+                dEvent.getInteraction().getMessage().delete().queue();
+                dEvent.getInteraction().reply("Deleting...").setEphemeral(true).queue();
+            } else
+                dEvent.getInteraction().reply("No Permission!").setEphemeral(true).queue();
         }
     }
 }
