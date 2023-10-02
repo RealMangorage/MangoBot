@@ -35,7 +35,7 @@ import org.mangorage.mangobot.core.commands.permissions.ForgePermissions;
 import org.mangorage.mangobot.core.commands.permissions.GlobalPermissions;
 import org.mangorage.mangobot.core.events.EventListener;
 import org.mangorage.mangobot.core.events.Listeners;
-import org.mangorage.mangobot.core.modules.ModMailHandler;
+import org.mangorage.mangobot.core.modules.modmail.ModMailHandler;
 import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.MangoBotAPIBuilder;
 import org.mangorage.mangobotapi.core.eventbus.EventBus;

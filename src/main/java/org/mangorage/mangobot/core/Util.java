@@ -24,6 +24,9 @@ package org.mangorage.mangobot.core;
 
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.utils.TimeUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +35,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.temporal.TemporalAccessor;
 
 public class Util {
+    private static final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+
+
+    public static TemporalAccessor getTimestamp(ISnowflake iSnowflake) {
+        return TimeUtil.getTimeCreated(iSnowflake);
+    }
+
+
     public static Integer parseStringIntoInteger(String s) {
         Integer res = null;
         try {
@@ -45,7 +57,6 @@ public class Util {
 
     public static void saveObjectToFile(Object object, String directory, String fileName) {
         try {
-            Gson gson = new Gson();
             String jsonData = gson.toJson(object);
 
             File dirs = new File(directory);
@@ -66,7 +77,6 @@ public class Util {
 
     public static <T> T loadJsonToObject(String file, Class<T> cls) {
         try {
-            Gson gson = new Gson();
             return gson.fromJson(Files.readString(Path.of(file)), cls);
         } catch (IOException e) {
             throw new RuntimeException(e);

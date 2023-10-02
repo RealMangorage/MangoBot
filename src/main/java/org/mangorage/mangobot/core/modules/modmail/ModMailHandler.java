@@ -20,18 +20,14 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.modules;
+package org.mangorage.mangobot.core.modules.modmail;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.mangorage.mangobot.core.Bot;
@@ -44,7 +40,6 @@ import org.mangorage.mangobotapi.core.events.discord.DMessageUpdateEvent;
 import org.mangorage.mangobotapi.core.events.discord.DStringSelectInteractionEvent;
 import org.mangorage.mangobotapi.core.util.BotUtil;
 
-import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,12 +48,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ModMailHandler {
-    private static final String SAVEDIR_GUILDS = "data/guilddata/modmail/guilds/%s/";
-    private static final String SAVEDIR_GUILDS_DIR = "data/guilddata/modmail/guilds";
-    private static final String SAVEDIR_USERS = "data/guilddata/modmail/users/%s/";
-    private static final String SAVEDIR_USERS_DIR = "data/guilddata/modmail/users";
+    protected static final String SAVEDIR_GUILDS = "data/guilddata/modmail/guilds/%s/";
+    protected static final String SAVEDIR_GUILDS_DIR = "data/guilddata/modmail/guilds";
+    protected static final String SAVEDIR_USERS = "data/guilddata/modmail/users/%s/";
+    protected static final String SAVEDIR_USERS_DIR = "data/guilddata/modmail/users";
 
-    private static final HashMap<String, Settings> GUILD_SETTINGS = new HashMap<>(); // GuildID -> CategoryID
+    private static final HashMap<String, ModMailSettings> GUILD_SETTINGS = new HashMap<>(); // GuildID -> CategoryID
     private static final HashMap<String, ModMailInstance> MOD_MAIL_INSTANCE = new HashMap<>(); // UserID -> Inst
     private static final HashMap<String, ModMailInstance> MOD_MAIL_INSTANCE_CHANNEL = new HashMap<>(); // ChannelID -> Inst
     private static final HashSet<ModMailInstance> MOD_MAIL_INSTANCE_ID = new HashSet<>();
@@ -69,7 +64,7 @@ public class ModMailHandler {
 
     public static ModMailInstance findByGuildAndUserID(String guildID, String userID) {
         if (MOD_MAIL_INSTANCE_ID.isEmpty()) return null;
-        var result = MOD_MAIL_INSTANCE_ID.stream().filter(inst -> inst.guildID().equals(guildID) && inst.userID().equals(userID)).findAny();
+        var result = MOD_MAIL_INSTANCE_ID.stream().filter(inst -> inst.getGuildID().equals(guildID) && inst.getUserID().equals(userID)).findAny();
         return result.orElse(null);
     }
 
@@ -83,7 +78,7 @@ public class ModMailHandler {
 
     public static void configure(String guildID, String categoryID, String guildName) {
         if (!GUILD_SETTINGS.containsKey(guildID)) {
-            var settings = new Settings(guildID, categoryID, guildName);
+            var settings = new ModMailSettings(guildID, categoryID, guildName);
             GUILD_SETTINGS.put(guildID, settings);
             settings.save();
         }
@@ -125,7 +120,7 @@ public class ModMailHandler {
     public static int join(Message message, User user, String guildID) {
         if (!MOD_MAIL_INSTANCE.containsKey(user.getId())) {
             Guild guild = Bot.getJDAInstance().getGuildById(guildID);
-            Settings settings = GUILD_SETTINGS.get(guildID);
+            ModMailSettings settings = GUILD_SETTINGS.get(guildID);
 
             // If guild or settings are null, don't bother any further
             if (guild == null) return 1; // guild doesnt exist
@@ -141,17 +136,18 @@ public class ModMailHandler {
             var current = findByGuildAndUserID(guildID, user.getId());
             if (current != null) {
                 MOD_MAIL_INSTANCE.put(user.getId(), current);
-                current.rejoin(user, guild);
+                current.rejoin(message, guild);
                 current.openModMail(message.getChannel().asPrivateChannel(), guild, user, settings.getJoinMessage());
             } else {
                 guild.createTextChannel(user.getEffectiveName(), category).queue(e -> {
                     var inst = new ModMailInstance(guildID, e.getId(), user.getId(), guild.getName(), guild.getIconUrl(), new AtomicBoolean(true));
 
                     MOD_MAIL_INSTANCE_ID.add(inst);
-                    MOD_MAIL_INSTANCE_CHANNEL.put(inst.channelID(), inst);
+                    MOD_MAIL_INSTANCE_CHANNEL.put(inst.getChannelID(), inst);
                     MOD_MAIL_INSTANCE.put(user.getId(), inst);
 
                     inst.openModMail(message.getChannel().asPrivateChannel(), guild, user, settings.getJoinMessage());
+                    inst.joined(e, user);
                     inst.save();
                 });
             }
@@ -161,27 +157,30 @@ public class ModMailHandler {
         }
     }
 
-    public static void close(String channelID) {
+    public static void close(Message message, String channelID) {
         var inst = MOD_MAIL_INSTANCE_CHANNEL.get(channelID);
         if (inst == null) return;
 
-        MOD_MAIL_INSTANCE.remove(inst.userID());
-        MOD_MAIL_INSTANCE_CHANNEL.remove(inst.channelID());
+        MOD_MAIL_INSTANCE.remove(inst.getUserID());
+        MOD_MAIL_INSTANCE_CHANNEL.remove(inst.getChannelID());
 
-        var channel = Bot.getJDAInstance().getTextChannelById(inst.channelID);
+        var channel = Bot.getJDAInstance().getTextChannelById(inst.getChannelID());
         if (channel == null) return;
 
         channel.delete().queue();
-        inst.closeModMail();
+        inst.closeModMail(message);
         inst.delete();
     }
 
-    public static void leave(PrivateChannel channel, User user) {
+    public static boolean leave(Message message) {
+        var user = message.getAuthor();
+        var channel = message.getChannel().asPrivateChannel();
         var inst = MOD_MAIL_INSTANCE.get(user.getId());
-        if (inst == null) return;
-        inst.leave(channel, user);
+        if (inst == null) return false;
+        inst.leave(message, channel, user);
         inst.save();
         MOD_MAIL_INSTANCE.remove(user.getId());
+        return true;
     }
 
     public static void onLoad(LoadEvent event) {
@@ -192,12 +191,12 @@ public class ModMailHandler {
                 File settings = new File("%s/settings.json".formatted(file.getAbsolutePath()));
                 if (settings.exists()) {
                     // Load
-                    Settings settingsObj = Util.loadJsonToObject(settings.getAbsolutePath(), Settings.class);
-                    GUILD_SETTINGS.put(settingsObj.guildID, settingsObj);
-                    if (settingsObj.guildName == null) {
-                        var guild = Bot.getJDAInstance().getGuildById(settingsObj.guildID);
+                    ModMailSettings settingsObj = Util.loadJsonToObject(settings.getAbsolutePath(), ModMailSettings.class);
+                    GUILD_SETTINGS.put(settingsObj.getGuildID(), settingsObj);
+                    if (settingsObj.getGuildName() == null) {
+                        var guild = Bot.getJDAInstance().getGuildById(settingsObj.getGuildID());
                         if (guild == null) return;
-                        settingsObj.guildName = guild.getName();
+                        settingsObj.setGuildName(guild.getName());
                     }
                 }
             }
@@ -216,9 +215,9 @@ public class ModMailHandler {
                     ModMailInstance inst = Util.loadJsonToObject(settings.getAbsolutePath(), ModMailInstance.class);
 
                     MOD_MAIL_INSTANCE_ID.add(inst);
-                    MOD_MAIL_INSTANCE_CHANNEL.put(inst.channelID(), inst);
-                    if (inst.active().get())
-                        MOD_MAIL_INSTANCE.put(inst.userID(), inst);
+                    MOD_MAIL_INSTANCE_CHANNEL.put(inst.getChannelID(), inst);
+                    if (inst.isActive())
+                        MOD_MAIL_INSTANCE.put(inst.getUserID(), inst);
                 }
             }
         });
@@ -245,7 +244,7 @@ public class ModMailHandler {
             User user = dEvent.getAuthor();
             MessageChannelUnion channel = dEvent.getChannel();
             var inst = MOD_MAIL_INSTANCE_CHANNEL.get(channel.getId());
-            if (inst == null || !inst.active().get()) return;
+            if (inst == null || !inst.isActive()) return;
             inst.sendToModMail(content, user);
         }
     }
@@ -253,151 +252,4 @@ public class ModMailHandler {
     public static void onMessageEdit(DMessageUpdateEvent event) {
     }
 
-    public static class Settings {
-        private final String guildID;
-        private String categoryID = "none";
-        private final String transcriptChannelID = "none";
-        private final String joinMessage = """
-                The %s ModMail Team will be with you shortly!
-                """;
-        private String guildName;
-
-        public Settings(String guildID, String categoryID, String guildName) {
-            this.guildID = guildID;
-            this.categoryID = categoryID;
-            this.guildName = guildName;
-        }
-
-        public String getGuildID() {
-            return guildID;
-        }
-
-        public String getCategoryID() {
-            return categoryID;
-        }
-
-        public String getJoinMessage() {
-            return joinMessage;
-        }
-
-        public String getGuildName() {
-            return guildName;
-        }
-
-        public void save() {
-            Util.saveObjectToFile(this, SAVEDIR_GUILDS.formatted(guildID), "settings.json");
-        }
-    }
-
-    public record ModMailInstance(String guildID, String channelID, String userID, String guildName,
-                                  String guildIconUrl, AtomicBoolean active) {
-
-        public void closeModMail() {
-            // Tell User this ModMailCommand has been closed...
-            Bot.getJDAInstance().retrieveUserById(userID).queue(DM -> {
-                if (DM == null) return;
-                DM.openPrivateChannel().queue(pc -> {
-                    pc.sendMessage("Your ModMail ticket for %s has been closed".formatted(guildName)).queue();
-                });
-            });
-        }
-
-        public void rejoin(User user, Guild guild) {
-            active.set(true);
-            TextChannel channel = guild.getTextChannelById(channelID());
-            if (channel == null) return;
-            EmbedBuilder builder = new EmbedBuilder();
-
-            builder.setAuthor(user.getEffectiveName(), null, user.getEffectiveAvatarUrl());
-            builder.setTitle("User has rejoined the ModMail Ticket.");
-            builder.setFooter("UserID: %s".formatted(user.getId()));
-            builder.setColor(Color.BLUE);
-
-            channel.sendMessageEmbeds(builder.build()).queue();
-        }
-
-        public void leave(PrivateChannel channel, User user) {
-            active.set(false);
-            Guild guild = Bot.getJDAInstance().getGuildById(guildID);
-            if (guild == null) return;
-            TextChannel guildChannel = guild.getTextChannelById(channelID());
-            if (guildChannel == null) return;
-
-
-            EmbedBuilder builder = new EmbedBuilder();
-
-            builder.setAuthor(user.getEffectiveName(), null, user.getEffectiveAvatarUrl());
-            builder.setTitle("User has left the ModMail Ticket.");
-            builder.setDescription("Do !mail close to fully close. User can always rejoin.");
-            builder.setFooter("UserID: %s".formatted(user.getId()));
-            builder.setColor(Color.BLUE);
-
-            var messageData = guildChannel.sendMessageEmbeds(
-                    builder.build()
-            );
-
-            messageData.queue();
-
-            channel.sendMessage("You have left %s's ModMail chat".formatted(guildName)).queue();
-        }
-
-        public void openModMail(PrivateChannel channel, Guild guild, User user, String joinMessage) {
-            // Send a message to the userID telling them the join message.
-            // join Message should have one %s
-            channel.sendMessage(joinMessage.formatted(guild.getName())).queue();
-        }
-
-        public void sendToModMail(Message message, User user) { // Sending from Guild Channel -> Private DM
-            // user being the Moderator in this case
-            Bot.getJDAInstance().retrieveUserById(userID).queue(DM -> {
-                if (DM == null) return;
-                EmbedBuilder builder = new EmbedBuilder();
-
-                builder.setAuthor(user.getEffectiveName(), null, user.getEffectiveAvatarUrl());
-                builder.setDescription(message.getContentRaw());
-                builder.setFooter("%s | %s".formatted(guildName, guildID), guildIconUrl);
-                builder.setTimestamp(message.getTimeCreated());
-                builder.setColor(Color.GREEN);
-
-                DM.openPrivateChannel().queue(pc -> {
-                    pc.sendMessageEmbeds(builder.build()).queue(after -> {
-                        message.addReaction(Emoji.fromUnicode("U+2705")).queue();
-                    });
-                });
-            });
-        }
-
-        public void sendToServer(Message message, User user) { // Sending from Private DM -> Guild Channel
-            // User being the person sending messages to Server
-
-
-            Guild guild = Bot.getJDAInstance().getGuildById(guildID);
-            if (guild == null) return;
-            TextChannel channel = guild.getTextChannelById(channelID);
-            if (channel == null) return;
-
-            EmbedBuilder builder = new EmbedBuilder();
-
-            builder.setAuthor(user.getEffectiveName(), null, user.getEffectiveAvatarUrl());
-            builder.setDescription(message.getContentRaw());
-            builder.setFooter("UserID: %s".formatted(user.getId()));
-            builder.setColor(Color.BLUE);
-
-            var messageData = channel.sendMessageEmbeds(
-                    builder.build()
-            );
-
-            messageData.queue(after -> {
-                message.addReaction(Emoji.fromUnicode("U+2705")).queue();
-            });
-        }
-
-        public void save() {
-            Util.saveObjectToFile(this, SAVEDIR_USERS.formatted(userID), "settings.json");
-        }
-
-        public void delete() {
-            Util.deleteFile(SAVEDIR_USERS.formatted(userID), "settings.json");
-        }
-    }
 }

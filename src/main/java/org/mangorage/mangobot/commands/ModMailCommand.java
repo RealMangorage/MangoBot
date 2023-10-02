@@ -28,7 +28,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.commands.permissions.GlobalPermissions;
-import org.mangorage.mangobot.core.modules.ModMailHandler;
+import org.mangorage.mangobot.core.modules.modmail.ModMailHandler;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
@@ -45,13 +45,14 @@ public class ModMailCommand extends AbstractCommand {
             if (member == null)
                 return CommandResult.FAIL;
 
+            Guild guild = member.getGuild();
+            String guildID = guild.getId();
+
             if (args.hasArg("close")) {
-                ModMailHandler.close(message.getGuildChannel().getId());
+                ModMailHandler.close(message, message.getGuildChannel().getId());
                 return CommandResult.PASS;
             }
 
-            Guild guild = member.getGuild();
-            String guildID = guild.getId();
             if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.MOD_MAIL))
                 return CommandResult.NO_PERMISSION;
             if (!args.hasArg("categoryID") || args.findArgOrDefault("categoryID", "null").equals("null"))
@@ -62,7 +63,7 @@ public class ModMailCommand extends AbstractCommand {
                 Category category = guild.getCategoryById(categoryID);
                 if (category == null) return CommandResult.FAIL;
                 ModMailHandler.configure(guildID, categoryID, guild.getName());
-                Bot.DEFAULT_SETTINGS.apply(message.reply("ModMailCommand for this server has been configured")).queue();
+                messageSettings.apply(message.reply("ModMailCommand for this server has been configured")).queue();
             } catch (Exception e) {
                 return CommandResult.FAIL;
             }
@@ -71,7 +72,9 @@ public class ModMailCommand extends AbstractCommand {
             ModMailHandler.showChoices(message, message.getAuthor());
         } else if (args.hasArg("leave")) {
             if (message.isFromGuild()) return CommandResult.NO_PERMISSION;
-            ModMailHandler.leave(message.getChannel().asPrivateChannel(), message.getAuthor());
+            boolean left = ModMailHandler.leave(message);
+            if (!left)
+                messageSettings.apply(message.reply("You are not in a ModMail Ticket")).queue();
         }
 
         return CommandResult.PASS;
