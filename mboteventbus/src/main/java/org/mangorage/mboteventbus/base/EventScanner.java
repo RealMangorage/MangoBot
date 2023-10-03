@@ -20,11 +20,11 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.base;
+package org.mangorage.mboteventbus.base;
 
 
-import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
+import org.mangorage.mboteventbus.annotations.SubscribeEvent;
+import org.mangorage.mboteventbus.impl.IEvent;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

@@ -58,6 +58,7 @@ dependencies {
 
     implementation project(path: ':mangobotapi')
     implementation project(path: ':mangobotapi')
+    implementation project(path: ':mboteventbus')
 
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$LOG4J_VERSION")
 }

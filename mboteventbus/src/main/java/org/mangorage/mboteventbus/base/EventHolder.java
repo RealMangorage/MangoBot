@@ -20,11 +20,11 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.base;
+package org.mangorage.mboteventbus.base;
 
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEventInvoker;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
+import org.mangorage.mboteventbus.impl.IEvent;
+import org.mangorage.mboteventbus.impl.IEventInvoker;
+import org.mangorage.mboteventbus.impl.IEventListener;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;

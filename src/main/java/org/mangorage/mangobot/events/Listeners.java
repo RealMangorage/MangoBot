@@ -22,8 +22,8 @@
 
 package org.mangorage.mangobot.events;
 
-import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
+import org.mangorage.mboteventbus.annotations.SubscribeEvent;
 
 public class Listeners {
 

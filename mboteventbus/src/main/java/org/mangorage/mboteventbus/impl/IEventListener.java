@@ -20,45 +20,20 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.base;
+package org.mangorage.mboteventbus.impl;
 
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
 
-public class EventBuilder<T> {
-    private final Class<T> classType;
-    private final IEvent<T> event;
-    private Integer priority = null;
-    private boolean recieveCancelled = false;
+@FunctionalInterface
+public interface IEventListener<T> {
 
-    public EventBuilder(Class<T> type, IEvent<T> event) {
-        this.event = event;
-        this.classType = type;
+    /* EventBus invokes this. */
+    void invoke(T event);
+
+    default int getPriority() {
+        return 0;
     }
 
-    public EventBuilder<T> setPriority(int priority) {
-        this.priority = priority;
-        return this;
+    default boolean recieveCancelled() {
+        return false;
     }
-
-    public EventBuilder<T> setRecieveCancelled(boolean recieveCancelled) {
-        this.recieveCancelled = recieveCancelled;
-        return this;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public boolean canRecieveCanclled() {
-        return recieveCancelled;
-    }
-
-    public Class<T> getClassType() {
-        return classType;
-    }
-
-    public IEvent<T> getEvent() {
-        return event;
-    }
-
 }

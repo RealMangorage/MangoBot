@@ -32,12 +32,12 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobotapi.core.data.DataHandler;
-import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageUpdateEvent;
 import org.mangorage.mangobotapi.core.events.discord.DStringSelectInteractionEvent;
+import org.mangorage.mboteventbus.annotations.SubscribeEvent;
+import org.mangorage.mboteventbus.impl.IEventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;

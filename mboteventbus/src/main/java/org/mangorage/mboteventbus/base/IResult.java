@@ -20,7 +20,17 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.impl;
+package org.mangorage.mboteventbus.base;
 
-public interface IMainBus {
+public interface IResult {
+
+    enum Result {
+        DENY,
+        DEFAULT,
+        ALLOW
+    }
+
+    void setResult(Result result);
+
+    Result getResult();
 }

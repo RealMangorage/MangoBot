@@ -20,17 +20,18 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.base;
+package org.mangorage.mboteventbus.base;
 
-public interface IResult {
 
-    enum Result {
-        DENY,
-        DEFAULT,
-        ALLOW
+public interface IPhase {
+
+    int getPhase();
+
+    /* Always do super call to ensure this logic is ran */
+    default void setPhase(int priority) {
+        if (seenPhase(-1))
+            throw new IllegalStateException("Cannot call Event#setCanceled() after the MONITOR phase");
     }
 
-    void setResult(Result result);
-
-    Result getResult();
+    boolean seenPhase(int priority);
 }

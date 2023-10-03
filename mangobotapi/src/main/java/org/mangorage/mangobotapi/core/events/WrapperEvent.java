@@ -22,7 +22,8 @@
 
 package org.mangorage.mangobotapi.core.events;
 
-import org.mangorage.mangobotapi.core.eventbus.base.Event;
+
+import org.mangorage.mboteventbus.base.Event;
 
 // Generic !
 public abstract class WrapperEvent<T, X> extends Event<T> {

@@ -20,20 +20,36 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.impl;
+package org.mangorage.mboteventbus.base;
 
+import org.mangorage.mboteventbus.impl.IEvent;
+import org.mangorage.mboteventbus.impl.IEventListener;
 
-@FunctionalInterface
-public interface IEventListener<T> {
+public class EventListener<T> implements IEventListener<T> {
+    private final IEvent<T> eventListener;
+    private final int priority;
+    private final boolean recieveCancelled;
 
-    /* EventBus invokes this. */
-    void invoke(T event);
-
-    default int getPriority() {
-        return 0;
+    public EventListener(int priority, boolean recieveCancelled, IEvent<T> eventListener) {
+        this.recieveCancelled = recieveCancelled;
+        this.priority = priority;
+        this.eventListener = eventListener;
     }
 
-    default boolean recieveCancelled() {
-        return false;
+    @Override
+    public void invoke(T event) {
+        eventListener.indirectInvoke(event);
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public int getPriority() {
+        return priority;
+    }
+
+    public boolean canRecieveCancelled() {
+        return recieveCancelled;
     }
 }

@@ -23,9 +23,9 @@
 package org.mangorage.mangobotapi;
 
 import net.dv8tion.jda.api.JDA;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
 import org.mangorage.mangobotapi.core.util.Lockable;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
+import org.mangorage.mboteventbus.impl.IEventBus;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;

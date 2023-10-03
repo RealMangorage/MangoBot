@@ -31,11 +31,11 @@ import org.mangorage.mangobotapi.core.commands.CommandAlias;
 import org.mangorage.mangobotapi.core.commands.CommandHolder;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.eventbus.EventBus;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mangobotapi.core.events.RegistryEvent;
 import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
+import org.mangorage.mboteventbus.impl.IEventBus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -154,7 +154,7 @@ public class CommandRegistry {
         }
     }
 
-    public void register(EventBus bus) {
+    public void register(IEventBus bus) {
         bus.addListener(StartupEvent.class, this::startupEvent);
         bus.addListener(RegistryEvent.class, this::registryEvent);
         bus.addListener(CommandEvent.class, this::commandEvent);

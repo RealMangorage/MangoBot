@@ -22,8 +22,8 @@
 
 package org.mangorage.mangobotapi.core.events;
 
-import org.mangorage.mangobotapi.core.eventbus.base.Event;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mboteventbus.base.Event;
 
 public class RegistryEvent extends Event<RegistryEvent> {
     private final CommandRegistry.CommandType type;

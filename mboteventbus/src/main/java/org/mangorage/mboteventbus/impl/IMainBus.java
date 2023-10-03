@@ -20,11 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.impl;
+package org.mangorage.mboteventbus.impl;
 
-@FunctionalInterface
-public interface IEventInvoker<T extends IEvent<T>> {
-
-    /* EventBus will call this to invoke the callbacks */
-    void invoke(T event);
+public interface IMainBus {
 }

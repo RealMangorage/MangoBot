@@ -25,8 +25,8 @@ package org.mangorage.mangobotapi.core.events;
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.eventbus.base.Event;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mboteventbus.base.Event;
 
 public class CommandEvent extends Event<CommandEvent> {
     private final Message message;

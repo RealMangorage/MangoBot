@@ -20,14 +20,11 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.impl;
+package org.mangorage.mboteventbus.impl;
 
-public interface IEvent<T> {
-    /**
-     * Only call this from {@link IEventListener <T>}
-     * Don't ever call it from {@link IEvent <T>} directly, as nothing will occur.
-     *
-     * @param event
-     */
-    void indirectInvoke(T event);
+@FunctionalInterface
+public interface IEventInvoker<T extends IEvent<T>> {
+
+    /* EventBus will call this to invoke the callbacks */
+    void invoke(T event);
 }

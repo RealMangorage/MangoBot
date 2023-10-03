@@ -39,12 +39,12 @@ import org.mangorage.mangobot.events.Listeners;
 import org.mangorage.mangobot.modules.modmail.ModMailHandler;
 import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.MangoBotAPIBuilder;
-import org.mangorage.mangobotapi.core.eventbus.EventBus;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.ShutdownEvent;
 import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 import org.mangorage.mangobotapi.core.util.misc.LockableReference;
+import org.mangorage.mboteventbus.EventBus;
 
 import java.util.EnumSet;
 import java.util.function.Consumer;

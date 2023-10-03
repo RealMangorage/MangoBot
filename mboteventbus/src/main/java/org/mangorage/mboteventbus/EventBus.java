@@ -20,16 +20,16 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus;
+package org.mangorage.mboteventbus;
 
-import org.mangorage.mangobotapi.core.eventbus.base.Event;
-import org.mangorage.mangobotapi.core.eventbus.base.EventBuilder;
-import org.mangorage.mangobotapi.core.eventbus.base.EventHolder;
-import org.mangorage.mangobotapi.core.eventbus.base.EventListener;
-import org.mangorage.mangobotapi.core.eventbus.base.EventScanner;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEvent;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEventListener;
+import org.mangorage.mboteventbus.base.Event;
+import org.mangorage.mboteventbus.base.EventBuilder;
+import org.mangorage.mboteventbus.base.EventHolder;
+import org.mangorage.mboteventbus.base.EventListener;
+import org.mangorage.mboteventbus.base.EventScanner;
+import org.mangorage.mboteventbus.impl.IEvent;
+import org.mangorage.mboteventbus.impl.IEventBus;
+import org.mangorage.mboteventbus.impl.IEventListener;
 
 import java.util.HashMap;
 /*

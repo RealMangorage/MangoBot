@@ -20,18 +20,45 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.base;
+package org.mangorage.mboteventbus.base;
 
+import org.mangorage.mboteventbus.impl.IEvent;
 
-public interface IPhase {
+public class EventBuilder<T> {
+    private final Class<T> classType;
+    private final IEvent<T> event;
+    private Integer priority = null;
+    private boolean recieveCancelled = false;
 
-    int getPhase();
-
-    /* Always do super call to ensure this logic is ran */
-    default void setPhase(int priority) {
-        if (seenPhase(-1))
-            throw new IllegalStateException("Cannot call Event#setCanceled() after the MONITOR phase");
+    public EventBuilder(Class<T> type, IEvent<T> event) {
+        this.event = event;
+        this.classType = type;
     }
 
-    boolean seenPhase(int priority);
+    public EventBuilder<T> setPriority(int priority) {
+        this.priority = priority;
+        return this;
+    }
+
+    public EventBuilder<T> setRecieveCancelled(boolean recieveCancelled) {
+        this.recieveCancelled = recieveCancelled;
+        return this;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public boolean canRecieveCanclled() {
+        return recieveCancelled;
+    }
+
+    public Class<T> getClassType() {
+        return classType;
+    }
+
+    public IEvent<T> getEvent() {
+        return event;
+    }
+
 }

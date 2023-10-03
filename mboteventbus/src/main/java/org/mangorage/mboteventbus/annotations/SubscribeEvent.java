@@ -20,26 +20,18 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.eventbus.impl;
+package org.mangorage.mboteventbus.annotations;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-import org.mangorage.mangobotapi.core.eventbus.base.Event;
-import org.mangorage.mangobotapi.core.eventbus.base.EventBuilder;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-public interface IEventBus {
-    <T extends Event<T>> void addListener(Class<T> type, IEvent<T> event);
+@Retention(value = RUNTIME)
+@Target(value = METHOD)
+public @interface SubscribeEvent {
+    int priority() default 0;
 
-    <T extends Event<T>> void addListener(int priority, Class<T> type, IEvent<T> event);
-
-    <T extends Event<T>> void addListener(int priority, Class<T> type, boolean recieveCancelled, IEvent<T> event);
-
-    <T extends Event<T>> void addListener(EventBuilder<T> builder);
-
-    void register(Object object);
-
-    <T extends Event<T>> boolean post(T event);
-
-    void startup();
-
-    void shutdown();
+    boolean recieveCancelled() default false;
 }

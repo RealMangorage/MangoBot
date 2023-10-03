@@ -23,7 +23,6 @@
 package org.mangorage.mangobotapi;
 
 import net.dv8tion.jda.api.JDA;
-import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.RegistryEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -32,6 +31,7 @@ import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mangobotapi.core.script.ScriptParser;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
+import org.mangorage.mboteventbus.impl.IEventBus;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
