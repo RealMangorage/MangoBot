@@ -254,7 +254,8 @@ public class TrickCommand extends AbstractCommand {
                 dMessage.withDeletion(mData, message.getAuthor()).queue();
             }
             case CODE -> {
-                executeScript(message, args.getFrom(2).split(" "), response);
+                // executeScript(message, args.getFrom(2).split(" "), response);
+                dMessage.apply(message.reply("Code Tricks are disabled!")).queue();
             }
             case ALIAS -> {
                 String defer = data.content();

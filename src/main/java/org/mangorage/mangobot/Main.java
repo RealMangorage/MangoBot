@@ -62,9 +62,18 @@ public class Main {
         if (System.console() == null) {
             final JPasswordField pf = new JPasswordField();
             pf.setEchoChar('#');
-            token = JOptionPane.showConfirmDialog(null, pf, message,
-                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION
-                    ? new String(pf.getPassword()) : "";
+            int reponse = JOptionPane.showConfirmDialog(
+                    null,
+                    pf,
+                    message,
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (reponse == JOptionPane.OK_CANCEL_OPTION || reponse == JOptionPane.CLOSED_OPTION)
+                System.exit(0);
+
+            token = reponse == JOptionPane.OK_OPTION ? new String(pf.getPassword()) : "";
 
         } else {
             Console c = System.console();

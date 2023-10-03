@@ -22,10 +22,6 @@
 
 package org.mangorage.mangobot.core.commands;
 
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.utils.FileUpload;
 import org.mangorage.mangobot.commands.ModMailCommand;
 import org.mangorage.mangobot.commands.PrefixCommand;
 import org.mangorage.mangobot.commands.ReplyCommand;
@@ -39,14 +35,10 @@ import org.mangorage.mangobot.commands.tricks.TrickCommand;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
-import org.mangorage.mangobot.core.commands.permissions.GlobalPermissions;
-import org.mangorage.mangobot.core.music.recorder.VoiceChatRecorder;
-import org.mangorage.mangobot.core.music.recorder.VoiceRelay;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.CommandHolder;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
-import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.registry.RegistryObject;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
@@ -78,59 +70,6 @@ public class GlobalCommands {
             }
             return CommandResult.PASS;
         }, false));
-
-
-        COMMANDS.register("record", AbstractCommand.create((message, arg) -> {
-            var member = message.getMember();
-            if (member == null)
-                return CommandResult.FAIL;
-
-            if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.TRICK_ADMIN))
-                return CommandResult.NO_PERMISSION;
-
-            String[] args = arg.getArgs();
-            MessageChannelUnion channel = message.getChannel();
-            if (args.length > 1) {
-                String channelID = args[0];
-                VoiceChannel channelC = message.getGuild().getChannelById(VoiceChannel.class, channelID);
-                if (channelC != null) {
-                    Integer seconds = Util.parseStringIntoInteger(args[1]);
-                    if (seconds != null && seconds <= 3600 && seconds > 0)
-                        VoiceChatRecorder.getInstance(message.getGuild().getId()).record(message, seconds, channelC);
-                    else
-                        channel.sendMessage("Max allowed time to record is 3600 seconds").queue();
-                }
-            } else {
-                Integer seconds = Util.parseStringIntoInteger(args[0]);
-                if (seconds != null && seconds <= 3600 && seconds > 0)
-                    VoiceChatRecorder.getInstance(message.getGuild().getId()).record(message, seconds);
-                else
-                    channel.sendMessage("Max allowed time to record is 3600 seconds").queue();
-            }
-            return CommandResult.PASS;
-        }, true));
-
-        COMMANDS.register("sendRecording", AbstractCommand.create((message, args) -> {
-            MessageChannelUnion channelUnion = message.getChannel();
-            message.reply("sending").queue();
-            VoiceChatRecorder.getInstance(message.getGuild().getId()).compressFile((file) -> {
-                channelUnion.sendMessage("Here!").addFiles(FileUpload.fromData(file)).queue();
-            }, message);
-
-
-            return CommandResult.PASS;
-        }, false));
-
-        COMMANDS.register("testRelay", AbstractCommand.create((message, args) -> {
-            GuildVoiceState state = message.getMember().getVoiceState();
-            if (state != null && state.inAudioChannel()) {
-                VoiceChannel voiceChannel = state.getChannel().asVoiceChannel();
-                VoiceRelay.getInstance(message.getGuild().getId()).join(voiceChannel);
-                message.reply("Connecting").queue();
-            }
-
-            return CommandResult.PASS;
-        }, true));
 
 
         if (Constants.USE_MUSIC) {
