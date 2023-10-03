@@ -20,30 +20,25 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.music;
+package org.mangorage.mangobot.events;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
+import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
 
-public class AudioTrackEvent {
-    private final AudioTrack track;
-    private final Info reason;
+public class Listeners {
 
-    public AudioTrackEvent(AudioTrack track, Info info) {
-        this.track = track;
-        this.reason = info;
-    }
-
-    public AudioTrack getTrack() {
-        return track;
-    }
-
-    public Info getReason() {
-        return reason;
-    }
-
-    public enum Info {
-        SUCCESS,
-        FAILED,
-        NO_MATCHES
+    @SubscribeEvent
+    public static void onButtonInteraction(DButtonInteractionEvent event) {
+        var dEvent = event.get();
+        var interaction = dEvent.getInteraction();
+        if (interaction.getComponentId().startsWith("mangobot:trash:")) {
+            String userId = interaction.getComponentId().split(":")[2];
+            var userClick = dEvent.getUser().getId();
+            if (userClick.equals(userId)) {
+                dEvent.getInteraction().getMessage().delete().queue();
+                dEvent.getInteraction().reply("Deleting...").setEphemeral(true).queue();
+            } else
+                dEvent.getInteraction().reply("No Permission!").setEphemeral(true).queue();
+        }
     }
 }

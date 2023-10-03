@@ -20,21 +20,18 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands;
+package org.mangorage.mangobot.commands;
 
-import org.mangorage.mangobot.commands.ModMailCommand;
-import org.mangorage.mangobot.commands.PrefixCommand;
-import org.mangorage.mangobot.commands.ReplyCommand;
-import org.mangorage.mangobot.commands.music.PauseCommand;
-import org.mangorage.mangobot.commands.music.PlayCommand;
-import org.mangorage.mangobot.commands.music.PlayingCommand;
-import org.mangorage.mangobot.commands.music.QueueCommand;
-import org.mangorage.mangobot.commands.music.StopCommand;
-import org.mangorage.mangobot.commands.music.VolumeCommand;
-import org.mangorage.mangobot.commands.tricks.TrickCommand;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
+import org.mangorage.mangobot.modules.music.commands.PauseCommand;
+import org.mangorage.mangobot.modules.music.commands.PlayCommand;
+import org.mangorage.mangobot.modules.music.commands.PlayingCommand;
+import org.mangorage.mangobot.modules.music.commands.QueueCommand;
+import org.mangorage.mangobot.modules.music.commands.StopCommand;
+import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
+import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.CommandHolder;
 import org.mangorage.mangobotapi.core.commands.CommandResult;

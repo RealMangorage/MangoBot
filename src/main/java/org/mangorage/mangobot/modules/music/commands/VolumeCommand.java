@@ -20,35 +20,37 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands.music;
+package org.mangorage.mangobot.modules.music.commands;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.core.music.MusicPlayer;
+import org.mangorage.mangobot.modules.music.MusicPlayer;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 
-public class PlayingCommand extends AbstractCommand {
+public class VolumeCommand extends AbstractCommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
+        String VOLUME = args.getOrDefault(0, "10");
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
+        CommandResult result = CommandResult.FAIL;
 
-        if (MusicPlayer.getInstance(guild.getId()).isPlaying()) {
-            AudioTrack track = MusicPlayer.getInstance(guild.getId()).getPlaying();
+        try {
+            int volume = Integer.valueOf(VOLUME);
+            if (volume <= 30) {
+                MusicPlayer.getInstance(guild.getId()).setVolume(volume);
+                channel.sendMessage("Volume set to " + volume).queue();
+            } else
+                channel.sendMessage("Max Volume allowed is 30").queue();
 
-
-            MessageEmbed embed = new EmbedBuilder()
-                    .setTitle(track.getInfo().title, track.getInfo().uri)
-                    .build();
-            channel.sendMessageFormat("Playing (%s / %s): ", track.getPosition(), track.getDuration()).addEmbeds(embed).queue();
+            result = CommandResult.PASS;
+        } catch (NumberFormatException e) {
+            channel.sendMessage("Invalid arguments.").queue();
         }
 
-        return CommandResult.PASS;
+        return result;
     }
 }

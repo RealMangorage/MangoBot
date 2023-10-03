@@ -20,25 +20,32 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.events;
+package org.mangorage.mangobot.modules.music.commands;
 
-import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
-import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import org.mangorage.mangobot.modules.music.MusicPlayer;
+import org.mangorage.mangobot.modules.music.MusicUtil;
+import org.mangorage.mangobotapi.core.commands.AbstractCommand;
+import org.mangorage.mangobotapi.core.commands.Arguments;
+import org.mangorage.mangobotapi.core.commands.CommandResult;
 
-public class Listeners {
+public class StopCommand extends AbstractCommand {
+    @Override
+    public CommandResult execute(Message message, Arguments args) {
+        MessageChannelUnion channel = message.getChannel();
+        Guild guild = message.getGuild();
 
-    @SubscribeEvent
-    public static void onButtonInteraction(DButtonInteractionEvent event) {
-        var dEvent = event.get();
-        var interaction = dEvent.getInteraction();
-        if (interaction.getComponentId().startsWith("mangobot:trash:")) {
-            String userId = interaction.getComponentId().split(":")[2];
-            var userClick = dEvent.getUser().getId();
-            if (userClick.equals(userId)) {
-                dEvent.getInteraction().getMessage().delete().queue();
-                dEvent.getInteraction().reply("Deleting...").setEphemeral(true).queue();
-            } else
-                dEvent.getInteraction().reply("No Permission!").setEphemeral(true).queue();
+        if (MusicPlayer.getInstance(guild.getId()).isPlaying()) {
+            MusicPlayer.getInstance(guild.getId()).stop();
+            channel.sendMessage("Stopped playing!").queue();
+        } else {
+            channel.sendMessage("Nothing is playing!").queue();
         }
+
+        MusicUtil.leaveVoiceChannel(message.getGuild());
+
+        return CommandResult.PASS;
     }
 }

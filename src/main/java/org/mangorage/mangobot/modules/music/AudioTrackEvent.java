@@ -20,13 +20,30 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.gui;
+package org.mangorage.mangobot.modules.music;
 
-import java.awt.*;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-public abstract class Renderable {
+public class AudioTrackEvent {
+    private final AudioTrack track;
+    private final Info reason;
 
-    abstract Dimension location();
+    public AudioTrackEvent(AudioTrack track, Info info) {
+        this.track = track;
+        this.reason = info;
+    }
 
-    abstract void paint(Graphics g);
+    public AudioTrack getTrack() {
+        return track;
+    }
+
+    public Info getReason() {
+        return reason;
+    }
+
+    public enum Info {
+        SUCCESS,
+        FAILED,
+        NO_MATCHES
+    }
 }

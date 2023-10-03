@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.modules.modmail;
+package org.mangorage.mangobot.modules.modmail;
 
 import com.google.gson.annotations.Expose;
 import net.dv8tion.jda.api.EmbedBuilder;

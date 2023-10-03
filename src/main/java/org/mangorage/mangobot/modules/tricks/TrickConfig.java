@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands.tricks;
+package org.mangorage.mangobot.modules.tricks;
 
 public record TrickConfig(boolean supressEmbeds) {
     public TrickConfig withEmbeds(boolean value) {

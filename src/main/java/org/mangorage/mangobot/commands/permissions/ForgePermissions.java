@@ -20,33 +20,30 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.commands.permissions;
+package org.mangorage.mangobot.commands.permissions;
 
+import org.mangorage.mangobot.commands.ForgeCommands;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.registry.UserPermission;
 
-import static org.mangorage.mangobot.core.commands.ForgeCommands.COMMANDS;
-import static org.mangorage.mangobot.core.commands.permissions.GlobalPermissions.RECORD_ADMIN;
-import static org.mangorage.mangobot.core.commands.permissions.GlobalPermissions.TRICK_ADMIN;
-
 public class ForgePermissions {
-    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.guild(COMMANDS.getID());
+    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.guild(ForgeCommands.COMMANDS.getID());
 
 
     static {
         // Admin Role
-        PERMISSIONS.register(TRICK_ADMIN, UserPermission.of("1129067881842360381"));
+        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1129067881842360381"));
         // Moderators Role
-        PERMISSIONS.register(TRICK_ADMIN, UserPermission.of("1129070272302022656"));
+        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1129070272302022656"));
         // Mango Bot Tester Role
-        PERMISSIONS.register(TRICK_ADMIN, UserPermission.of("1150880910745538631"));
+        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1150880910745538631"));
 
         // Admin Role
-        PERMISSIONS.register(RECORD_ADMIN, UserPermission.of("1129067881842360381"));
+        PERMISSIONS.register(GlobalPermissions.RECORD_ADMIN, UserPermission.of("1129067881842360381"));
         // Moderator Role
-        PERMISSIONS.register(RECORD_ADMIN, UserPermission.of("1130506065381957642"));
+        PERMISSIONS.register(GlobalPermissions.RECORD_ADMIN, UserPermission.of("1130506065381957642"));
         // Moderators Role
-        PERMISSIONS.register(RECORD_ADMIN, UserPermission.of("1129070272302022656"));
+        PERMISSIONS.register(GlobalPermissions.RECORD_ADMIN, UserPermission.of("1129070272302022656"));
     }
 
     public static void init() {

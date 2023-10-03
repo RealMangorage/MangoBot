@@ -20,35 +20,57 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands.music;
+package org.mangorage.mangobot.modules.music.commands;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.core.music.MusicPlayer;
+import org.mangorage.mangobot.modules.music.MusicPlayer;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 
-public class PauseCommand extends AbstractCommand {
+public class QueueCommand extends AbstractCommand {
     @Override
-    public CommandResult execute(Message message, Arguments args) {
+    public CommandResult execute(Message message, Arguments arg) {
+        String[] args = arg.getArgs();
+        String URL = args[0];
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
+        MusicPlayer player = MusicPlayer.getInstance(guild.getId());
 
-        if (MusicPlayer.getInstance(guild.getId()).isPlaying()) {
-            MusicPlayer.getInstance(guild.getId()).pause();
-            AudioTrack track = MusicPlayer.getInstance(guild.getId()).getPlaying();
+        if (URL != null) {
+            player.load(URL, e -> {
+                /**
+                 MessageEmbed embed = new EmbedBuilder()
+                 .setTitle(track.getInfo().title, track.getInfo().uri)
+                 .build();
+                 channel.sendMessage("Playing: ").addEmbeds(embed).queue();
 
-            MessageEmbed embed = new EmbedBuilder()
-                    .setTitle(track.getInfo().title, track.getInfo().uri)
-                    .build();
-            channel.sendMessage("Paused: ").addEmbeds(embed).queue();
-        } else
-            channel.sendMessage("Nothing is playing").queue();
+
+                 channel.sendMessage("Queued: " + track.getInfo().title).queue();
+                 **/
+                switch (e.getReason()) {
+                    case SUCCESS -> {
+                        player.add(e.getTrack());
+                        MessageEmbed embed = new EmbedBuilder()
+                                .setTitle(e.getTrack().getInfo().title, e.getTrack().getInfo().uri)
+                                .build();
+                        channel.sendMessage("Added to Queue: ").addEmbeds(embed).queue();
+
+                    }
+                    case FAILED -> {
+                        channel.sendMessage("Failed").queue();
+                    }
+                    case NO_MATCHES -> {
+                        channel.sendMessage("No matches was found!").queue();
+                    }
+                }
+
+            });
+        }
         return CommandResult.PASS;
     }
 }

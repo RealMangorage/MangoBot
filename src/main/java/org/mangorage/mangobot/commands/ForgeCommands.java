@@ -20,10 +20,18 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core.music;
+package org.mangorage.mangobot.commands;
 
-public enum AudioStatus {
-    PLAYING,
-    PAUSED,
-    STOPPED
+import org.mangorage.mangobot.core.Bot;
+import org.mangorage.mangobotapi.core.commands.CommandHolder;
+import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobotapi.core.registry.RegistryObject;
+
+public class ForgeCommands {
+    public static final CommandRegistry COMMANDS = CommandRegistry.guild("1129059589325852724");
+    public static final RegistryObject<CommandHolder<PingCommand>> PING = COMMANDS.register("pings", new PingCommand());
+
+    public static void init() {
+        COMMANDS.register(Bot.EVENT_BUS);
+    }
 }
