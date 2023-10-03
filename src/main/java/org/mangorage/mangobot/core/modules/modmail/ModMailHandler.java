@@ -31,16 +31,14 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.core.Util;
+import org.mangorage.mangobotapi.core.data.DataHandler;
 import org.mangorage.mangobotapi.core.eventbus.annotations.SubscribeEvent;
 import org.mangorage.mangobotapi.core.eventbus.impl.IEventBus;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageUpdateEvent;
 import org.mangorage.mangobotapi.core.events.discord.DStringSelectInteractionEvent;
-import org.mangorage.mangobotapi.core.util.BotUtil;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,10 +48,34 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ModMailHandler {
     protected static final String SAVEDIR_GUILDS = "data/guilddata/modmail/guilds/%s/";
     protected static final String SAVEDIR_GUILDS_DIR = "data/guilddata/modmail/guilds";
+    protected static final DataHandler<ModMailSettings> GUILD_SETTINGS_HANDLER = DataHandler.create(
+            (settings) -> {
+                ModMailHandler.GUILD_SETTINGS.put(settings.getGuildID(), settings);
+            },
+            ModMailSettings.class,
+            "data/guilddata/modmail/guilds",
+            "settings.json"
+    );
+
+    protected static final DataHandler<ModMailInstance> MODMAIl_INSTANCE_HANDLER = DataHandler.create(
+            (inst) -> {
+                ModMailHandler.MOD_MAIL_INSTANCE_ID.add(inst);
+                ModMailHandler.MOD_MAIL_INSTANCE_CHANNEL.put(inst.getChannelID(), inst);
+                if (inst.isActive())
+                    ModMailHandler.MOD_MAIL_INSTANCE.put(inst.getUserID(), inst);
+            },
+            ModMailInstance.class,
+            "data/guilddata/modmail/users",
+            "settings.json"
+    );
+
+
+
     protected static final String SAVEDIR_USERS = "data/guilddata/modmail/users/%s/";
     protected static final String SAVEDIR_USERS_DIR = "data/guilddata/modmail/users";
 
     private static final HashMap<String, ModMailSettings> GUILD_SETTINGS = new HashMap<>(); // GuildID -> CategoryID
+
     private static final HashMap<String, ModMailInstance> MOD_MAIL_INSTANCE = new HashMap<>(); // UserID -> Inst
     private static final HashMap<String, ModMailInstance> MOD_MAIL_INSTANCE_CHANNEL = new HashMap<>(); // ChannelID -> Inst
     private static final HashSet<ModMailInstance> MOD_MAIL_INSTANCE_ID = new HashSet<>();
@@ -87,13 +109,23 @@ public class ModMailHandler {
     public static void showChoices(Message message, User user) {
         List<SelectOption> OPTIONS = new ArrayList<>();
         GUILD_SETTINGS.forEach((key, setting) -> {
-            OPTIONS.add(SelectOption.of(setting.getGuildName(), setting.getGuildID()));
+            var isMember = user.getJDA().getGuilds().stream()
+                    .filter(guild -> guild.getId().equals(setting.getGuildID()))
+                    .anyMatch(guild -> guild.isMember(user));
+
+            if (isMember) {
+                OPTIONS.add(SelectOption.of(setting.getGuildName(), setting.getGuildID()));
+            }
         });
 
-        StringSelectMenu.Builder menu = StringSelectMenu.create("mangobot:modmail");
-        menu.addOptions(OPTIONS);
+        if (!OPTIONS.isEmpty()) {
+            StringSelectMenu.Builder menu = StringSelectMenu.create("mangobot:modmail");
+            menu.addOptions(OPTIONS);
 
-        message.reply("Select a ModMail to join").setActionRow(menu.build()).queue();
+            message.reply("Select a ModMail to join").setActionRow(menu.build()).queue();
+        } else {
+            message.reply("You are not in any guilds that have ModMail configured!").queue();
+        }
     }
 
     @SubscribeEvent
@@ -185,42 +217,15 @@ public class ModMailHandler {
 
     public static void onLoad(LoadEvent event) {
         System.out.println("Loading ModMailHandler Data Stage 1...");
-        List<File> DATA_DIR = BotUtil.getFilesInDir(SAVEDIR_GUILDS_DIR);
-        DATA_DIR.forEach(file -> {
-            if (file.isDirectory()) {
-                File settings = new File("%s/settings.json".formatted(file.getAbsolutePath()));
-                if (settings.exists()) {
-                    // Load
-                    ModMailSettings settingsObj = Util.loadJsonToObject(settings.getAbsolutePath(), ModMailSettings.class);
-                    GUILD_SETTINGS.put(settingsObj.getGuildID(), settingsObj);
-                    if (settingsObj.getGuildName() == null) {
-                        var guild = Bot.getJDAInstance().getGuildById(settingsObj.getGuildID());
-                        if (guild == null) return;
-                        settingsObj.setGuildName(guild.getName());
-                    }
-                }
-            }
-        });
+
+        GUILD_SETTINGS_HANDLER.loadAll(); // Loads everything...
 
         System.out.println("Loading ModMailHandler Data Stage 1 -> Completed");
 
+
         System.out.println("Loading ModMailHandler Data Stage 2...");
 
-        List<File> USERS_DIR = BotUtil.getFilesInDir(SAVEDIR_USERS_DIR);
-        USERS_DIR.forEach(file -> {
-            if (file.isDirectory()) {
-                File settings = new File("%s/settings.json".formatted(file.getAbsolutePath()));
-                if (settings.exists()) {
-                    // Load
-                    ModMailInstance inst = Util.loadJsonToObject(settings.getAbsolutePath(), ModMailInstance.class);
-
-                    MOD_MAIL_INSTANCE_ID.add(inst);
-                    MOD_MAIL_INSTANCE_CHANNEL.put(inst.getChannelID(), inst);
-                    if (inst.isActive())
-                        MOD_MAIL_INSTANCE.put(inst.getUserID(), inst);
-                }
-            }
-        });
+        MODMAIl_INSTANCE_HANDLER.loadAll();
 
         System.out.println("Loading ModMailHandler Data Stage 2 -> Completed");
     }

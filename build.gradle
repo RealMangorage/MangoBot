@@ -52,11 +52,11 @@ dependencies {
     implementation("net.dv8tion:JDA:$JDA_VERSION") // JDA
     implementation("com.github.walkyst:lavaplayer-fork:$LAVA_VERSION")
     // LavaPlayer to stream audio from YT/FILES to Discord
+
     implementation("com.google.code.gson:gson:$GSON_VERSION")
     implementation("org.apache.logging.log4j:log4j-core:$LOG4J_VERSION")
 
     implementation project(path: ':mangobotapi')
-
 
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$LOG4J_VERSION")
 }

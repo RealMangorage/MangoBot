@@ -28,7 +28,6 @@ import com.google.gson.GsonBuilder;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.utils.TimeUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -38,8 +37,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.temporal.TemporalAccessor;
 
 public class Util {
-    private static final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
+    private static final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public static TemporalAccessor getTimestamp(ISnowflake iSnowflake) {
         return TimeUtil.getTimeCreated(iSnowflake);
@@ -53,34 +52,6 @@ public class Util {
         } catch (NumberFormatException ignored) {
         }
         return res;
-    }
-
-    public static void saveObjectToFile(Object object, String directory, String fileName) {
-        try {
-            String jsonData = gson.toJson(object);
-
-            File dirs = new File(directory);
-            if (!dirs.exists() && !dirs.mkdirs()) return;
-            Files.writeString(Path.of("%s/%s".formatted(directory, fileName)), jsonData);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void deleteFile(String directory, String fileName) {
-        try {
-            Files.delete(Path.of("%s/%s".formatted(directory, fileName)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T> T loadJsonToObject(String file, Class<T> cls) {
-        try {
-            return gson.fromJson(Files.readString(Path.of(file)), cls);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     // execute runnable on a thread

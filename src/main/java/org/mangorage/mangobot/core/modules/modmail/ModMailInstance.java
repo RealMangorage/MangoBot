@@ -31,7 +31,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.core.Util;
+import org.mangorage.mangobotapi.core.util.APIUtil;
 
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -215,8 +215,6 @@ public class ModMailInstance {
 
     public void sendToServer(Message message, User user) { // Sending from Private DM -> Guild Channel
         // User being the person sending messages to Server
-
-
         Guild guild = Bot.getJDAInstance().getGuildById(guildID);
         if (guild == null) return;
         TextChannel channel = guild.getTextChannelById(channelID);
@@ -240,10 +238,11 @@ public class ModMailInstance {
     }
 
     public void save() {
-        Util.saveObjectToFile(this, ModMailHandler.SAVEDIR_USERS.formatted(userID), "settings.json");
+        ModMailHandler.MODMAIl_INSTANCE_HANDLER.save(this, getUserID());
     }
 
+    // Keep for now!
     public void delete() {
-        Util.deleteFile(ModMailHandler.SAVEDIR_USERS.formatted(userID), "settings.json");
+        APIUtil.deleteFile(ModMailHandler.SAVEDIR_USERS.formatted(userID), "settings.json");
     }
 }

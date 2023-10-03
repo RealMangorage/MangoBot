@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 
 public class Test {
 
-
     public static void main(String[] args) {
         int pointsPerDay = 75;
         int pointsPerDollar = 100 / 5;

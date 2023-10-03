@@ -24,7 +24,7 @@ package org.mangorage.mangobot;
 
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.BotSettings;
-import org.mangorage.mangobotapi.core.util.BotUtil;
+import org.mangorage.mangobotapi.core.util.APIUtil;
 
 import javax.swing.*;
 import java.io.Console;
@@ -39,7 +39,7 @@ public class Main {
         var currentToken = BotSettings.BOT_TOKEN.get();
         if (currentToken.equalsIgnoreCase("empty"))
             requestBotToken(false);
-        if (!BotUtil.isValidBotToken(currentToken))
+        if (!APIUtil.isValidBotToken(currentToken))
             requestBotToken(true);
 
         Runtime.getRuntime().addShutdownHook(new Thread(Bot::close));
@@ -72,7 +72,7 @@ public class Main {
             token = String.valueOf(chars);
         }
 
-        if (BotUtil.isValidBotToken(token)) {
+        if (APIUtil.isValidBotToken(token)) {
             BotSettings.BOT_TOKEN.set(token);
             System.out.println("Configured the Bot Token. Proceeding to init Bot.");
         } else {

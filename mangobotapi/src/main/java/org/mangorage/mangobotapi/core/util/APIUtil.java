@@ -22,15 +22,19 @@
 
 package org.mangorage.mangobotapi.core.util;
 
+import com.google.gson.Gson;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-public class BotUtil {
+public class APIUtil {
     public static boolean isValidBotToken(String token) {
         var bot = JDABuilder.createDefault(token);
         JDA jda = null;
@@ -52,5 +56,33 @@ public class BotUtil {
         if (file.isDirectory() && file.listFiles() != null)
             return Arrays.asList(file.listFiles());
         return List.of();
+    }
+
+    public static void saveObjectToFile(Gson gson, Object object, String directory, String fileName) {
+        try {
+            String jsonData = gson.toJson(object);
+
+            File dirs = new File(directory);
+            if (!dirs.exists() && !dirs.mkdirs()) return;
+            Files.writeString(Path.of("%s/%s".formatted(directory, fileName)), jsonData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void deleteFile(String directory, String fileName) {
+        try {
+            Files.delete(Path.of("%s/%s".formatted(directory, fileName)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T loadJsonToObject(Gson gson, String file, Class<T> cls) {
+        try {
+            return gson.fromJson(Files.readString(Path.of(file)), cls);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

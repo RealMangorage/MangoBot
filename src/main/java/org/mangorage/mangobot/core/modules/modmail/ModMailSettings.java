@@ -23,7 +23,9 @@
 package org.mangorage.mangobot.core.modules.modmail;
 
 import com.google.gson.annotations.Expose;
-import org.mangorage.mangobot.core.Util;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import org.mangorage.mangobot.core.Bot;
 
 public class ModMailSettings {
     @Expose
@@ -58,6 +60,12 @@ public class ModMailSettings {
     }
 
     public String getGuildName() {
+        if (guildName == null) {
+            JDA jda = Bot.getJDAInstance();
+            Guild guild = jda.getGuildById(guildID);
+            if (guild == null) return "";
+            guildName = guild.getName();
+        }
         return guildName;
     }
 
@@ -66,6 +74,6 @@ public class ModMailSettings {
     }
 
     public void save() {
-        Util.saveObjectToFile(this, ModMailHandler.SAVEDIR_GUILDS.formatted(guildID), "settings.json");
+        ModMailHandler.GUILD_SETTINGS_HANDLER.save(this, getGuildID());
     }
 }

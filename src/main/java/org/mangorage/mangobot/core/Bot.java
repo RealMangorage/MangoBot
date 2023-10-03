@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.mangobot.core.commands.ForgeCommands;
 import org.mangorage.mangobot.core.commands.GlobalCommands;
@@ -126,19 +127,29 @@ public class Bot {
                 GatewayIntent.DIRECT_MESSAGE_REACTIONS,
                 GatewayIntent.GUILD_VOICE_STATES,
                 GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
-                GatewayIntent.SCHEDULED_EVENTS
+                GatewayIntent.SCHEDULED_EVENTS,
+                GatewayIntent.GUILD_MEMBERS,
+                GatewayIntent.GUILD_PRESENCES
         );
 
         EnumSet<CacheFlag> cacheFlags = EnumSet.of(
-                CacheFlag.EMOJI
+                CacheFlag.EMOJI,
+                CacheFlag.ROLE_TAGS,
+                CacheFlag.VOICE_STATE,
+                CacheFlag.ACTIVITY, // Cant do
+                CacheFlag.CLIENT_STATUS,
+                CacheFlag.MEMBER_OVERRIDES,
+                CacheFlag.STICKER,
+                CacheFlag.SCHEDULED_EVENTS,
+                CacheFlag.FORUM_TAGS
         );
 
         builder.setActivity(Activity.of(Activity.ActivityType.CUSTOM_STATUS, "!mail join to open a ModMail ticket", "https://www.minecraftforge.net/"));
-
         builder.setStatus(OnlineStatus.ONLINE);
 
         builder.setEnabledIntents(intents);
         builder.enableCache(cacheFlags);
+        builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 
         builder.setEventManager(new AnnotatedEventManager());
         builder.addEventListeners(new EventListener(EVENT_BUS));
