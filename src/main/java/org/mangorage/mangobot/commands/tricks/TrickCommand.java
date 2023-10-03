@@ -22,7 +22,6 @@
 
 package org.mangorage.mangobot.commands.tricks;
 
-import com.google.gson.Gson;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -32,6 +31,7 @@ import org.mangorage.mangobot.core.commands.permissions.GlobalPermissions;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.data.DataHandler;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -48,8 +48,6 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,47 +66,39 @@ public class TrickCommand extends AbstractCommand {
         ALIAS
     }
 
-    private static final String TRICKS_DIR = "data/guilddata/tricks/";
     private static final String SAVE_PATH = "data/guilddata/tricks/%s/";
-
 
     private final HashMap<String, HashMap<String, Data>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
     private final ConcurrentHashMap<String, PagedList<String>> PAGES = new ConcurrentHashMap<>();
+
+    private final DataHandler<Data> TRICK_DATA_HANDLER = DataHandler.create(
+            (data) -> {
+                if (data.settings == null)
+                    data = data.withSettings(new TrickConfig(true));
+                System.out.println("Loaded Trick: '%s' for guild '%s'".formatted(data.trickID(), GuildCache.getName(data.guildID)));
+                CONTENT.computeIfAbsent(data.guildID(), (k) -> new HashMap<>()).put(data.trickID(), data);
+
+                System.out.println("Loaded Trick: %s".formatted(data.trickID()));
+            },
+            Data.class,
+            "data/guilddata/tricks",
+            "%s"
+    );
 
     public void onSaveEvent(SaveEvent event) {
         System.out.println("Saving Tricks Data!");
 
         CONTENT.forEach((guildID, data) -> {
             data.forEach((trickid, trick) -> {
-                trick.save();
+                trick.save(TRICK_DATA_HANDLER);
             });
         });
     }
 
     public void onLoadEvent(LoadEvent event) {
         System.out.println("Loading Tricks Data!");
-        File saveDir = new File(TRICKS_DIR);
-        if (saveDir.exists()) {
-            for (File dir : saveDir.listFiles())
-                if (dir.isDirectory())
-                    for (File file : dir.listFiles())
-                        if (!file.isDirectory())
-                            load(file);
-        }
+        TRICK_DATA_HANDLER.loadAll();
         System.out.println("Finished loading Tricks Data!");
-    }
-
-    private void load(File file) {
-        Gson gson = new Gson();
-        try {
-            Data data = gson.fromJson(Files.readString(file.toPath()), Data.class);
-            if (data.settings == null)
-                data = data.withSettings(new TrickConfig(true));
-            System.out.println("Loaded Trick: '%s' for guild '%s'".formatted(data.trickID(), GuildCache.getName(data.guildID)));
-            CONTENT.computeIfAbsent(data.guildID, (k) -> new HashMap<>()).put(data.trickID(), data);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public TrickCommand() {
@@ -150,7 +140,7 @@ public class TrickCommand extends AbstractCommand {
                 Data data = new Data(guildID, id, member.getId(), trickType, content, new TrickConfig(hasSupressArg));
                 CONTENT.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(id, data);
 
-                data.save();
+                data.save(TRICK_DATA_HANDLER);
                 dMessage.apply(message.reply("Added Trick: '%s'".formatted(id))).queue();
             }
             return CommandResult.PASS;
@@ -178,7 +168,7 @@ public class TrickCommand extends AbstractCommand {
             Data data = new Data(guildID, oldData.trickID(), oldData.ownerID(), trickType, content, new TrickConfig(hasSupressArg));
             CONTENT.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(id, data);
 
-            data.save();
+            data.save(TRICK_DATA_HANDLER);
             dMessage.apply(message.reply("Modfied Trick: '%s'".formatted(id))).queue();
 
             return CommandResult.PASS;
@@ -402,21 +392,11 @@ public class TrickCommand extends AbstractCommand {
 
     public record Data(String guildID, String trickID, String ownerID, Type trickType, String content,
                        TrickConfig settings) {
-        public void save() {
-            File dir = new File(SAVE_PATH.formatted(guildID));
-            if (!dir.exists())
-                dir.mkdirs();
-
-            Gson gson = new Gson();
-            try {
-                String json = gson.toJson(new Data(guildID, trickID, ownerID, trickType, content, new TrickConfig(settings.supressEmbeds())));
-                Files.writeString(Path.of((SAVE_PATH + "%s.json").formatted(guildID, trickID)), json);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        public void save(DataHandler<Data> dataHandler) {
+            dataHandler.save("%s.json".formatted(trickID()), this, guildID());
         }
 
-        public void delete() {
+        public void delete() { // TODO: Update!
             File file = Path.of((SAVE_PATH + "%s.json").formatted(guildID, trickID)).toFile();
             if (file.exists())
                 file.delete();

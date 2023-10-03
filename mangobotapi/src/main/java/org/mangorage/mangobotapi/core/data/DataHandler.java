@@ -32,16 +32,18 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class DataHandler<T> {
-    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+    private static final Gson GSON_EXPOSE = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+    private static final Gson GSON_NON_EXPOSE = new Gson();
 
-    public static List<File> getFiles(ArrayList<File> files, String dir, int depth) {
+
+    public static List<File> getFiles(ArrayList<File> files, String dir, int depthLimit, int depth) {
         File file = new File(dir);
         File[] filesArray = file.listFiles();
         if (file.isDirectory() && filesArray != null) {
             for (File f : filesArray) {
                 if (f.isDirectory()) {
-                    if (depth < 5)
-                        getFiles(files, f.getAbsolutePath(), depth + 1);
+                    if (depth < depthLimit)
+                        getFiles(files, f.getAbsolutePath(), depthLimit, +1);
                 } else {
                     files.add(f);
                 }
@@ -59,9 +61,71 @@ public class DataHandler<T> {
         return result;
     }
 
-
+    /**
+     * @param objectLoadingConsumer
+     * @param type
+     * @param directory
+     * @param fileName              -> %s if you want to wildcard it.
+     * @param <T>
+     * @return
+     */
     public static <T> DataHandler<T> create(Consumer<T> objectLoadingConsumer, Class<T> type, String directory, String fileName) {
-        return new DataHandler<>(objectLoadingConsumer, type, directory, fileName);
+        return create(objectLoadingConsumer, type, directory, fileName, Properties.create());
+    }
+
+    /**
+     * @param objectLoadingConsumer
+     * @param type
+     * @param directory
+     * @param fileName              -> %s if you want to wildcard it.
+     * @param properties            -> properties for this DataHandler
+     * @param <T>
+     * @return
+     */
+    public static <T> DataHandler<T> create(Consumer<T> objectLoadingConsumer, Class<T> type, String directory, String fileName, Properties properties) {
+        return new DataHandler<>(objectLoadingConsumer, type, directory, fileName, properties);
+    }
+
+    public static class Properties {
+        public static Properties create() {
+            return new Properties();
+        }
+
+        private boolean useExpose = false;
+        private int depthLimit = 1;
+
+        private Properties() {
+        }
+
+        /**
+         * Wether or not we should use -> {@link com.google.gson.annotations.Expose}
+         *
+         * @return
+         */
+        public Properties useExposeAnnotation() {
+            this.useExpose = true;
+            return this;
+        }
+
+        public Properties setDepthLimit(int depthLimit) {
+            this.depthLimit = depthLimit;
+            return this;
+        }
+
+        public boolean usesExposeAnnotation() {
+            return useExpose;
+        }
+
+        public int getDepthLimit() {
+            return depthLimit;
+        }
+
+        private Properties copy() {
+            if (useExpose)
+                return new Properties().setDepthLimit(depthLimit).useExposeAnnotation();
+            else
+                return new Properties().setDepthLimit(depthLimit);
+        }
     }
 
 
@@ -69,12 +133,18 @@ public class DataHandler<T> {
     private final Class<T> type;
     private final String directory;
     private final String fileName;
+    private final Properties properties;
 
-    private DataHandler(Consumer<T> objectLoadingConsumer, Class<T> type, String directory, String fileName) {
+    private DataHandler(Consumer<T> objectLoadingConsumer, Class<T> type, String directory, String fileName, Properties properties) {
         this.objectLoadingConsumer = objectLoadingConsumer;
         this.type = type;
         this.directory = directory;
         this.fileName = fileName;
+        this.properties = properties.copy();
+    }
+
+    private Gson getGson() {
+        return properties.usesExposeAnnotation() ? GSON_EXPOSE : GSON_NON_EXPOSE;
     }
 
     /**
@@ -82,11 +152,19 @@ public class DataHandler<T> {
      * @param args   -> used if there is any %s in the directory
      */
     public void save(T object, String... args) {
-        File file = new File("%s/%s".formatted(getDirectoryWithArgs(directory, args), fileName));
-        if (!file.exists() && !file.mkdirs()) return;
-        // Make it so args can be construected and that we add /arg1/arg2/arg3 to the directory
-        APIUtil.saveObjectToFile(GSON, object, getDirectoryWithArgs(directory, args), fileName);
+        save(fileName, object, args);
     }
+
+    /**
+     * @param object   -> object to serialize
+     * @param fileName -> the name for the file. Includes extension
+     * @param args     -> used if there is any %s in the directory
+     */
+    public void save(String fileName, T object, String... args) {
+        // Make it so args can be construected and that we add /arg1/arg2/arg3 to the directory
+        APIUtil.saveObjectToFile(getGson(), object, getDirectoryWithArgs(directory, args), fileName);
+    }
+
 
     /**
      * Loads all objects in the directory
@@ -96,10 +174,13 @@ public class DataHandler<T> {
         if (!file.exists() && !file.mkdirs())
             return;
 
-        List<File> files = getFiles(new ArrayList<>(), directory, 0);
+        List<File> files = getFiles(new ArrayList<>(), directory, properties.getDepthLimit(), 0);
         for (File f : files) {
-            if (!f.getName().equals(fileName)) continue; // Don't bother loading if it's not the file we want
-            T t = APIUtil.loadJsonToObject(GSON, f.getAbsolutePath(), type);
+
+            if (!fileName.equals("%s"))
+                if (!f.getName().equals(fileName)) continue; // Don't bother loading if it's not the file we want
+
+            T t = APIUtil.loadJsonToObject(getGson(), f.getAbsolutePath(), type);
             objectLoadingConsumer.accept(t);
         }
     }

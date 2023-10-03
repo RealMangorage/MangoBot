@@ -46,15 +46,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ModMailHandler {
-    protected static final String SAVEDIR_GUILDS = "data/guilddata/modmail/guilds/%s/";
-    protected static final String SAVEDIR_GUILDS_DIR = "data/guilddata/modmail/guilds";
     protected static final DataHandler<ModMailSettings> GUILD_SETTINGS_HANDLER = DataHandler.create(
             (settings) -> {
                 ModMailHandler.GUILD_SETTINGS.put(settings.getGuildID(), settings);
             },
             ModMailSettings.class,
             "data/guilddata/modmail/guilds",
-            "settings.json"
+            "settings.json",
+            DataHandler.Properties.create()
+                    .useExposeAnnotation()
     );
 
     protected static final DataHandler<ModMailInstance> MODMAIl_INSTANCE_HANDLER = DataHandler.create(
@@ -66,7 +66,9 @@ public class ModMailHandler {
             },
             ModMailInstance.class,
             "data/guilddata/modmail/users",
-            "settings.json"
+            "settings.json",
+            DataHandler.Properties.create()
+                    .useExposeAnnotation()
     );
 
 
