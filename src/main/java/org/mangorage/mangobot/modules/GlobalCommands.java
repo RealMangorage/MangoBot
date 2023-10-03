@@ -20,11 +20,14 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands;
+package org.mangorage.mangobot.modules;
 
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.core.Util;
+import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
+import org.mangorage.mangobot.modules.basic.commands.ReplyCommand;
+import org.mangorage.mangobot.modules.modmail.commands.ModMailCommand;
 import org.mangorage.mangobot.modules.music.commands.PauseCommand;
 import org.mangorage.mangobot.modules.music.commands.PlayCommand;
 import org.mangorage.mangobot.modules.music.commands.PlayingCommand;

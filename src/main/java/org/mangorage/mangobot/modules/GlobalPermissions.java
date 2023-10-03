@@ -20,18 +20,30 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands;
+package org.mangorage.mangobot.modules;
 
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobotapi.core.commands.CommandHolder;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
-import org.mangorage.mangobotapi.core.registry.RegistryObject;
+import net.dv8tion.jda.api.Permission;
+import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.registry.UserPermission;
 
-public class ForgeCommands {
-    public static final CommandRegistry COMMANDS = CommandRegistry.guild("1129059589325852724");
-    public static final RegistryObject<CommandHolder<PingCommand>> PING = COMMANDS.register("pings", new PingCommand());
+public class GlobalPermissions {
+    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.global();
+
+    public static final UserPermission.Node PLAYING = UserPermission.Node.of("playing");
+    public static final UserPermission.Node TRICK_ADMIN = UserPermission.Node.of("trickadmin");
+    public static final UserPermission.Node PREFIX_ADMIN = UserPermission.Node.of("prefix");
+    public static final UserPermission.Node RECORD_ADMIN = UserPermission.Node.of("record");
+    public static final UserPermission.Node MOD_MAIL = UserPermission.Node.of("mod_mail");
+
+
+    static {
+        PERMISSIONS.register(PLAYING, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(TRICK_ADMIN, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(PREFIX_ADMIN, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(RECORD_ADMIN, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(MOD_MAIL, Permission.ADMINISTRATOR);
+    }
 
     public static void init() {
-        COMMANDS.register(Bot.EVENT_BUS);
     }
 }

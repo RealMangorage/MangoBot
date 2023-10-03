@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands;
+package org.mangorage.mangobot.modules.basic.commands;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;

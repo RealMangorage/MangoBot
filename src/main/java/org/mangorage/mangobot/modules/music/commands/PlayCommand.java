@@ -30,7 +30,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.commands.permissions.GlobalPermissions;
+import org.mangorage.mangobot.modules.GlobalPermissions;
 import org.mangorage.mangobot.modules.music.MusicPlayer;
 import org.mangorage.mangobot.modules.music.MusicUtil;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;

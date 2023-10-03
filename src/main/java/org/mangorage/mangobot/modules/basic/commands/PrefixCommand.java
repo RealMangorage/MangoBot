@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands;
+package org.mangorage.mangobot.modules.basic.commands;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -31,8 +31,8 @@ import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 
-import static org.mangorage.mangobot.commands.permissions.GlobalPermissions.PREFIX_ADMIN;
 import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
+import static org.mangorage.mangobot.modules.GlobalPermissions.PREFIX_ADMIN;
 
 public class PrefixCommand extends AbstractCommand {
     @Override

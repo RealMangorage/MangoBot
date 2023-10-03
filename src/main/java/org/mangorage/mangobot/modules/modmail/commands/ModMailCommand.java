@@ -20,14 +20,14 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.commands;
+package org.mangorage.mangobot.modules.modmail.commands;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import org.mangorage.mangobot.commands.permissions.GlobalPermissions;
 import org.mangorage.mangobot.core.Bot;
+import org.mangorage.mangobot.modules.GlobalPermissions;
 import org.mangorage.mangobot.modules.modmail.ModMailHandler;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;

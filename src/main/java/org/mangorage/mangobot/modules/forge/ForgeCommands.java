@@ -20,25 +20,19 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.events;
+package org.mangorage.mangobot.modules.forge;
 
-import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
-import org.mangorage.mboteventbus.annotations.SubscribeEvent;
+import org.mangorage.mangobot.core.Bot;
+import org.mangorage.mangobot.modules.basic.commands.PingCommand;
+import org.mangorage.mangobotapi.core.commands.CommandHolder;
+import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobotapi.core.registry.RegistryObject;
 
-public class Listeners {
+public class ForgeCommands {
+    public static final CommandRegistry COMMANDS = CommandRegistry.guild("1129059589325852724");
+    public static final RegistryObject<CommandHolder<PingCommand>> PING = COMMANDS.register("pings", new PingCommand());
 
-    @SubscribeEvent
-    public static void onButtonInteraction(DButtonInteractionEvent event) {
-        var dEvent = event.get();
-        var interaction = dEvent.getInteraction();
-        if (interaction.getComponentId().startsWith("mangobot:trash:")) {
-            String userId = interaction.getComponentId().split(":")[2];
-            var userClick = dEvent.getUser().getId();
-            if (userClick.equals(userId)) {
-                dEvent.getInteraction().getMessage().delete().queue();
-                dEvent.getInteraction().reply("Deleting...").setEphemeral(true).queue();
-            } else
-                dEvent.getInteraction().reply("No Permission!").setEphemeral(true).queue();
-        }
+    public static void init() {
+        COMMANDS.register(Bot.EVENT_BUS);
     }
 }
