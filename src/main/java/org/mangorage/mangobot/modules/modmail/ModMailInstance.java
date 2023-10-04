@@ -243,6 +243,7 @@ public class ModMailInstance {
 
     // Keep for now!
     public void delete() {
+        // TODO: Impl this into DataHandler (HANDLER.delete(fileName, directoryArgs)); ?
         APIUtil.deleteFile(ModMailHandler.SAVEDIR_USERS.formatted(userID), "settings.json");
     }
 }

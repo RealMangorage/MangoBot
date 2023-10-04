@@ -82,7 +82,8 @@ public class TrickCommand extends AbstractCommand {
             },
             Data.class,
             "data/guilddata/tricks",
-            "%s"
+            DataHandler.Properties.create()
+                    .setFileNamePredicate(e -> true)
     );
 
     public void onSaveEvent(SaveEvent event) {

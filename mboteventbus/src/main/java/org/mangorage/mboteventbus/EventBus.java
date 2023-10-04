@@ -36,6 +36,12 @@ import java.util.HashMap;
     TODO: Change RequiredClass to Marker
  */
 
+/**
+ * Default Provided EventBus. You Can create
+ * your own if you wish to use something that
+ * uses more then {@link Event}
+ **/
+
 public class EventBus implements IEventBus {
     public static final boolean verbose = false;
     public static EventBus create() {

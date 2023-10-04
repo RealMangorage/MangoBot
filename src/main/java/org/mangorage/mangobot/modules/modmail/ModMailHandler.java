@@ -52,9 +52,9 @@ public class ModMailHandler {
             },
             ModMailSettings.class,
             "data/guilddata/modmail/guilds",
-            "settings.json",
             DataHandler.Properties.create()
                     .useExposeAnnotation()
+                    .useDefaultFileNamePredicate()
     );
 
     protected static final DataHandler<ModMailInstance> MODMAIl_INSTANCE_HANDLER = DataHandler.create(
@@ -66,15 +66,15 @@ public class ModMailHandler {
             },
             ModMailInstance.class,
             "data/guilddata/modmail/users",
-            "settings.json",
             DataHandler.Properties.create()
                     .useExposeAnnotation()
+                    .setFileName("settings.json")
+                    .useDefaultFileNamePredicate()
     );
 
 
 
     protected static final String SAVEDIR_USERS = "data/guilddata/modmail/users/%s/";
-    protected static final String SAVEDIR_USERS_DIR = "data/guilddata/modmail/users";
 
     private static final HashMap<String, ModMailSettings> GUILD_SETTINGS = new HashMap<>(); // GuildID -> CategoryID
 

@@ -30,6 +30,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class DataHandler<T> {
     private static final Gson GSON_EXPOSE = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -61,38 +62,29 @@ public class DataHandler<T> {
         return result;
     }
 
-    /**
-     * @param objectLoadingConsumer
-     * @param type
-     * @param directory
-     * @param fileName              -> %s if you want to wildcard it.
-     * @param <T>
-     * @return
-     */
-    public static <T> DataHandler<T> create(Consumer<T> objectLoadingConsumer, Class<T> type, String directory, String fileName) {
-        return create(objectLoadingConsumer, type, directory, fileName, Properties.create());
-    }
 
     /**
      * @param objectLoadingConsumer
      * @param type
      * @param directory
-     * @param fileName              -> %s if you want to wildcard it.
      * @param properties            -> properties for this DataHandler
      * @param <T>
      * @return
      */
-    public static <T> DataHandler<T> create(Consumer<T> objectLoadingConsumer, Class<T> type, String directory, String fileName, Properties properties) {
-        return new DataHandler<>(objectLoadingConsumer, type, directory, fileName, properties);
+    public static <T> DataHandler<T> create(Consumer<T> objectLoadingConsumer, Class<T> type, String directory, Properties properties) {
+        return new DataHandler<>(objectLoadingConsumer, type, directory, properties);
     }
 
-    public static class Properties {
+    public final static class Properties {
         public static Properties create() {
             return new Properties();
         }
 
         private boolean useExpose = false;
         private int depthLimit = 1;
+
+        private String fileName;
+        private Predicate<String> fileNamePredicate;
 
         private Properties() {
         }
@@ -112,6 +104,35 @@ public class DataHandler<T> {
             return this;
         }
 
+        /**
+         * Set to null if you want to use a dynamic fileName
+         * you can pass thru your own fileName on save/load.
+         * loadAll will use fileNamePredicate to determine
+         * if it should load the file.
+         */
+        public Properties setFileName(String fileName) {
+            this.fileName = fileName;
+            return this;
+        }
+
+        public Properties setFileNamePredicate(Predicate<String> fileNamePredicate) {
+            this.fileNamePredicate = fileNamePredicate;
+            return this;
+        }
+
+        // Requires setFileName to be set
+        public Properties useDefaultFileNamePredicate() {
+            return setFileNamePredicate(e -> e.equals(getFileName()));
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public Predicate<String> getFileNamePredicate() {
+            return fileNamePredicate;
+        }
+
         public boolean usesExposeAnnotation() {
             return useExpose;
         }
@@ -122,9 +143,9 @@ public class DataHandler<T> {
 
         private Properties copy() {
             if (useExpose)
-                return new Properties().setDepthLimit(depthLimit).useExposeAnnotation();
+                return create().useExposeAnnotation().setDepthLimit(depthLimit).setFileName(fileName).setFileNamePredicate(fileNamePredicate);
             else
-                return new Properties().setDepthLimit(depthLimit);
+                return create().setDepthLimit(depthLimit).setFileName(fileName).setFileNamePredicate(fileNamePredicate);
         }
     }
 
@@ -132,14 +153,12 @@ public class DataHandler<T> {
     private final Consumer<T> objectLoadingConsumer;
     private final Class<T> type;
     private final String directory;
-    private final String fileName;
     private final Properties properties;
 
-    private DataHandler(Consumer<T> objectLoadingConsumer, Class<T> type, String directory, String fileName, Properties properties) {
+    private DataHandler(Consumer<T> objectLoadingConsumer, Class<T> type, String directory, Properties properties) {
         this.objectLoadingConsumer = objectLoadingConsumer;
         this.type = type;
         this.directory = directory;
-        this.fileName = fileName;
         this.properties = properties.copy();
     }
 
@@ -152,7 +171,7 @@ public class DataHandler<T> {
      * @param args   -> used if there is any %s in the directory
      */
     public void save(T object, String... args) {
-        save(fileName, object, args);
+        save(properties.getFileName(), object, args);
     }
 
     /**
@@ -171,14 +190,12 @@ public class DataHandler<T> {
      */
     public void loadAll() {
         File file = new File(directory);
-        if (!file.exists() && !file.mkdirs())
-            return;
+        if (!file.exists() && !file.mkdirs()) return;
 
         List<File> files = getFiles(new ArrayList<>(), directory, properties.getDepthLimit(), 0);
         for (File f : files) {
-
-            if (!fileName.equals("%s"))
-                if (!f.getName().equals(fileName)) continue; // Don't bother loading if it's not the file we want
+            // Don't bother loading if it's not the file we want
+            if (!properties.getFileNamePredicate().test(f.getName())) continue;
 
             T t = APIUtil.loadJsonToObject(getGson(), f.getAbsolutePath(), type);
             objectLoadingConsumer.accept(t);
