@@ -57,7 +57,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.mangorage.mangobot.core.Bot.EVENT_BUS;
 
-// TODO: Redo Execute command entirely, make more use of Arguments.class
 @SuppressWarnings("all")
 public class TrickCommand extends AbstractCommand {
     public enum Type {
@@ -398,7 +397,7 @@ public class TrickCommand extends AbstractCommand {
             dataHandler.save("%s.json".formatted(trickID()), this, guildID());
         }
 
-        public void delete() { // TODO: Update!
+        public void delete() {
             File file = Path.of((SAVE_PATH + "%s.json").formatted(guildID, trickID)).toFile();
             if (file.exists())
                 file.delete();

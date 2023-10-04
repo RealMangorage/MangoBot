@@ -32,9 +32,6 @@ import org.mangorage.mboteventbus.impl.IEventBus;
 import org.mangorage.mboteventbus.impl.IEventListener;
 
 import java.util.HashMap;
-/*
-    TODO: Change RequiredClass to Marker
- */
 
 /**
  * Default Provided EventBus. You Can create

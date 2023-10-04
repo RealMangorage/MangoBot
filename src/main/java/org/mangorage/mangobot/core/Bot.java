@@ -49,8 +49,6 @@ import java.util.function.Consumer;
 
 import static org.mangorage.mangobot.core.Constants.STARTUP_MESSAGE;
 
-
-// TODO: Rewrite this class slightly....
 public class Bot {
     private static final LockableReference<Bot> BOT_INSTANCE = new LockableReference<>();
     public static final EventBus EVENT_BUS = EventBus.create();
