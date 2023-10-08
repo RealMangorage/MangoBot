@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import org.mangorage.mangobotapi.core.modules.buttonactions.Actions;
 
 public class MessageSettings {
     public static Builder create() {
@@ -39,9 +40,10 @@ public class MessageSettings {
     public MessageCreateAction withDeletion(MessageCreateAction action, User user) {
         var button = Button.of(
                 ButtonStyle.PRIMARY,
-                "mangobot:trash:%s".formatted(user.getId()),
+                Actions.TRASH.getId(user.getId()),
                 Emoji.fromCustom("trash", 1150898672897359983L, false)
         );
+
         return action.addActionRow(button);
     }
 

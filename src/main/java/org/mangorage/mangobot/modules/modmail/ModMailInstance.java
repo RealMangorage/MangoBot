@@ -31,7 +31,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobotapi.core.util.APIUtil;
 
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -243,7 +242,6 @@ public class ModMailInstance {
 
     // Keep for now!
     public void delete() {
-        // TODO: Impl this into DataHandler (HANDLER.delete(fileName, directoryArgs)); ?
-        APIUtil.deleteFile(ModMailHandler.SAVEDIR_USERS.formatted(userID), "settings.json");
+        ModMailHandler.MODMAIl_INSTANCE_HANDLER.delete(getUserID());
     }
 }

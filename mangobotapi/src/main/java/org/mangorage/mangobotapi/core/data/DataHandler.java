@@ -184,6 +184,13 @@ public class DataHandler<T> {
         APIUtil.saveObjectToFile(getGson(), object, getDirectoryWithArgs(directory, args), fileName);
     }
 
+    public void delete(String... args) {
+        deleteFile(properties.getFileName(), args);
+    }
+
+    public void deleteFile(String fileName, String... args) {
+        APIUtil.deleteFile(getDirectoryWithArgs(directory, args), fileName);
+    }
 
     /**
      * Loads all objects in the directory

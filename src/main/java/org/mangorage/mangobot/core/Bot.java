@@ -35,6 +35,7 @@ import org.mangorage.mangobot.modules.GlobalPermissions;
 import org.mangorage.mangobot.modules.forge.ForgeCommands;
 import org.mangorage.mangobot.modules.forge.ForgePermissions;
 import org.mangorage.mangobot.modules.modmail.ModMailHandler;
+import org.mangorage.mangobot.modules.requestpaste.PasteRequestModule;
 import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.MangoBotAPIBuilder;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -170,6 +171,7 @@ public class Bot {
                 EVENT_BUS.addListener(ShutdownEvent.class, this::onShutdown);
                 EVENT_BUS.register(Listeners.class);
                 ModMailHandler.register(bus);
+                PasteRequestModule.register(bus);
             });
         }
 

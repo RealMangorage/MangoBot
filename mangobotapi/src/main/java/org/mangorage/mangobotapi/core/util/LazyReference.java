@@ -22,13 +22,24 @@
 
 package org.mangorage.mangobotapi.core.util;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Supplier;
 
-public class TaskScheduler {
-    private final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(100_000);
+public class LazyReference<T> {
+    private Supplier<T> supplier;
+    private T object;
 
-    public static ScheduledExecutorService getExecutor() {
-        return executor;
+    public static <T> LazyReference<T> create(Supplier<T> supplier) {
+        return new LazyReference<>(supplier);
     }
+
+    private LazyReference(Supplier<T> supplier) {
+        this.supplier = supplier;
+    }
+
+    public T get() {
+        if (object == null)
+            object = supplier.get();
+        return object;
+    }
+
 }

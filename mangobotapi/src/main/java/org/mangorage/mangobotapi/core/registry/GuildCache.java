@@ -24,27 +24,9 @@ package org.mangorage.mangobotapi.core.registry;
 
 import org.mangorage.mangobotapi.MangoBotAPI;
 
-import java.util.HashMap;
-
-public class GuildCache {
-    private static final HashMap<String, GuildCache> CACHE = new HashMap<>();
-
-    public static String getName(String guildID) {
-        GuildCache cache = CACHE.computeIfAbsent(guildID, (k) -> new GuildCache(k));
-        return cache.getName();
-    }
-
-    private final String guildID;
-    private String name = null;
-
-    private GuildCache(String guildID) {
-        this.guildID = guildID;
-    }
-
-    public String getName() {
-        if (name != null)
-            return name;
-        name = MangoBotAPI.getInstance().getJDA().getGuildById(guildID).getName();
-        return name;
+public final class GuildCache {
+    public static String getGuildName(String guildID) {
+        var guild = MangoBotAPI.getInstance().getJDA().getGuildById(guildID);
+        return guild != null ? guild.getName() : "[Undefined]";
     }
 }

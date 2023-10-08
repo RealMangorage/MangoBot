@@ -23,6 +23,7 @@
 package org.mangorage.mangobot.core;
 
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
+import org.mangorage.mangobotapi.core.modules.buttonactions.ButtonActions;
 import org.mangorage.mboteventbus.annotations.SubscribeEvent;
 
 public class Listeners {
@@ -30,6 +31,7 @@ public class Listeners {
     @SubscribeEvent
     public static void onButtonInteraction(DButtonInteractionEvent event) {
         var dEvent = event.get();
+        /**
         var interaction = dEvent.getInteraction();
         if (interaction.getComponentId().startsWith("mangobot:trash:")) {
             String userId = interaction.getComponentId().split(":")[2];
@@ -40,5 +42,7 @@ public class Listeners {
             } else
                 dEvent.getInteraction().reply("No Permission!").setEphemeral(true).queue();
         }
+         **/
+        ButtonActions.post(dEvent.getInteraction());
     }
 }

@@ -29,4 +29,5 @@ import org.mangorage.mangobotapi.core.config.ISetting;
 public class BotSettings {
     private final static Config CONFIG = new Config("botresources/", ".env");
     public static final ISetting<String> BOT_TOKEN = ConfigSetting.create(CONFIG, "BOT_TOKEN", "empty");
+    public static final ISetting<String> PASTE_TOKEN = ConfigSetting.create(CONFIG, "PASTE_TOKEN", "empty");
 }

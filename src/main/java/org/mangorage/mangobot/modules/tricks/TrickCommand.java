@@ -65,7 +65,7 @@ public class TrickCommand extends AbstractCommand {
         ALIAS
     }
 
-    private static final String SAVE_PATH = "data/guilddata/tricks/%s/";
+    private static final String SAVE_PATH = "data/tricks/%s/";
 
     private final HashMap<String, HashMap<String, Data>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
     private final ConcurrentHashMap<String, PagedList<String>> PAGES = new ConcurrentHashMap<>();
@@ -74,13 +74,11 @@ public class TrickCommand extends AbstractCommand {
             (data) -> {
                 if (data.settings == null)
                     data = data.withSettings(new TrickConfig(true));
-                System.out.println("Loaded Trick: '%s' for guild '%s'".formatted(data.trickID(), GuildCache.getName(data.guildID)));
+                System.out.println("Loaded Trick: '%s' for guild '%s'".formatted(data.trickID(), GuildCache.getGuildName(data.guildID)));
                 CONTENT.computeIfAbsent(data.guildID(), (k) -> new HashMap<>()).put(data.trickID(), data);
-
-                System.out.println("Loaded Trick: %s".formatted(data.trickID()));
             },
             Data.class,
-            "data/guilddata/tricks",
+            "data/tricks",
             DataHandler.Properties.create()
                     .setFileNamePredicate(e -> true)
     );
@@ -117,6 +115,8 @@ public class TrickCommand extends AbstractCommand {
         String guildID = message.getGuild().getId();
         String type = args.get(0);
         String id = args.get(1);
+        if (id != null) id = id.toLowerCase();
+
         // !tricks -a wow -supress false -content Wow is amazing!
         // !tricks -a wow -content wooop!
 
@@ -206,7 +206,7 @@ public class TrickCommand extends AbstractCommand {
                         Getting Tricks List... 
                         """).queue((m -> {
                     PAGES.put(m.getId(), tricks);
-                    TaskScheduler.executor.schedule(new RunnableTask<>(m, (d) -> removeTricksList(d.get())), 10, TimeUnit.MINUTES);
+                    TaskScheduler.getExecutor().schedule(new RunnableTask<>(m, (d) -> removeTricksList(d.get())), 10, TimeUnit.MINUTES);
                     updateTrickListMessage(tricks, m, true);
                         })
                 );

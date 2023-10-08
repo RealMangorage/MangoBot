@@ -20,15 +20,27 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.util;
+package org.mangorage.mangobotapi.core.modules.buttonactions;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
-public class TaskScheduler {
-    private final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(100_000);
-
-    public static ScheduledExecutorService getExecutor() {
-        return executor;
+public class Actions {
+    public record Trash(String userID) {
     }
+
+    public static final ButtonActions.PermanentButtonAction<Trash> TRASH = ButtonActions.registerPermanent("trash",
+            Actions.Trash.class,
+            (interaction, data) -> {
+                var iUser = interaction.getUser();
+                var iMessage = interaction.getMessage();
+
+                if (iUser.getId().equals(data.userID())) {
+                    iMessage.delete().queue();
+                    return true;
+                }
+
+                interaction.reply("No Permission!").setEphemeral(true).queue();
+
+                return false;
+            },
+            (data) -> new Trash(data[0])
+    );
 }

@@ -20,15 +20,9 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.util;
+package org.mangorage.mangobotapi.core.util.annotations;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
-public class TaskScheduler {
-    private final static ScheduledExecutorService executor = Executors.newScheduledThreadPool(100_000);
-
-    public static ScheduledExecutorService getExecutor() {
-        return executor;
-    }
+public @interface InsteadUse {
+    String value();
 }

@@ -22,12 +22,14 @@
 
 package org.mangorage.mangobot.test;
 
+import org.mangorage.mangobot.test.classes.ElectricTruck;
+
 import java.time.LocalDateTime;
 
 public class Test {
 
     public static void main(String[] args) {
-        int pointsPerDay = 75;
+        int pointsPerDay = 46;
         int pointsPerDollar = 100 / 5;
         int days = 30;
 
@@ -43,6 +45,12 @@ public class Test {
 
         LocalDateTime a = LocalDateTime.now();
 
+        listBaseClass(ElectricTruck.class);
+
         System.out.println(a);
+    }
+
+    public static void listBaseClass(Class<?> cls) {
+        System.out.println(cls.getName());
     }
 }
