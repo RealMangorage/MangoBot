@@ -23,6 +23,10 @@
 package org.mangorage.mangobotapi.core.modules.buttonactions;
 
 public class Actions {
+
+    public static void init() {
+    }
+
     public record Trash(String userID) {
     }
 

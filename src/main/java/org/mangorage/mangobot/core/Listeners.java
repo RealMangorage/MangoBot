@@ -31,18 +31,7 @@ public class Listeners {
     @SubscribeEvent
     public static void onButtonInteraction(DButtonInteractionEvent event) {
         var dEvent = event.get();
-        /**
-        var interaction = dEvent.getInteraction();
-        if (interaction.getComponentId().startsWith("mangobot:trash:")) {
-            String userId = interaction.getComponentId().split(":")[2];
-            var userClick = dEvent.getUser().getId();
-            if (userClick.equals(userId)) {
-                dEvent.getInteraction().getMessage().delete().queue();
-                dEvent.getInteraction().reply("Deleting...").setEphemeral(true).queue();
-            } else
-                dEvent.getInteraction().reply("No Permission!").setEphemeral(true).queue();
-        }
-         **/
         ButtonActions.post(dEvent.getInteraction());
     }
+
 }

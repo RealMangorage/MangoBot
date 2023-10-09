@@ -22,224 +22,67 @@
 
 package org.mangorage.mangobotapi.core.registry;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.mangorage.mangobotapi.MangoBotAPI;
+import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
-import org.mangorage.mangobotapi.core.commands.Arguments;
-import org.mangorage.mangobotapi.core.commands.CommandAlias;
 import org.mangorage.mangobotapi.core.commands.CommandHolder;
-import org.mangorage.mangobotapi.core.commands.CommandPrefix;
-import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
-import org.mangorage.mangobotapi.core.events.RegistryEvent;
-import org.mangorage.mangobotapi.core.events.StartupEvent;
-import org.mangorage.mangobotapi.core.util.MessageSettings;
 import org.mangorage.mboteventbus.impl.IEventBus;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-/**
- * TODO: Figure out how to do proper registering
- * So that GLOBAL gets its commands registered first then anything afterwards
- */
-
 
 public class CommandRegistry {
-    public enum CommandType {
-        COMMAND,
-        ALIAS,
-        UNKNOWN
-    }
+    public static final CommandRegistry GLOBAL = new CommandRegistry("-1");
 
-    private static final CommandRegistry GLOBAL = new CommandRegistry();
-    private static final HashMap<String, CommandRegistry> GUILDS = new HashMap<>();
-    private static final MessageSettings DEFAULT_SETTINGS = MangoBotAPI.getInstance().getDefaultMessageSettings();
-
-    public static CommandRegistry guild(String guildID) {
-        Objects.requireNonNull(guildID);
-        return GUILDS.computeIfAbsent(guildID, CommandRegistry::new);
-    }
-
-    public static CommandRegistry global() {
-        return GLOBAL;
-    }
-
-
-    // Returns true if it was a command...
-    public static boolean handleMessage(MessageReceivedEvent event) {
-        // Handle Message and prefix
-        String Prefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : CommandPrefix.DEFAULT;
-
-        Message message = event.getMessage();
-        String rawMessage = message.getContentRaw();
-
-        if (rawMessage.startsWith(Prefix)) {
-            if (event.getAuthor().isBot()) return true;
-            String[] command_pre = rawMessage.split(" ");
-            String command = command_pre[0].replaceFirst(Prefix, "");
-            Arguments arguments = Arguments.of(Arguments.of(command_pre).getFrom(1).split(" "));
-
-            var commandEvent = new CommandEvent(event.getMessage(), command, arguments);
-            MangoBotAPI.getInstance().getEventBus().post(commandEvent);
-
-            if (commandEvent.isHandled()) {
-                commandEvent.getCommandResult().accept(message);
-            } else {
-                DEFAULT_SETTINGS.apply(message.reply("Invalid Command")).queue();
-            }
-
-            return true;
-        }
-
-        return false;
+    public static CommandRegistry create(@NotNull String guildID) {
+        return new CommandRegistry(guildID);
     }
 
     private final String guildID;
-    private final List<RegistryObject<?>> REGISTRY_OBJECTS = new ArrayList<>();
-    private HashMap<String, CommandHolder<?>> COMMANDS = new HashMap<>();
-    private HashMap<String, CommandAlias> COMMAND_ALIASES = new HashMap<>();
-    private final AtomicBoolean frozen = new AtomicBoolean(false);
+    private final HashMap<String, CommandHolder<?>> HOLDERS = new HashMap<>();
 
     private CommandRegistry(String guildID) {
         this.guildID = guildID;
     }
 
-    private CommandRegistry() {
-        this(null);
-    }
-
-    public <X extends AbstractCommand> RegistryObject<CommandHolder<X>> register(String id, X command, CommandAlias.Builder... builders) {
-        if (frozen.get())
-            throw new IllegalStateException("Cannot register stuff to a frozen registry");
-        RegistryObject<CommandHolder<X>> RO = new RegistryObject<>(CommandHolder.create(id, command), CommandType.COMMAND);
-        REGISTRY_OBJECTS.add(RO);
-        Arrays.asList(builders).forEach(e -> registerAlias(RO.get(), e));
-        return RO;
-    }
-
-    public void registryEvent(RegistryEvent event) {
-        REGISTRY_OBJECTS.forEach(registryObject -> {
-            if (registryObject.getType() == CommandType.COMMAND && registryObject.getType() == event.type()) {
-                CommandHolder<?> holder = (CommandHolder<?>) registryObject.get();
-                COMMANDS.put(holder.getID(), holder);
-            } else if (registryObject.getType() == CommandType.ALIAS && registryObject.getType() == event.type()) {
-                CommandAlias alias = (CommandAlias) registryObject.get();
-                COMMAND_ALIASES.put(alias.getID(), alias);
-            }
-        });
-    }
-
-    public void startupEvent(StartupEvent event) {
-        if (event.phase() == StartupEvent.Phase.FINISHED) {
-            System.out.println("Clearing Registry Objects and Freezing Registry for id: %s".formatted(guildID));
-            REGISTRY_OBJECTS.clear();
-            frozen.set(true);
-        }
-    }
-
-    public void commandEvent(CommandEvent event) {
-        if (!event.isHandled()) {
-            CommandType type = getType(event.getCommand());
-            if (type == CommandType.COMMAND && COMMANDS.containsKey(event.getCommand())) {
-                event.setHandled(COMMANDS.get(event.getCommand()).getCommand().execute(event.getMessage(), event.getArguments()));
-            } else if (type == CommandType.ALIAS && COMMAND_ALIASES.containsKey(event.getCommand())) {
-                event.setHandled(COMMAND_ALIASES.get(event.getCommand()).execute(event.getMessage(), event.getArguments()));
-            }
-        }
-    }
-
-    public void register(IEventBus bus) {
-        bus.addListener(StartupEvent.class, this::startupEvent);
-        bus.addListener(RegistryEvent.class, this::registryEvent);
-        bus.addListener(CommandEvent.class, this::commandEvent);
-    }
-
-    public <X extends AbstractCommand> RegistryObject<CommandAlias> registerAlias(CommandHolder<X> holder, CommandAlias.Builder builder) {
-        if (frozen.get())
-            throw new IllegalStateException("Cannot register stuff to a frozen registry. Use CommandEvent to handle further command alias's");
-        RegistryObject<CommandAlias> RO = new RegistryObject<>(builder.build(holder), CommandType.ALIAS);
-        REGISTRY_OBJECTS.add(RO);
-        return RO;
-    }
-
-    protected void registerCommand(CommandHolder<?> holder) {
-        String id = holder.getID();
-
-        CommandType type = global().getType(holder.getID());
-        if (type != CommandType.UNKNOWN)
-            throw new IllegalStateException("""
-                    Tried to register already taken command %s:
-                    """.formatted(id));
-        COMMANDS.put(id, holder);
-    }
-
-    protected void registerAlias(CommandAlias alias) {
-        String id = alias.getID();
-
-        CommandType type = global().getType(alias.getID());
-        if (type != CommandType.UNKNOWN)
-            throw new IllegalStateException("""
-                    Tried to register already taken command %s:
-                    """.formatted(id));
-        COMMAND_ALIASES.put(id, alias);
-    }
-
-    protected void registerCommands(ArrayList<RegistryObject<CommandHolder<?>>> REGISTRY_OBJECTS) {
-        REGISTRY_OBJECTS.forEach(ro -> {
-            registerCommand(ro.get());
-        });
-    }
-
-
-    protected void registerAliases(ArrayList<RegistryObject<CommandAlias>> REGISTRY_OBJECTS) {
-        REGISTRY_OBJECTS.forEach(ro -> {
-            registerAlias(ro.get());
-        });
-    }
-
-    public String getID() {
+    public String getGuildId() {
         return guildID;
     }
 
-    public CommandType getType(String value) {
-        if (COMMANDS.containsKey(value))
-            return CommandType.COMMAND;
-        if (COMMAND_ALIASES.containsKey(value))
-            return CommandType.ALIAS;
-        return CommandType.UNKNOWN;
+    public <T extends AbstractCommand> CommandHolder<T> register(String id, T command) {
+        var holder = CommandHolder.create(id, command);
+        HOLDERS.put(id, holder);
+        return holder;
     }
 
-    public CommandHolder<?> getCommandHolder(String command) {
-        return switch (getType(command)) {
-            case COMMAND -> COMMANDS.get(command);
-            case ALIAS -> COMMAND_ALIASES.get(command).getCommandHolder();
-            case UNKNOWN -> null;
-        };
+    public void register(IEventBus bus) {
+        bus.addListener(CommandEvent.class, this::commandEvent);
     }
 
-    public void execute(Message message, String command, String[] args) {
-        CommandType type = getType(command);
-        CommandHolder<?> commandHolder = getCommandHolder(command);
-        if (commandHolder == null)
-            return;
+    private void commandEvent(CommandEvent event) {
+        if (!event.isHandled()) {
 
-        if (guildID == null || (commandHolder.getCommand().isGuildOnly() && !message.isFromGuild()))
-            return;
+            boolean isGuild = event.getMessage().isFromGuild();
 
-
-        CommandResult result = switch (type) {
-            case COMMAND -> COMMANDS.get(command).getCommand().execute(message, Arguments.of(args));
-            case ALIAS -> COMMAND_ALIASES.get(command).execute(message, Arguments.of(args));
-            case UNKNOWN -> null;
-        };
-
-        if (result != null)
-            result.accept(message);
+            if (isGuild) {
+                if (event.getGuildId().equals(guildID) || guildID.contains("-1")) {
+                    var holder = HOLDERS.get(event.getCommand());
+                    if (holder != null) {
+                        var command = holder.getCommand();
+                        if (command != null) {
+                            event.setHandled(command.execute(event.getMessage(), event.getArguments()));
+                        }
+                    }
+                }
+            } else if (guildID.equals("-1")) {
+                var holder = HOLDERS.get(event.getCommand());
+                if (holder != null) {
+                    var command = holder.getCommand();
+                    if (command != null) {
+                        if (command.isGuildOnly()) return;
+                        event.setHandled(command.execute(event.getMessage(), event.getArguments()));
+                    }
+                }
+            }
+        }
     }
 }

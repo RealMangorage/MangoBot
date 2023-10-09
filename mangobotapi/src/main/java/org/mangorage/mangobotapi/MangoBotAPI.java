@@ -24,11 +24,10 @@ package org.mangorage.mangobotapi;
 
 import net.dv8tion.jda.api.JDA;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
-import org.mangorage.mangobotapi.core.events.RegistryEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.ShutdownEvent;
 import org.mangorage.mangobotapi.core.events.StartupEvent;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobotapi.core.modules.buttonactions.Actions;
 import org.mangorage.mangobotapi.core.script.ScriptParser;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 import org.mangorage.mboteventbus.impl.IEventBus;
@@ -79,10 +78,9 @@ public class MangoBotAPI {
             switch (event.phase()) {
                 case STARTUP -> {
                     ScriptParser.init();
+                    Actions.init();
                 }
                 case REGISTRATION -> {
-                    EVENT_BUS.post(new RegistryEvent(CommandRegistry.CommandType.COMMAND));
-                    EVENT_BUS.post(new RegistryEvent(CommandRegistry.CommandType.ALIAS));
                 }
                 case FINISHED -> {
                     EVENT_BUS.post(new LoadEvent());

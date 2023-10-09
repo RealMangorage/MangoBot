@@ -170,6 +170,7 @@ public class Bot {
                 EVENT_BUS.addListener(StartupEvent.class, this::onStartup);
                 EVENT_BUS.addListener(ShutdownEvent.class, this::onShutdown);
                 EVENT_BUS.register(Listeners.class);
+
                 ModMailHandler.register(bus);
                 PasteRequestModule.register(bus);
             });
@@ -181,6 +182,8 @@ public class Bot {
     public void onStartup(StartupEvent event) {
         switch (event.phase()) {
             case STARTUP -> {
+
+
                 GlobalCommands.init();
                 ForgeCommands.init();
 

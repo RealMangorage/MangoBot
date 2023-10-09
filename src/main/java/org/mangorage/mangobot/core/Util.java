@@ -26,7 +26,13 @@ package org.mangorage.mangobot.core;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.TimeUtil;
+import org.mangorage.mangobotapi.MangoBotAPI;
+import org.mangorage.mangobotapi.core.commands.Arguments;
+import org.mangorage.mangobotapi.core.commands.CommandPrefix;
+import org.mangorage.mangobotapi.core.events.CommandEvent;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -44,6 +50,34 @@ public class Util {
         return TimeUtil.getTimeCreated(iSnowflake);
     }
 
+
+    public static boolean handleMessage(MessageReceivedEvent event) {
+        // Handle Message and prefix
+        String Prefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : CommandPrefix.DEFAULT;
+
+        Message message = event.getMessage();
+        String rawMessage = message.getContentRaw();
+
+        if (rawMessage.startsWith(Prefix)) {
+            if (event.getAuthor().isBot()) return true;
+            String[] command_pre = rawMessage.split(" ");
+            String command = command_pre[0].replaceFirst(Prefix, "");
+            Arguments arguments = Arguments.of(Arguments.of(command_pre).getFrom(1).split(" "));
+
+            var commandEvent = new CommandEvent(event.getMessage(), command, arguments);
+            MangoBotAPI.getInstance().getEventBus().post(commandEvent);
+
+            if (commandEvent.isHandled()) {
+                commandEvent.getCommandResult().accept(message);
+            } else {
+                Bot.DEFAULT_SETTINGS.apply(message.reply("Invalid Command")).queue();
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 
     public static Integer parseStringIntoInteger(String s) {
         Integer res = null;

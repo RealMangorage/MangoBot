@@ -54,6 +54,7 @@ public class ModMailHandler {
             "data/modmail/guilds",
             DataHandler.Properties.create()
                     .useExposeAnnotation()
+                    .setFileName("settings.json")
                     .useDefaultFileNamePredicate()
     );
 

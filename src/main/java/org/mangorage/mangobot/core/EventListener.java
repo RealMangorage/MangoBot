@@ -35,7 +35,6 @@ import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageUpdateEvent;
 import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
 import org.mangorage.mangobotapi.core.events.discord.DStringSelectInteractionEvent;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mboteventbus.impl.IEventBus;
 
 
@@ -44,7 +43,7 @@ public record EventListener(IEventBus bus) {
 
     @SubscribeEvent
     public void messageRecieved(MessageReceivedEvent event) {
-        var isCommand = CommandRegistry.handleMessage(event);
+        var isCommand = Util.handleMessage(event);
         bus.post(new DMessageRecievedEvent(event, isCommand));
     }
 

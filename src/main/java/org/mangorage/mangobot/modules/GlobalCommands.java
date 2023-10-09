@@ -39,14 +39,13 @@ import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.CommandHolder;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
-import org.mangorage.mangobotapi.core.registry.RegistryObject;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 public class GlobalCommands {
-    public static final CommandRegistry COMMANDS = CommandRegistry.global();
-    public static final RegistryObject<CommandHolder<TrickCommand>> TRICK_COMMAND = COMMANDS.register("tricks", new TrickCommand());
-    public static final RegistryObject<CommandHolder<ModMailCommand>> MOD_MAIL_COMMAND = COMMANDS.register("mail", new ModMailCommand());
-    public static final RegistryObject<CommandHolder<PrefixCommand>> PREFIX_ADMIN = COMMANDS.register("setPrefix", new PrefixCommand());
+    public static final CommandRegistry COMMANDS = CommandRegistry.GLOBAL;
+    public static final CommandHolder<TrickCommand> TRICK_COMMAND = COMMANDS.register("tricks", new TrickCommand());
+    public static final CommandHolder<ModMailCommand> MOD_MAIL_COMMAND = COMMANDS.register("mail", new ModMailCommand());
+    public static final CommandHolder<PrefixCommand> PREFIX_ADMIN = COMMANDS.register("setPrefix", new PrefixCommand());
 
 
     static {
