@@ -20,20 +20,28 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.forge;
+package org.mangorage.mangobotapi.core.commands;
 
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.modules.basic.commands.PingCommand;
-import org.mangorage.mangobotapi.core.commands.AliasCommand;
-import org.mangorage.mangobotapi.core.commands.CommandHolder;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import net.dv8tion.jda.api.entities.Message;
 
-public class ForgeCommands {
-    public static final CommandRegistry COMMANDS = CommandRegistry.create("1129059589325852724");
-    public static final CommandHolder<PingCommand> PING = COMMANDS.register("pings", new PingCommand());
-    public static final CommandHolder<AliasCommand> PING_MINI = COMMANDS.registerAlias("pingy", PING);
+public final class AliasCommand extends AbstractCommand {
 
-    public static void init() {
-        COMMANDS.register(Bot.EVENT_BUS);
+    private final CommandHolder<?> commandHolder;
+
+    public AliasCommand(CommandHolder<?> commandHolder) {
+        this.commandHolder = commandHolder;
+    }
+
+    @Override
+    public CommandResult execute(Message message, Arguments args) {
+        return commandHolder.getCommand().execute(message, args);
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public boolean isGuildOnly() {
+        return commandHolder.getCommand().isGuildOnly();
     }
 }

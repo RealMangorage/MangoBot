@@ -22,9 +22,6 @@
 
 package org.mangorage.mangobotapi.core.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CommandHolder<T extends AbstractCommand> {
 
     public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value) {
@@ -33,7 +30,6 @@ public class CommandHolder<T extends AbstractCommand> {
 
     private final String id;
     private final T value;
-    private final List<CommandAlias> aliases = new ArrayList<>();
 
     private CommandHolder(String id, T value) {
         this.id = id;
@@ -48,12 +44,5 @@ public class CommandHolder<T extends AbstractCommand> {
         return value;
     }
 
-    public List<CommandAlias> getAliases() {
-        return aliases;
-    }
-
-    public void addAlias(CommandAlias alias) {
-        this.aliases.add(alias);
-    }
 
 }

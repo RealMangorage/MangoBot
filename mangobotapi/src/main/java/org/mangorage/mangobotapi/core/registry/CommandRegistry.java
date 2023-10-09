@@ -24,6 +24,7 @@ package org.mangorage.mangobotapi.core.registry;
 
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
+import org.mangorage.mangobotapi.core.commands.AliasCommand;
 import org.mangorage.mangobotapi.core.commands.CommandHolder;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mboteventbus.impl.IEventBus;
@@ -48,8 +49,24 @@ public class CommandRegistry {
         return guildID;
     }
 
+    private void checkIfExists(String id) {
+        if (HOLDERS.containsKey(id))
+            throw new IllegalArgumentException("Command under same id already exists. ID -> %s".formatted(id));
+    }
+
     public <T extends AbstractCommand> CommandHolder<T> register(String id, T command) {
+        checkIfExists(id);
         var holder = CommandHolder.create(id, command);
+        HOLDERS.put(id, holder);
+        return holder;
+    }
+
+    public CommandHolder<AliasCommand> registerAlias(String id, CommandHolder<?> commandHolder) {
+        checkIfExists(id);
+        if (commandHolder.getCommand() instanceof AliasCommand)
+            throw new IllegalArgumentException("Cannot alias an alias");
+        var aliasCommand = new AliasCommand(commandHolder);
+        var holder = CommandHolder.create(id, aliasCommand);
         HOLDERS.put(id, holder);
         return holder;
     }

@@ -24,6 +24,7 @@ package org.mangorage.mangobotapi.core.commands;
 
 import java.util.function.Function;
 
+// TODO: Make this better?
 public class Arguments {
     public static Arguments of(String... args) {
         return new Arguments(args);
@@ -157,11 +158,5 @@ public class Arguments {
         }
 
         return -1;
-    }
-
-    public static void main(String[] args) {
-        Arguments arguments = Arguments.of("-a", "value", "howdy", "okay", "eeeek!");
-        System.out.println(arguments.findArg("-a"));
-        System.out.println(arguments.findArg("-v"));
     }
 }
