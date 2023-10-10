@@ -61,6 +61,12 @@ public class Config {
                 });
             } catch (Exception ignored) {
             }
+        } else {
+            try {
+                Files.createDirectories(path.getParent());
+                Files.createFile(path);
+            } catch (IOException ignored) {
+            }
         }
     }
 

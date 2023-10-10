@@ -32,7 +32,7 @@ import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 
 import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
-import static org.mangorage.mangobot.modules.GlobalPermissions.PREFIX_ADMIN;
+import static org.mangorage.mangobot.guilds.global.GlobalPermissions.PREFIX_ADMIN;
 
 public class PrefixCommand extends AbstractCommand {
     @Override

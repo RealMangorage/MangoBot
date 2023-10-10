@@ -38,6 +38,7 @@ public record CommandResult(String string) {
     public static final CommandResult FAIL = of("An error occured while executing this command");
     public static final CommandResult NO_PERMISSION = of("You dont have permission to use this command!");
     public static final CommandResult UNDER_MAINTENANCE = of("This is currently under maintenance! Please try again later!");
+    public static final CommandResult GUILD_ONLY = of("This is a Guild Only Command!");
 
     public void accept(Message message) {
         if (string() != null)

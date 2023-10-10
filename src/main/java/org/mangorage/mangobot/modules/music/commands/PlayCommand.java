@@ -30,7 +30,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.modules.GlobalPermissions;
+import org.mangorage.mangobot.guilds.global.GlobalPermissions;
 import org.mangorage.mangobot.modules.music.MusicPlayer;
 import org.mangorage.mangobot.modules.music.MusicUtil;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
@@ -43,22 +43,28 @@ public class PlayCommand extends AbstractCommand {
     public CommandResult execute(Message message, Arguments arg) {
         String[] args = arg.getArgs();
 
+        if (!message.isFromGuild()) return CommandResult.GUILD_ONLY;
+
         String URL = args[0];
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
-        MusicPlayer player = MusicPlayer.getInstance(guild.getId());
-        GuildVoiceState voiceState = message.getMember().getVoiceState();
         Member member = message.getMember();
 
-        if (member != null && !PermissionRegistry.hasNeededPermission(member, GlobalPermissions.PLAYING)) {
+
+        if (member == null) return CommandResult.FAIL;
+
+        if (!PermissionRegistry.hasNeededPermission(member, GlobalPermissions.PLAYING)) {
             return CommandResult.NO_PERMISSION;
         }
 
-        if (voiceState.inAudioChannel()) {
-            if (URL.length() > 0) {
-                if (!player.isPlaying()) {
-                    System.out.println(String.join(" ", args));
 
+        GuildVoiceState voiceState = member.getVoiceState();
+        if (voiceState == null) return CommandResult.FAIL;
+        MusicPlayer player = MusicPlayer.getInstance(guild.getId());
+
+        if (voiceState.inAudioChannel()) {
+            if (!URL.isEmpty()) {
+                if (!player.isPlaying()) {
                     player.load(String.join(" ", args), e -> {
                         switch (e.getReason()) {
                             case SUCCESS -> {

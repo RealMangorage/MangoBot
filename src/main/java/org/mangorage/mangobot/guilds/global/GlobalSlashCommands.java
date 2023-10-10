@@ -20,36 +20,12 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.test;
+package org.mangorage.mangobot.guilds.global;
 
+import org.mangorage.mangobot.core.Bot;
 
-import java.time.LocalDateTime;
-
-public class Test {
-
-    public static void main(String[] args) {
-        var fileName = "test.txt";
-        var ext = ".txt";
-        var fileNameNoExt = fileName.substring(0, fileName.length() - ext.length());
-        System.out.println(fileNameNoExt);
-
-        int pointsPerDay = 46;
-        int pointsPerDollar = 100 / 5;
-        int days = 30;
-
-        int potentialEarnedPoints = pointsPerDay * days;
-        int earnedPoints = 529;
-
-        int potentialTotalIncome = potentialEarnedPoints / pointsPerDollar;
-        int totalIncome = earnedPoints / pointsPerDollar;
-
-        System.out.println("Estimated Income: %s".formatted(potentialTotalIncome));
-        System.out.println("Earned Income: %s".formatted(totalIncome));
-
-
-        LocalDateTime a = LocalDateTime.now();
-
-        System.out.println(a);
+public class GlobalSlashCommands {
+    public static void init() {
+        Bot.getJDAInstance().upsertCommand("ping", "Get Bot's ping status").queue();
     }
-
 }

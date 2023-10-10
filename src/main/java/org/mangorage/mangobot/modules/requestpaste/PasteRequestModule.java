@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobot.modules.requestpaste;
 
+import net.dv8tion.jda.api.entities.Message;
 import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
 import org.eclipse.egit.github.core.User;
@@ -43,12 +44,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PasteRequestModule {
     private static final LazyReference<GitHubClient> GITHUB_CLIENT = LazyReference.create(() -> new GitHubClient().setOAuth2Token(BotSettings.PASTE_TOKEN.get()));
     private static final List<String> VALID_EXTENSIONS = List.of(
             "txt",
-            "log"
+            "log",
+            "java",
+            "json",
+            "cfg"
     );
 
     public static void register(IEventBus bus) {
@@ -60,7 +65,7 @@ public class PasteRequestModule {
         return extension != null && VALID_EXTENSIONS.contains(extension);
     }
 
-    private static GistFile getData(InputStream stream, String fileName) {
+    private static GistFile getData(InputStream stream, String fileName, String extension) {
         StringBuilder textBuilder = new StringBuilder();
         try (Reader reader = new BufferedReader(new InputStreamReader
                 (stream, StandardCharsets.UTF_8))) {
@@ -77,6 +82,14 @@ public class PasteRequestModule {
         return result;
     }
 
+    private static String getFileName(Message.Attachment attachment, int count) {
+        var fileName = attachment.getFileName();
+        var ext = ".%s".formatted(attachment.getFileExtension());
+        if (ext == null) return attachment.getFileName();
+        var fileNameNoExt = fileName.substring(0, fileName.length() - ext.length());
+        return "%s_%s%s".formatted(fileNameNoExt, count, ext);
+    }
+
     public static void onMessage(DMessageRecievedEvent event) {
         TaskScheduler.getExecutor().execute(() -> {
             var dEvent = event.get();
@@ -89,10 +102,10 @@ public class PasteRequestModule {
 
             if (attachments.isEmpty()) return;
 
-            StringBuilder results = new StringBuilder();
 
             GitHubClient CLIENT = GITHUB_CLIENT.get();
             GistService service = new GistService(CLIENT);
+            AtomicInteger count = new AtomicInteger(1);
 
             Gist gist = new Gist();
             gist.setPublic(true);
@@ -102,7 +115,8 @@ public class PasteRequestModule {
             HashMap<String, GistFile> FILES = new HashMap<>();
             attachments.forEach(attachment -> {
                 try {
-                    FILES.put(attachment.getFileName(), getData(attachment.getProxy().download().get(), attachment.getFileName()));
+                    var fileName = getFileName(attachment, count.getAndAdd(1));
+                    FILES.put(fileName, getData(attachment.getProxy().download().get(), fileName, attachment.getFileExtension()));
                 } catch (ExecutionException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }

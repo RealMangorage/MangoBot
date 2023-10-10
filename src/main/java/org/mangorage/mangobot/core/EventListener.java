@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobot.core;
 
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
@@ -37,6 +38,8 @@ import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
 import org.mangorage.mangobotapi.core.events.discord.DStringSelectInteractionEvent;
 import org.mangorage.mboteventbus.impl.IEventBus;
 
+import java.time.temporal.ChronoUnit;
+
 
 @SuppressWarnings("unused")
 public record EventListener(IEventBus bus) {
@@ -45,6 +48,19 @@ public record EventListener(IEventBus bus) {
     public void messageRecieved(MessageReceivedEvent event) {
         var isCommand = Util.handleMessage(event);
         bus.post(new DMessageRecievedEvent(event, isCommand));
+    }
+
+    @SubscribeEvent
+    public void onSlashCommand(SlashCommandInteractionEvent event) {
+        var interaction = event.getInteraction();
+        if (interaction.getFullCommandName().equals("ping")) {
+            interaction.reply("Ping: ...").queue(m -> {
+                m.retrieveOriginal().queue(original -> {
+                    long ping = event.getTimeCreated().until(original.getTimeCreated(), ChronoUnit.MILLIS);
+                    m.editOriginal("Ping: " + ping + "ms | Websocket: " + event.getJDA().getGatewayPing() + "ms").queue();
+                });
+            });
+        }
     }
 
     @SubscribeEvent

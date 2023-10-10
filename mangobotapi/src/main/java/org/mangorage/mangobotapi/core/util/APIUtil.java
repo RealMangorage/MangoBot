@@ -23,8 +23,6 @@
 package org.mangorage.mangobotapi.core.util;
 
 import com.google.gson.Gson;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,12 +33,14 @@ import java.util.List;
 
 public class APIUtil {
     public static boolean isValidBotToken(String token) {
+        /**
         var bot = JDABuilder.createLight(token);
         try {
             bot.build();
         } catch (InvalidTokenException ignored) {
             return false;
         }
+         **/
         return true;
     }
 

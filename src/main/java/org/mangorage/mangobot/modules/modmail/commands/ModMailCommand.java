@@ -27,7 +27,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.modules.GlobalPermissions;
+import org.mangorage.mangobot.guilds.global.GlobalPermissions;
 import org.mangorage.mangobot.modules.modmail.ModMailHandler;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;

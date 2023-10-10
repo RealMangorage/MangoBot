@@ -50,18 +50,27 @@ sourceSets {
 dependencies {
     // Libs for Bot
     implementation("net.dv8tion:JDA:$JDA_VERSION") // JDA
-    implementation("com.github.walkyst:lavaplayer-fork:$LAVA_VERSION")
+    implementation("dev.arbjerg:lavaplayer:$LAVA_VERSION")
     // LavaPlayer to stream audio from YT/FILES to Discord
-
     implementation("com.google.code.gson:gson:$GSON_VERSION")
     implementation("org.apache.logging.log4j:log4j-core:$LOG4J_VERSION")
-
     implementation("org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5") // GITHUB API
 
+    // Core Libs
     implementation project(path: ':mangobotapi')
     implementation project(path: ':mboteventbus')
 
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$LOG4J_VERSION")
+
+
+    shadow project(path: ':mangobotapi')
+    shadow project(path: ':mboteventbus')
+    shadow("net.dv8tion:JDA:$JDA_VERSION")
+    shadow("dev.arbjerg:lavaplayer:$LAVA_VERSION")
+    shadow("com.google.code.gson:gson:$GSON_VERSION")
+    shadow("org.apache.logging.log4j:log4j-core:$LOG4J_VERSION")
+    shadow("org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5")
+
 }
 
 
@@ -95,6 +104,10 @@ tasks.register('buildBotJar', Jar) {
     manifest {
         attributes 'Main-Class': 'org.mangorage.mangobot.Main'
     }
+}
+
+shadowJar {
+    group "bot tasks"
 }
 
 test {

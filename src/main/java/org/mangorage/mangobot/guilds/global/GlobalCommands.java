@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules;
+package org.mangorage.mangobot.guilds.global;
 
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.core.Constants;

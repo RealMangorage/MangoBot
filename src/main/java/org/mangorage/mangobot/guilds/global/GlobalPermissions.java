@@ -20,30 +20,26 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.forge;
+package org.mangorage.mangobot.guilds.global;
 
-import org.mangorage.mangobot.modules.GlobalPermissions;
+import net.dv8tion.jda.api.Permission;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.registry.UserPermission;
 
-public class ForgePermissions {
-    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.guild(ForgeCommands.COMMANDS.getGuildId());
+public class GlobalPermissions {
+    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.global();
+
+    public static final UserPermission.Node PLAYING = UserPermission.Node.of("playing");
+    public static final UserPermission.Node TRICK_ADMIN = UserPermission.Node.of("trickadmin");
+    public static final UserPermission.Node PREFIX_ADMIN = UserPermission.Node.of("prefix");
+    public static final UserPermission.Node MOD_MAIL = UserPermission.Node.of("mod_mail");
 
 
     static {
-        // Admin Role
-        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1129067881842360381"));
-        // Moderators Role
-        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1129070272302022656"));
-        // Mango Bot Tester Role
-        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1150880910745538631"));
-
-        // Admin Role
-        PERMISSIONS.register(GlobalPermissions.RECORD_ADMIN, UserPermission.of("1129067881842360381"));
-        // Moderator Role
-        PERMISSIONS.register(GlobalPermissions.RECORD_ADMIN, UserPermission.of("1130506065381957642"));
-        // Moderators Role
-        PERMISSIONS.register(GlobalPermissions.RECORD_ADMIN, UserPermission.of("1129070272302022656"));
+        PERMISSIONS.register(PLAYING, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(TRICK_ADMIN, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(PREFIX_ADMIN, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(MOD_MAIL, Permission.ADMINISTRATOR);
     }
 
     public static void init() {

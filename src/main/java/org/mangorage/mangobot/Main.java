@@ -48,7 +48,7 @@ public class Main {
 
 
     private static void requestBotToken(boolean wasInvalid) {
-        String message = "Enter your Bot Token";
+        String message = "Enter your Bot Token to get started...";
         if (wasInvalid) {
             System.out.println("Current Bot Token detected as invalid...");
             System.out.println("Please re-enter your Discord Bot's Token:");
