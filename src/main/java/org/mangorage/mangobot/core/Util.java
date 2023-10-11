@@ -59,7 +59,7 @@ public class Util {
         Message message = event.getMessage();
         String rawMessage = message.getContentRaw();
 
-        if (rawMessage.startsWith(Prefix)) {
+        if (rawMessage.length() > 1 && rawMessage.startsWith(Prefix)) {
             if (event.getAuthor().isBot()) return true;
             String[] command_pre = rawMessage.split(" ");
             String command = command_pre[0].replaceFirst(Prefix, "");
