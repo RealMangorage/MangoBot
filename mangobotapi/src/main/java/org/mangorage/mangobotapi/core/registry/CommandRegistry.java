@@ -22,84 +22,25 @@
 
 package org.mangorage.mangobotapi.core.registry;
 
-import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.AbstractCommand;
-import org.mangorage.mangobotapi.core.commands.AliasCommand;
-import org.mangorage.mangobotapi.core.commands.CommandHolder;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
-import org.mangorage.mboteventbus.impl.IEventBus;
-
-import java.util.HashMap;
+import org.mangorage.mboteventbus.base.EventHolder;
+import org.mangorage.mboteventbus.impl.IEventListener;
 
 public class CommandRegistry {
-    public static final CommandRegistry GLOBAL = new CommandRegistry("-1");
-
-    public static CommandRegistry create(@NotNull String guildID) {
-        return new CommandRegistry(guildID);
-    }
-
-    private final String guildID;
-    private final HashMap<String, CommandHolder<?>> HOLDERS = new HashMap<>();
-
-    private CommandRegistry(String guildID) {
-        this.guildID = guildID;
-    }
-
-    public String getGuildId() {
-        return guildID;
-    }
-
-    private void checkIfExists(String id) {
-        if (HOLDERS.containsKey(id))
-            throw new IllegalArgumentException("Command under same id already exists. ID -> %s".formatted(id));
-    }
-
-    public <T extends AbstractCommand> CommandHolder<T> register(String id, T command) {
-        checkIfExists(id);
-        var holder = CommandHolder.create(id, command);
-        HOLDERS.put(id, holder);
-        return holder;
-    }
-
-    public CommandHolder<AliasCommand> registerAlias(String id, CommandHolder<?> commandHolder) {
-        checkIfExists(id);
-        if (commandHolder.getCommand() instanceof AliasCommand)
-            throw new IllegalArgumentException("Cannot alias an alias");
-        var aliasCommand = new AliasCommand(commandHolder);
-        var holder = CommandHolder.create(id, aliasCommand);
-        HOLDERS.put(id, holder);
-        return holder;
-    }
-
-    public void register(IEventBus bus) {
-        bus.addListener(CommandEvent.class, this::commandEvent);
-    }
-
-    private void commandEvent(CommandEvent event) {
-        if (!event.isHandled()) {
-
-            boolean isGuild = event.getMessage().isFromGuild();
-
-            if (isGuild) {
-                if (event.getGuildId().equals(guildID) || guildID.contains("-1")) {
-                    var holder = HOLDERS.get(event.getCommand());
-                    if (holder != null) {
-                        var command = holder.getCommand();
-                        if (command != null) {
-                            event.setHandled(command.execute(event.getMessage(), event.getArguments()));
-                        }
-                    }
+    private static final EventHolder<CommandEvent> COMMAND_EVENT = EventHolder.create(
+            CommandEvent.class,
+            (i) -> (e) -> {
+                for (IEventListener<CommandEvent> commandEventIEventListener : i) {
+                    commandEventIEventListener.invoke(e);
                 }
-            } else if (guildID.equals("-1")) {
-                var holder = HOLDERS.get(event.getCommand());
-                if (holder != null) {
-                    var command = holder.getCommand();
-                    if (command != null) {
-                        if (command.isGuildOnly()) return;
-                        event.setHandled(command.execute(event.getMessage(), event.getArguments()));
-                    }
-                }
-            }
-        }
+            });
+
+    public static void addCommand(AbstractCommand command) {
+        COMMAND_EVENT.addListener(command.getListener());
+    }
+
+    public static void postCommand(CommandEvent event) {
+        COMMAND_EVENT.post(event);
     }
 }

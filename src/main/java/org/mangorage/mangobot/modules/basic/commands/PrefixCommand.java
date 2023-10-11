@@ -58,6 +58,15 @@ public class PrefixCommand extends AbstractCommand {
         return CommandResult.FAIL;
     }
 
+    /**
+     * @param command
+     * @return
+     */
+    @Override
+    public boolean isValidCommand(String command) {
+        return command.equalsIgnoreCase("setprefix");
+    }
+
     @Override
     public boolean isGuildOnly() {
         return true;

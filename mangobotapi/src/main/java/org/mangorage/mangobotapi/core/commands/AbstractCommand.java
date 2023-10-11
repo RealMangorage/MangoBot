@@ -23,35 +23,23 @@
 package org.mangorage.mangobotapi.core.commands;
 
 import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobotapi.core.events.CommandEvent;
+import org.mangorage.mboteventbus.impl.IEvent;
 
 public abstract class AbstractCommand {
-    public static AbstractCommand create(ICommand command, boolean isGuild) {
-        if (command == null)
-            throw new IllegalStateException("Command cannot be null");
-        return new AbstractCommand() {
-            @Override
-            public CommandResult execute(Message message, Arguments args) {
-                return command.execute(message, args);
-            }
+    public abstract CommandResult execute(Message message, Arguments args);
 
-            /**
-             * @return
-             */
-            @Override
-            public boolean isGuildOnly() {
-                return isGuild;
+    public IEvent<CommandEvent> getListener() {
+        return (e) -> {
+            if (isValidCommand(e.getCommand())) {
+                e.setHandled(execute(e.getMessage(), e.getArguments()));
             }
         };
     }
 
-    public abstract CommandResult execute(Message message, Arguments args);
+    public abstract boolean isValidCommand(String command);
 
     public boolean isGuildOnly() {
         return true;
-    }
-
-    @FunctionalInterface
-    public interface ICommand {
-        CommandResult execute(Message message, Arguments args);
     }
 }

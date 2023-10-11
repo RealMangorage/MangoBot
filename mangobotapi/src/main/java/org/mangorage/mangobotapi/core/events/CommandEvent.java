@@ -67,7 +67,6 @@ public class CommandEvent extends Event<CommandEvent> {
         return arguments;
     }
 
-
     public String getGuildId() {
         return message.getGuild().getId();
     }

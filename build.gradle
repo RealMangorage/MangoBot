@@ -50,8 +50,7 @@ sourceSets {
 dependencies {
     // Libs for Bot
     implementation("net.dv8tion:JDA:$JDA_VERSION") // JDA
-    implementation("dev.arbjerg:lavaplayer:$LAVA_VERSION")
-    // LavaPlayer to stream audio from YT/FILES to Discord
+    implementation("dev.arbjerg:lavaplayer:$LAVA_VERSION") // LavaPlayer to stream audio from YT/FILES to Discord
     implementation("com.google.code.gson:gson:$GSON_VERSION")
     implementation("org.apache.logging.log4j:log4j-core:$LOG4J_VERSION")
     implementation("org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5") // GITHUB API
@@ -63,8 +62,11 @@ dependencies {
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$LOG4J_VERSION")
 
 
+    // Shadow
     shadow project(path: ':mangobotapi')
     shadow project(path: ':mboteventbus')
+
+
     shadow("net.dv8tion:JDA:$JDA_VERSION")
     shadow("dev.arbjerg:lavaplayer:$LAVA_VERSION")
     shadow("com.google.code.gson:gson:$GSON_VERSION")
@@ -92,22 +94,9 @@ tasks.register('runTestBot', JavaExec) {
     mainClass = 'org.mangorage.mangobottest.Main'
 }
 
-tasks.register('buildBotJar', Jar) {
-    group "bot tasks"
-    description "Build the Bot Jar with API included"
-
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from sourceSets.main.output
-    from sourceSets.main.resources
-
-    manifest {
-        attributes 'Main-Class': 'org.mangorage.mangobot.Main'
-    }
-}
-
 shadowJar {
     group "bot tasks"
+    description "Builds the bot jar"
 }
 
 test {

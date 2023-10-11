@@ -27,7 +27,7 @@ import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.registry.UserPermission;
 
 public class ForgePermissions {
-    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.guild(ForgeCommands.COMMANDS.getGuildId());
+    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.guild("1129059589325852724");
 
 
     static {

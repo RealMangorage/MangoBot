@@ -58,9 +58,11 @@ public class ReplyCommand extends AbstractCommand {
         return CommandResult.PASS;
     }
 
-    /**
-     * @return
-     */
+    @Override
+    public boolean isValidCommand(String command) {
+        return false;
+    }
+
     @Override
     public boolean isGuildOnly() {
         return false;

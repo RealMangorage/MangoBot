@@ -20,28 +20,44 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.commands;
+package org.mangorage.mangobot.modules.developer;
 
 import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobot.core.Bot;
+import org.mangorage.mangobotapi.core.commands.AbstractCommand;
+import org.mangorage.mangobotapi.core.commands.Arguments;
+import org.mangorage.mangobotapi.core.commands.CommandResult;
 
-public final class AliasCommand extends AbstractCommand {
-
-    private final CommandHolder<?> commandHolder;
-
-    public AliasCommand(CommandHolder<?> commandHolder) {
-        this.commandHolder = commandHolder;
-    }
-
-    @Override
-    public CommandResult execute(Message message, Arguments args) {
-        return commandHolder.getCommand().execute(message, args);
-    }
-
+public class KickBotCommand extends AbstractCommand {
     /**
+     * @param message
+     * @param args
      * @return
      */
     @Override
-    public boolean isGuildOnly() {
-        return commandHolder.getCommand().isGuildOnly();
+    public CommandResult execute(Message message, Arguments args) {
+        if (message.getAuthor().getId().equals("194596094200643584")) {
+            var guildID = args.get(0);
+            if (guildID.isBlank()) {
+                message.reply("Usage: !kickBot <guildID>").queue();
+                return CommandResult.PASS;
+            }
+
+            var guild = Bot.getJDAInstance().getGuildById(guildID);
+            if (guild == null) {
+                message.reply("Guild not found").queue();
+                return CommandResult.PASS;
+            }
+            message.reply("Kicked myself from guild: " + guild.getName()).queue();
+            guild.leave().queue();
+        } else {
+            return CommandResult.DEVELOPERS_ONLY;
+        }
+        return CommandResult.PASS;
+    }
+
+    @Override
+    public boolean isValidCommand(String command) {
+        return command.equalsIgnoreCase("kickBot");
     }
 }

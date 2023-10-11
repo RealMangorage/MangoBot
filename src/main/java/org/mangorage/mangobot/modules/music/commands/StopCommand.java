@@ -48,4 +48,9 @@ public class StopCommand extends AbstractCommand {
 
         return CommandResult.PASS;
     }
+
+    @Override
+    public boolean isValidCommand(String command) {
+        return command.equalsIgnoreCase("stop");
+    }
 }

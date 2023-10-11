@@ -20,28 +20,39 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobotapi.core.commands;
+package org.mangorage.mangobot.modules.developer;
 
-public class CommandHolder<T extends AbstractCommand> {
+import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobotapi.core.commands.AbstractCommand;
+import org.mangorage.mangobotapi.core.commands.Arguments;
+import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.util.TaskScheduler;
 
-    public static <T extends AbstractCommand> CommandHolder<T> create(String id, T value) {
-        return new CommandHolder<>(id, value);
+import java.util.concurrent.TimeUnit;
+
+public class TerminateCommand extends AbstractCommand {
+
+
+    @Override
+    public CommandResult execute(Message message, Arguments args) {
+        if (message.getAuthor().getId().equals("194596094200643584")) {
+            message.getChannel().sendMessage("Terminating Bot in 5 seconds...").queue();
+            TaskScheduler.getExecutor().schedule(() -> {
+                System.exit(0);
+            }, 5, TimeUnit.SECONDS);
+        } else {
+            return CommandResult.DEVELOPERS_ONLY;
+        }
+        return CommandResult.DEVELOPERS_ONLY;
     }
 
-    private final String id;
-    private final T value;
-
-    private CommandHolder(String id, T value) {
-        this.id = id;
-        this.value = value;
-    }
-
-    public String getID() {
-        return id;
-    }
-
-    public T getCommand() {
-        return value;
+    /**
+     * @param command
+     * @return
+     */
+    @Override
+    public boolean isValidCommand(String command) {
+        return command.equalsIgnoreCase("terminate");
     }
 
 

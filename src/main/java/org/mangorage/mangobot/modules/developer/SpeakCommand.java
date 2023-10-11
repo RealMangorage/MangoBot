@@ -20,18 +20,18 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.guilds.forge;
+package org.mangorage.mangobot.modules.developer;
 
-import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.modules.basic.commands.PingCommand;
-import org.mangorage.mangobotapi.core.commands.CommandHolder;
-import org.mangorage.mangobotapi.core.registry.CommandRegistry;
+import org.mangorage.mangobot.modules.basic.commands.ReplyCommand;
 
-public class ForgeCommands {
-    public static final CommandRegistry COMMANDS = CommandRegistry.create("1129059589325852724");
-    public static final CommandHolder<PingCommand> PING = COMMANDS.register("pings", new PingCommand());
+public class SpeakCommand extends ReplyCommand {
 
-    public static void init() {
-        COMMANDS.register(Bot.EVENT_BUS);
+    public SpeakCommand() {
+        super("I have Spoken!");
+    }
+
+    @Override
+    public boolean isValidCommand(String command) {
+        return command.equalsIgnoreCase("speak");
     }
 }

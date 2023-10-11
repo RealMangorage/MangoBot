@@ -40,7 +40,7 @@ public class VolumeCommand extends AbstractCommand {
 
         try {
             int volume = Integer.valueOf(VOLUME);
-            if (volume <= 30) {
+            if (volume <= 100) {
                 MusicPlayer.getInstance(guild.getId()).setVolume(volume);
                 channel.sendMessage("Volume set to " + volume).queue();
             } else
@@ -52,5 +52,14 @@ public class VolumeCommand extends AbstractCommand {
         }
 
         return result;
+    }
+
+    /**
+     * @param command
+     * @return
+     */
+    @Override
+    public boolean isValidCommand(String command) {
+        return command.equalsIgnoreCase("setvolume");
     }
 }

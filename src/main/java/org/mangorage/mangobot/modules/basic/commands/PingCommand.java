@@ -48,4 +48,13 @@ public class PingCommand extends AbstractCommand {
 
         return CommandResult.PASS;
     }
+
+    /**
+     * @param command
+     * @return
+     */
+    @Override
+    public boolean isValidCommand(String command) {
+        return command.equalsIgnoreCase("ping");
+    }
 }

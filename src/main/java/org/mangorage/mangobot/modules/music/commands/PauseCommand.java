@@ -51,4 +51,13 @@ public class PauseCommand extends AbstractCommand {
             channel.sendMessage("Nothing is playing").queue();
         return CommandResult.PASS;
     }
+
+    /**
+     * @param command
+     * @return
+     */
+    @Override
+    public boolean isValidCommand(String command) {
+        return command.equalsIgnoreCase("pause");
+    }
 }

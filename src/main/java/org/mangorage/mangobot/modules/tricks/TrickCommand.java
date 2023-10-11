@@ -234,6 +234,15 @@ public class TrickCommand extends AbstractCommand {
         return CommandResult.FAIL;
     }
 
+    /**
+     * @param command
+     * @return
+     */
+    @Override
+    public boolean isValidCommand(String command) {
+        return command.equalsIgnoreCase("tricks");
+    }
+
     private Type getTrickType(Arguments args) {
         if (args.hasArg("-code"))
             return Type.CODE;

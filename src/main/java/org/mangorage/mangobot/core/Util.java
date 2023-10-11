@@ -33,6 +33,7 @@ import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
+import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -65,6 +66,14 @@ public class Util {
             Arguments arguments = Arguments.of(Arguments.of(command_pre).getFrom(1).split(" "));
 
             var commandEvent = new CommandEvent(event.getMessage(), command, arguments);
+            CommandRegistry.postCommand(commandEvent);
+
+            if (commandEvent.isHandled()) {
+                commandEvent.getCommandResult().accept(message);
+                return true;
+            }
+
+            // Now post to anything using our EventBus...
             MangoBotAPI.getInstance().getEventBus().post(commandEvent);
 
             if (commandEvent.isHandled()) {
@@ -86,11 +95,6 @@ public class Util {
         } catch (NumberFormatException ignored) {
         }
         return res;
-    }
-
-    // execute runnable on a thread
-    public static void call(Runnable runnable) {
-        new Thread(runnable).start();
     }
 
     public static boolean copy(Path from, BasicFileAttributes a, Path target) {

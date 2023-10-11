@@ -30,9 +30,8 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.mangorage.mangobot.guilds.forge.ForgeCommands;
 import org.mangorage.mangobot.guilds.forge.ForgePermissions;
-import org.mangorage.mangobot.guilds.global.GlobalCommands;
+import org.mangorage.mangobot.guilds.global.Commands;
 import org.mangorage.mangobot.guilds.global.GlobalPermissions;
 import org.mangorage.mangobot.guilds.global.GlobalSlashCommands;
 import org.mangorage.mangobot.modules.modmail.ModMailHandler;
@@ -154,6 +153,7 @@ public class Bot {
         builder.setEnableShutdownHook(true);
         builder.setAutoReconnect(true);
 
+
         this.BOT = builder.build();
         finalizer.accept(this);
         // ****** Builder End *********
@@ -184,8 +184,7 @@ public class Bot {
     public void onStartup(StartupEvent event) {
         switch (event.phase()) {
             case STARTUP -> {
-                GlobalCommands.init();
-                ForgeCommands.init();
+                Commands.init();
 
                 GlobalPermissions.init();
                 ForgePermissions.init();
