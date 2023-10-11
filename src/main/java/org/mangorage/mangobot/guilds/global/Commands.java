@@ -25,7 +25,9 @@ package org.mangorage.mangobot.guilds.global;
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.modules.basic.commands.PingCommand;
 import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
+import org.mangorage.mangobot.modules.developer.KickBotCommand;
 import org.mangorage.mangobot.modules.developer.SpeakCommand;
+import org.mangorage.mangobot.modules.developer.TerminateCommand;
 import org.mangorage.mangobot.modules.modmail.commands.ModMailCommand;
 import org.mangorage.mangobot.modules.music.commands.PauseCommand;
 import org.mangorage.mangobot.modules.music.commands.PlayCommand;
@@ -44,6 +46,8 @@ public class Commands {
         CommandRegistry.addCommand(new PrefixCommand());
         CommandRegistry.addCommand(new PingCommand());
         CommandRegistry.addCommand(new SpeakCommand());
+        CommandRegistry.addCommand(new KickBotCommand());
+        CommandRegistry.addCommand(new TerminateCommand());
 
         if (Constants.USE_MUSIC) {
             CommandRegistry.addCommand(new PlayCommand());

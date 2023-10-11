@@ -68,15 +68,16 @@ public class Util {
             var commandEvent = new CommandEvent(event.getMessage(), command, arguments);
             CommandRegistry.postCommand(commandEvent);
 
-            if (commandEvent.isHandled()) {
-                commandEvent.getCommandResult().accept(message);
-                return true;
-            }
-
             // Now post to anything using our EventBus...
-            MangoBotAPI.getInstance().getEventBus().post(commandEvent);
+            if (!commandEvent.isHandled())
+                MangoBotAPI.getInstance().getEventBus().post(commandEvent);
 
-            if (commandEvent.isHandled()) {
+            if (commandEvent.getException() != null) {
+                Bot.DEFAULT_SETTINGS.apply(message.reply("""
+                        An Exception occurred while executing the command.
+                        %s
+                        """.formatted(commandEvent.getException().getMessage()))).queue();
+            } else if (commandEvent.isHandled()) {
                 commandEvent.getCommandResult().accept(message);
             } else {
                 Bot.DEFAULT_SETTINGS.apply(message.reply("Invalid Command")).queue();

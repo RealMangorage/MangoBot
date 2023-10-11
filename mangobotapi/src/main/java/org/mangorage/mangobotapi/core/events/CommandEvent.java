@@ -34,6 +34,7 @@ public class CommandEvent extends Event<CommandEvent> {
 
     private boolean handled = false;
     private CommandResult result;
+    private Exception exception;
 
     public CommandEvent(Message message, String command, Arguments arguments) {
         this.message = message;
@@ -49,10 +50,18 @@ public class CommandEvent extends Event<CommandEvent> {
         return result;
     }
 
+    public Exception getException() {
+        return exception;
+    }
+
     public void setHandled(CommandResult result) {
         if (handled) return;
         this.handled = true;
         this.result = result;
+    }
+
+    public void setException(Exception exception) {
+        this.exception = exception;
     }
 
     public Message getMessage() {

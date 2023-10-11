@@ -33,7 +33,12 @@ public abstract class AbstractCommand {
         return (e) -> {
             if (isValidCommand(e.getCommand())) {
                 if (isGuildOnly() && !e.getMessage().isFromGuild()) return;
-                e.setHandled(execute(e.getMessage(), e.getArguments()));
+                try {
+                    e.setHandled(execute(e.getMessage(), e.getArguments()));
+                } catch (Exception ex) {
+                    e.setHandled(CommandResult.PASS);
+                    e.setException(ex);
+                }
             }
         };
     }
