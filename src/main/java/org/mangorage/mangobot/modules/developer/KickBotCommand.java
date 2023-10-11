@@ -24,11 +24,11 @@ package org.mangorage.mangobot.modules.developer;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 
-public class KickBotCommand extends AbstractCommand {
+public class KickBotCommand implements ICommand {
     /**
      * @param message
      * @param args
@@ -56,8 +56,11 @@ public class KickBotCommand extends AbstractCommand {
         return CommandResult.PASS;
     }
 
+    /**
+     * @return
+     */
     @Override
-    public boolean isValidCommand(String command) {
-        return command.equalsIgnoreCase("kickBot");
+    public String commandId() {
+        return "kickBot";
     }
 }

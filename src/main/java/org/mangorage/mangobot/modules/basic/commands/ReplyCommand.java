@@ -23,13 +23,13 @@
 package org.mangorage.mangobot.modules.basic.commands;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 
 import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
 
-public class ReplyCommand extends AbstractCommand {
+public abstract class ReplyCommand implements ICommand {
     private final String MESSAGE_RESPONSE;
     private final boolean supress;
     private boolean notifications;
@@ -56,15 +56,5 @@ public class ReplyCommand extends AbstractCommand {
     public CommandResult execute(Message message, Arguments args) {
         DEFAULT_SETTINGS.apply(message.getChannel().sendMessage(MESSAGE_RESPONSE)).queue();
         return CommandResult.PASS;
-    }
-
-    @Override
-    public boolean isValidCommand(String command) {
-        return false;
-    }
-
-    @Override
-    public boolean isGuildOnly() {
-        return false;
     }
 }

@@ -29,13 +29,13 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.guilds.global.GlobalPermissions;
 import org.mangorage.mangobot.modules.modmail.ModMailHandler;
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
-public class ModMailCommand extends AbstractCommand {
+public class ModMailCommand implements ICommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         MessageSettings messageSettings = Bot.DEFAULT_SETTINGS;
@@ -81,12 +81,11 @@ public class ModMailCommand extends AbstractCommand {
     }
 
     /**
-     * @param command
      * @return
      */
     @Override
-    public boolean isValidCommand(String command) {
-        return command.equalsIgnoreCase("mail");
+    public String commandId() {
+        return "mail";
     }
 
     @Override

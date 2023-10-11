@@ -27,11 +27,11 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.modules.music.MusicPlayer;
 import org.mangorage.mangobot.modules.music.MusicUtil;
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 
-public class StopCommand extends AbstractCommand {
+public class StopCommand implements ICommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         MessageChannelUnion channel = message.getChannel();
@@ -49,8 +49,12 @@ public class StopCommand extends AbstractCommand {
         return CommandResult.PASS;
     }
 
+    /**
+     * @return
+     */
     @Override
-    public boolean isValidCommand(String command) {
-        return command.equalsIgnoreCase("stop");
+    public String commandId() {
+        return "stop";
     }
+
 }

@@ -26,13 +26,21 @@ import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mboteventbus.impl.IEvent;
 
-public abstract class AbstractCommand {
-    public abstract CommandResult execute(Message message, Arguments args);
+import java.util.List;
 
-    public IEvent<CommandEvent> getListener() {
+public interface ICommand {
+    CommandResult execute(Message message, Arguments args);
+
+    default IEvent<CommandEvent> getListener() {
         return (e) -> {
             if (isValidCommand(e.getCommand())) {
-                if (isGuildOnly() && !e.getMessage().isFromGuild()) return;
+                var fromGuild = e.getMessage().isFromGuild();
+
+                if (!fromGuild && isGuildOnly()) return;
+                if (fromGuild && !allowedGuilds().isEmpty() && !allowedGuilds().contains(e.getMessage().getGuild().getId()))
+                    return;
+                if (!allowedUsers().isEmpty() && !allowedUsers().contains(e.getMessage().getAuthor().getId())) return;
+
                 try {
                     e.setHandled(execute(e.getMessage(), e.getArguments()));
                 } catch (Exception ex) {
@@ -43,9 +51,31 @@ public abstract class AbstractCommand {
         };
     }
 
-    public abstract boolean isValidCommand(String command);
+    String commandId();
 
-    public boolean isGuildOnly() {
+    default boolean isValidCommand(String command) {
+        boolean result = ignoreCase() ? command.equalsIgnoreCase(commandId()) : command.equals(commandId());
+        return ignoreCase() ? result : commandAliases().contains(command) || result;
+    }
+
+    default List<String> commandAliases() {
+        return List.of();
+    }
+
+    default boolean ignoreCase() {
+        return false;
+    }
+
+    default boolean isGuildOnly() {
         return true;
     }
+
+    default List<String> allowedGuilds() {
+        return List.of();
+    }
+
+    default List<String> allowedUsers() {
+        return List.of();
+    }
+
 }

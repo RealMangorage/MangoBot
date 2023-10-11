@@ -24,14 +24,13 @@ package org.mangorage.mangobot.modules.basic.commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 
 import java.awt.*;
 
-public class PingCommand extends AbstractCommand {
-
+public class PingCommand implements ICommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         message.getChannel().sendMessageEmbeds(
@@ -49,12 +48,9 @@ public class PingCommand extends AbstractCommand {
         return CommandResult.PASS;
     }
 
-    /**
-     * @param command
-     * @return
-     */
+
     @Override
-    public boolean isValidCommand(String command) {
-        return command.equalsIgnoreCase("ping");
+    public String commandId() {
+        return "ping";
     }
 }

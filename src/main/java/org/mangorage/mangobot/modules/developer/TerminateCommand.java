@@ -23,14 +23,14 @@
 package org.mangorage.mangobot.modules.developer;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 import org.mangorage.mangobotapi.core.util.TaskScheduler;
 
 import java.util.concurrent.TimeUnit;
 
-public class TerminateCommand extends AbstractCommand {
+public class TerminateCommand implements ICommand {
 
 
     @Override
@@ -47,12 +47,11 @@ public class TerminateCommand extends AbstractCommand {
     }
 
     /**
-     * @param command
      * @return
      */
     @Override
-    public boolean isValidCommand(String command) {
-        return command.equalsIgnoreCase("terminate");
+    public String commandId() {
+        return "terminate";
     }
 
 

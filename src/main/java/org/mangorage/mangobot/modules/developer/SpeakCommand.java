@@ -30,8 +30,11 @@ public class SpeakCommand extends ReplyCommand {
         super("I have Spoken!");
     }
 
+    /**
+     * @return
+     */
     @Override
-    public boolean isValidCommand(String command) {
-        return command.equalsIgnoreCase("speak");
+    public String commandId() {
+        return "speak";
     }
 }

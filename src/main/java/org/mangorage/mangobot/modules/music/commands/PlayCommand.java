@@ -33,12 +33,12 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.guilds.global.GlobalPermissions;
 import org.mangorage.mangobot.modules.music.MusicPlayer;
 import org.mangorage.mangobot.modules.music.MusicUtil;
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 
-public class PlayCommand extends AbstractCommand {
+public class PlayCommand implements ICommand {
     @Override
     public CommandResult execute(Message message, Arguments arg) {
         String[] args = arg.getArgs();
@@ -113,8 +113,11 @@ public class PlayCommand extends AbstractCommand {
         return CommandResult.PASS;
     }
 
+    /**
+     * @return
+     */
     @Override
-    public boolean isValidCommand(String command) {
-        return command.equalsIgnoreCase("play");
+    public String commandId() {
+        return "play";
     }
 }

@@ -24,5 +24,7 @@ package org.mangorage.mangobotapi.core.util.annotations;
 
 
 public @interface InsteadUse {
-    String value();
+    String reason();
+
+    Class<?> use() default Void.class;
 }

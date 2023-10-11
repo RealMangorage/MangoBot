@@ -22,7 +22,7 @@
 
 package org.mangorage.mangobotapi.core.registry;
 
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mboteventbus.base.EventHolder;
 import org.mangorage.mboteventbus.impl.IEventListener;
@@ -36,7 +36,7 @@ public class CommandRegistry {
                 }
             });
 
-    public static void addCommand(AbstractCommand command) {
+    public static void addCommand(ICommand command) {
         COMMAND_EVENT.addListener(command.getListener());
     }
 

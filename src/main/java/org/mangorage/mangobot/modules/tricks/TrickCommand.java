@@ -28,9 +28,9 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.guilds.global.GlobalPermissions;
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 import org.mangorage.mangobotapi.core.data.DataHandler;
 import org.mangorage.mangobotapi.core.events.CommandEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
@@ -58,7 +58,7 @@ import java.util.concurrent.TimeUnit;
 import static org.mangorage.mangobot.core.Bot.EVENT_BUS;
 
 @SuppressWarnings("all")
-public class TrickCommand extends AbstractCommand {
+public class TrickCommand implements ICommand {
     public enum Type {
         DEFAULT,
         CODE,
@@ -235,13 +235,13 @@ public class TrickCommand extends AbstractCommand {
     }
 
     /**
-     * @param command
      * @return
      */
     @Override
-    public boolean isValidCommand(String command) {
-        return command.equalsIgnoreCase("tricks");
+    public String commandId() {
+        return "tricks";
     }
+
 
     private Type getTrickType(Arguments args) {
         if (args.hasArg("-code"))

@@ -25,16 +25,16 @@ package org.mangorage.mangobot.modules.basic.commands;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 
 import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
 import static org.mangorage.mangobot.guilds.global.GlobalPermissions.PREFIX_ADMIN;
 
-public class PrefixCommand extends AbstractCommand {
+public class PrefixCommand implements ICommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         String prefix = args.getOrDefault(0, "");
@@ -59,16 +59,11 @@ public class PrefixCommand extends AbstractCommand {
     }
 
     /**
-     * @param command
      * @return
      */
     @Override
-    public boolean isValidCommand(String command) {
-        return command.equalsIgnoreCase("setprefix");
+    public String commandId() {
+        return "setPrefix";
     }
 
-    @Override
-    public boolean isGuildOnly() {
-        return true;
-    }
 }

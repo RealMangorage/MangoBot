@@ -26,11 +26,11 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.modules.music.MusicPlayer;
-import org.mangorage.mangobotapi.core.commands.AbstractCommand;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 
-public class VolumeCommand extends AbstractCommand {
+public class VolumeCommand implements ICommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         String VOLUME = args.getOrDefault(0, "10");
@@ -55,11 +55,12 @@ public class VolumeCommand extends AbstractCommand {
     }
 
     /**
-     * @param command
      * @return
      */
     @Override
-    public boolean isValidCommand(String command) {
-        return command.equalsIgnoreCase("setvolume");
+    public String commandId() {
+        return "setVolume";
     }
+
+
 }
