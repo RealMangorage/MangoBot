@@ -32,6 +32,7 @@ public abstract class AbstractCommand {
     public IEvent<CommandEvent> getListener() {
         return (e) -> {
             if (isValidCommand(e.getCommand())) {
+                if (isGuildOnly() && !e.getMessage().isFromGuild()) return;
                 e.setHandled(execute(e.getMessage(), e.getArguments()));
             }
         };
