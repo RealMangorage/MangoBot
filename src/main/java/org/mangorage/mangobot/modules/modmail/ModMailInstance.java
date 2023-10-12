@@ -245,7 +245,7 @@ public class ModMailInstance {
 
     public void sendAttachments(TextChannel channel, List<Message.Attachment> attachmentList) {
         attachmentList.forEach(attachment -> {
-            if (attachment.isImage()) {
+            if (attachment.isImage() || attachment.isVideo()) {
                 channel.sendMessage(attachment.getUrl()).queue();
             } else {
                 channel.sendMessage("Attachment: %s".formatted(attachment.getFileName())).queue();
@@ -255,7 +255,7 @@ public class ModMailInstance {
 
     public void sendAttachments(PrivateChannel channel, List<Message.Attachment> attachmentList) {
         attachmentList.forEach(attachment -> {
-            if (attachment.isImage()) {
+            if (attachment.isImage() || attachment.isVideo()) {
                 channel.sendMessage(attachment.getUrl()).queue();
             } else {
                 channel.sendMessage("Attachment: %s".formatted(attachment.getFileName())).queue();
