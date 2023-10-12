@@ -26,7 +26,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Launcher {
-    public static final String METADATA = "https://s01.oss.sonatype.org/content/repositories/releases/io/github/realmangorage/org/mangorage/mangobot/maven-metadata.xml";
+    public static final String METADATA = "https://s01.oss.sonatype.org/content/repositories/releases/io/github/realmangorage/mangobot/maven-metadata.xml";
 
 
     public static void main(String[] args) {

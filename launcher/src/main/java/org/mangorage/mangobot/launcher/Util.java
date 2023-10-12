@@ -36,7 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Util {
-    private static final String BOT_URL = "https://s01.oss.sonatype.org/content/repositories/releases/io/github/realmangorage/org/mangorage/mangobot/{VERSION}/mangobot-{VERSION}-all.jar";
+    private static final String BOT_URL = "https://s01.oss.sonatype.org/content/repositories/releases/io/github/realmangorage/mangobot/{VERSION}/mangobot-{VERSION}-all.jar";
     private static final String BOT_DIR = "bot/";
     private static final String DATA_DIR = "botdata/";
 

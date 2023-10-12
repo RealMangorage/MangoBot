@@ -149,6 +149,7 @@ publishing {
             def releasesRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/releases/'
             def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            group "io.github.realmangorage"
             credentials {
                 username = findProperty("mango.maven.username")
                 password = findProperty("mango.maven.password")
