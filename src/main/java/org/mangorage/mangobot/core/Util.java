@@ -32,7 +32,7 @@ import net.dv8tion.jda.api.utils.TimeUtil;
 import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
-import org.mangorage.mangobotapi.core.events.CommandEvent;
+import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
 import java.io.IOException;
@@ -65,8 +65,8 @@ public class Util {
             String command = command_pre[0].replaceFirst(Prefix, "");
             Arguments arguments = Arguments.of(Arguments.of(command_pre).getFrom(1).split(" "));
 
-            var commandEvent = new CommandEvent(event.getMessage(), command, arguments);
-            CommandRegistry.postCommand(commandEvent);
+            var commandEvent = new BasicCommandEvent(event.getMessage(), command, arguments);
+            CommandRegistry.postBasicCommand(commandEvent);
 
             // Now post to anything using our EventBus...
             if (!commandEvent.isHandled())

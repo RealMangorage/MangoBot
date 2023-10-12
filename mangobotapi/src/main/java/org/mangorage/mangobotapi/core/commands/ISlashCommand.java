@@ -22,40 +22,29 @@
 
 package org.mangorage.mangobotapi.core.commands;
 
+import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+import org.mangorage.mangobotapi.core.events.SlashCommandEvent;
 import org.mangorage.mboteventbus.impl.IEvent;
 
-import java.util.List;
+public interface ISlashCommand extends ICommand<SlashCommandInteraction, SlashCommandEvent> {
+    default IEvent<SlashCommandEvent> getListener() {
+        return (e) -> {
+            if (isValidCommand(e.getCommand())) {
+                var interaction = e.getInteraction();
+                var fromGuild = interaction.isFromGuild();
 
-public interface ICommand<Type, EventClass> {
-    CommandResult execute(Type message, Arguments args);
+                if (!fromGuild && isGuildOnly()) return;
+                if (fromGuild && !allowedGuilds().isEmpty() && !allowedGuilds().contains(interaction.getGuild().getId()))
+                    return;
+                if (!allowedUsers().isEmpty() && !allowedUsers().contains(interaction.getUser().getId())) return;
 
-    IEvent<EventClass> getListener();
-
-    String commandId();
-
-    default boolean isValidCommand(String command) {
-        boolean result = ignoreCase() ? command.equalsIgnoreCase(commandId()) : command.equals(commandId());
-        return ignoreCase() ? result : commandAliases().contains(command) || result;
+                try {
+                    e.setHandled(execute(interaction, e.getArguments()));
+                } catch (Exception ex) {
+                    e.setHandled(CommandResult.PASS);
+                    e.setException(ex);
+                }
+            }
+        };
     }
-
-    default List<String> commandAliases() {
-        return List.of();
-    }
-
-    default boolean ignoreCase() {
-        return false;
-    }
-
-    default boolean isGuildOnly() {
-        return true;
-    }
-
-    default List<String> allowedGuilds() {
-        return List.of();
-    }
-
-    default List<String> allowedUsers() {
-        return List.of();
-    }
-
 }

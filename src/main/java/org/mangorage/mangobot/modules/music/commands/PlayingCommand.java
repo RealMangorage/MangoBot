@@ -31,9 +31,9 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.mangorage.mangobot.modules.music.MusicPlayer;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.commands.ICommand;
+import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 
-public class PlayingCommand implements ICommand {
+public class PlayingCommand implements IBasicCommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         MessageChannelUnion channel = message.getChannel();

@@ -22,13 +22,11 @@
 
 package org.mangorage.mangobotapi.core.events;
 
-import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mboteventbus.base.Event;
 
-public class CommandEvent extends Event<CommandEvent> {
-    private final Message message;
+public abstract class CommandEvent<Type> extends Event<Type> {
     private final String command;
     private final Arguments arguments;
 
@@ -36,8 +34,7 @@ public class CommandEvent extends Event<CommandEvent> {
     private CommandResult result;
     private Exception exception;
 
-    public CommandEvent(Message message, String command, Arguments arguments) {
-        this.message = message;
+    public CommandEvent(String command, Arguments arguments) {
         this.command = command;
         this.arguments = arguments;
     }
@@ -64,9 +61,6 @@ public class CommandEvent extends Event<CommandEvent> {
         this.exception = exception;
     }
 
-    public Message getMessage() {
-        return message;
-    }
 
     public String getCommand() {
         return command;
@@ -74,9 +68,5 @@ public class CommandEvent extends Event<CommandEvent> {
 
     public Arguments getArguments() {
         return arguments;
-    }
-
-    public String getGuildId() {
-        return message.getGuild().getId();
     }
 }

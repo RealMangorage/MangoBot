@@ -20,41 +20,27 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.basic.commands;
+package org.mangorage.mangobotapi.core.events;
 
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import org.mangorage.mangobotapi.core.commands.Arguments;
-import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 
-import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
+public class SlashCommandEvent extends CommandEvent<SlashCommandEvent> {
 
-public abstract class ReplyCommand implements IBasicCommand {
-    private final String MESSAGE_RESPONSE;
-    private final boolean supress;
-    private boolean notifications;
+    private final SlashCommandInteraction interaction;
 
-    public ReplyCommand(String message, boolean supress) {
-        this.MESSAGE_RESPONSE = message;
-        this.supress = supress;
+    public SlashCommandEvent(SlashCommandInteraction interaction, String command, Arguments arguments) {
+        super(command, arguments);
+        this.interaction = interaction;
     }
 
-    public ReplyCommand(String message) {
-        this(message, true);
+    public SlashCommandInteraction getInteraction() {
+        return interaction;
     }
 
-    public ReplyCommand notifications(boolean value) {
-        this.notifications = !value;
-        return this;
-    }
-
-    public String getMessage() {
-        return MESSAGE_RESPONSE;
-    }
-
-    @Override
-    public CommandResult execute(Message message, Arguments args) {
-        DEFAULT_SETTINGS.apply(message.getChannel().sendMessage(MESSAGE_RESPONSE)).queue();
-        return CommandResult.PASS;
+    public String getGuildId() {
+        var guild = interaction.getGuild();
+        if (guild == null) return "-1";
+        return interaction.getGuild().getId();
     }
 }

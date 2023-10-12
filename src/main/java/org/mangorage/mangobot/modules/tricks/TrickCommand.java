@@ -30,9 +30,9 @@ import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.guilds.global.GlobalPermissions;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.commands.ICommand;
+import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.data.DataHandler;
-import org.mangorage.mangobotapi.core.events.CommandEvent;
+import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
@@ -58,7 +58,7 @@ import java.util.concurrent.TimeUnit;
 import static org.mangorage.mangobot.core.Bot.EVENT_BUS;
 
 @SuppressWarnings("all")
-public class TrickCommand implements ICommand {
+public class TrickCommand implements IBasicCommand {
     public enum Type {
         DEFAULT,
         CODE,
@@ -103,7 +103,7 @@ public class TrickCommand implements ICommand {
         // Register listeners to Bot.EVENT_BUS
         EVENT_BUS.addListener(LoadEvent.class, this::onLoadEvent);
         EVENT_BUS.addListener(SaveEvent.class, this::onSaveEvent);
-        EVENT_BUS.addListener(CommandEvent.class, this::onCommandEvent);
+        EVENT_BUS.addListener(BasicCommandEvent.class, this::onCommandEvent);
         EVENT_BUS.addListener(DButtonInteractionEvent.class, this::onButton);
     }
 
@@ -373,7 +373,7 @@ public class TrickCommand implements ICommand {
     }
 
 
-    public void onCommandEvent(CommandEvent event) {
+    public void onCommandEvent(BasicCommandEvent event) {
         if (!event.isHandled()) {
             Message message = event.getMessage();
             if (!message.isFromGuild()) return;

@@ -20,41 +20,24 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.basic.commands;
+package org.mangorage.mangobotapi.core.events;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.commands.Arguments;
-import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 
-import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
+public class BasicCommandEvent extends CommandEvent<BasicCommandEvent> {
+    private final Message message;
 
-public abstract class ReplyCommand implements IBasicCommand {
-    private final String MESSAGE_RESPONSE;
-    private final boolean supress;
-    private boolean notifications;
-
-    public ReplyCommand(String message, boolean supress) {
-        this.MESSAGE_RESPONSE = message;
-        this.supress = supress;
+    public BasicCommandEvent(Message message, String command, Arguments arguments) {
+        super(command, arguments);
+        this.message = message;
     }
 
-    public ReplyCommand(String message) {
-        this(message, true);
+    public Message getMessage() {
+        return message;
     }
 
-    public ReplyCommand notifications(boolean value) {
-        this.notifications = !value;
-        return this;
-    }
-
-    public String getMessage() {
-        return MESSAGE_RESPONSE;
-    }
-
-    @Override
-    public CommandResult execute(Message message, Arguments args) {
-        DEFAULT_SETTINGS.apply(message.getChannel().sendMessage(MESSAGE_RESPONSE)).queue();
-        return CommandResult.PASS;
+    public String getGuildId() {
+        return message.getGuild().getId();
     }
 }

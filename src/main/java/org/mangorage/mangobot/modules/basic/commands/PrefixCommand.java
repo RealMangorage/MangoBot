@@ -28,13 +28,13 @@ import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.commands.ICommand;
+import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 
 import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
 import static org.mangorage.mangobot.guilds.global.GlobalPermissions.PREFIX_ADMIN;
 
-public class PrefixCommand implements ICommand {
+public class PrefixCommand implements IBasicCommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         String prefix = args.getOrDefault(0, "");

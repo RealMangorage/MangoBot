@@ -22,25 +22,43 @@
 
 package org.mangorage.mangobotapi.core.registry;
 
-import org.mangorage.mangobotapi.core.commands.ICommand;
-import org.mangorage.mangobotapi.core.events.CommandEvent;
+import org.mangorage.mangobotapi.core.commands.IBasicCommand;
+import org.mangorage.mangobotapi.core.commands.ISlashCommand;
+import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
+import org.mangorage.mangobotapi.core.events.SlashCommandEvent;
 import org.mangorage.mboteventbus.base.EventHolder;
 import org.mangorage.mboteventbus.impl.IEventListener;
 
 public class CommandRegistry {
-    private static final EventHolder<CommandEvent> COMMAND_EVENT = EventHolder.create(
-            CommandEvent.class,
+    private static final EventHolder<BasicCommandEvent> BASIC_COMMAND_EVENT = EventHolder.create(
+            BasicCommandEvent.class,
             (i) -> (e) -> {
-                for (IEventListener<CommandEvent> commandEventIEventListener : i) {
-                    commandEventIEventListener.invoke(e);
+                for (IEventListener<BasicCommandEvent> listener : i) {
+                    listener.invoke(e);
                 }
             });
 
-    public static void addCommand(ICommand command) {
-        COMMAND_EVENT.addListener(command.getListener());
+    public static final EventHolder<SlashCommandEvent> SLASH_COMMAND_EVENT = EventHolder.create(
+            SlashCommandEvent.class,
+            (i) -> (e) -> {
+                for (IEventListener<SlashCommandEvent> listener : i) {
+                    listener.invoke(e);
+                }
+            });
+
+    public static void addBasicCommand(IBasicCommand command) {
+        BASIC_COMMAND_EVENT.addListener(command.getListener());
     }
 
-    public static void postCommand(CommandEvent event) {
-        COMMAND_EVENT.post(event);
+    public static void addSlashCommand(ISlashCommand command) {
+        SLASH_COMMAND_EVENT.addListener(command.getListener());
+    }
+
+    public static void postBasicCommand(BasicCommandEvent event) {
+        BASIC_COMMAND_EVENT.post(event);
+    }
+
+    public static void postSlashCommand(SlashCommandEvent event) {
+        SLASH_COMMAND_EVENT.post(event);
     }
 }

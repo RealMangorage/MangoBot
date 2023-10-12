@@ -31,11 +31,11 @@ import org.mangorage.mangobot.guilds.global.GlobalPermissions;
 import org.mangorage.mangobot.modules.modmail.ModMailHandler;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.commands.ICommand;
+import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
-public class ModMailCommand implements ICommand {
+public class ModMailCommand implements IBasicCommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         MessageSettings messageSettings = Bot.DEFAULT_SETTINGS;

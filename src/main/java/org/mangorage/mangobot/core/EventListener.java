@@ -32,15 +32,16 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
 import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
+import org.mangorage.mangobotapi.core.commands.Arguments;
+import org.mangorage.mangobotapi.core.events.SlashCommandEvent;
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageDeleteEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageUpdateEvent;
 import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
 import org.mangorage.mangobotapi.core.events.discord.DStringSelectInteractionEvent;
+import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 import org.mangorage.mboteventbus.impl.IEventBus;
-
-import java.time.temporal.ChronoUnit;
 
 
 @SuppressWarnings("unused")
@@ -54,15 +55,7 @@ public record EventListener(IEventBus bus) {
 
     @SubscribeEvent
     public void onSlashCommand(SlashCommandInteractionEvent event) {
-        var interaction = event.getInteraction();
-        if (interaction.getFullCommandName().equals("ping")) {
-            interaction.reply("Ping: ...").queue(m -> {
-                m.retrieveOriginal().queue(original -> {
-                    long ping = event.getTimeCreated().until(original.getTimeCreated(), ChronoUnit.MILLIS);
-                    m.editOriginal("Ping: " + ping + "ms | Websocket: " + event.getJDA().getGatewayPing() + "ms").queue();
-                });
-            });
-        }
+        CommandRegistry.postSlashCommand(new SlashCommandEvent(event, event.getName(), Arguments.empty()));
     }
 
     @SubscribeEvent

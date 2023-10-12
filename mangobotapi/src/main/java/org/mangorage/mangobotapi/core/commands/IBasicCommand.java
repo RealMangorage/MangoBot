@@ -20,39 +20,32 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.developer;
+package org.mangorage.mangobotapi.core.commands;
+
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobotapi.core.commands.Arguments;
-import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.commands.IBasicCommand;
-import org.mangorage.mangobotapi.core.util.TaskScheduler;
+import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
+import org.mangorage.mboteventbus.impl.IEvent;
 
-import java.util.concurrent.TimeUnit;
+public interface IBasicCommand extends ICommand<Message, BasicCommandEvent> {
+    default IEvent<BasicCommandEvent> getListener() {
+        return (e) -> {
+            if (isValidCommand(e.getCommand())) {
+                var message = e.getMessage();
+                var fromGuild = message.isFromGuild();
 
-public class TerminateCommand implements IBasicCommand {
+                if (!fromGuild && isGuildOnly()) return;
+                if (fromGuild && !allowedGuilds().isEmpty() && !allowedGuilds().contains(message.getGuild().getId()))
+                    return;
+                if (!allowedUsers().isEmpty() && !allowedUsers().contains(message.getAuthor().getId())) return;
 
-
-    @Override
-    public CommandResult execute(Message message, Arguments args) {
-        if (message.getAuthor().getId().equals("194596094200643584")) {
-            message.getChannel().sendMessage("Terminating Bot in 5 seconds...").queue();
-            TaskScheduler.getExecutor().schedule(() -> {
-                System.exit(0);
-            }, 5, TimeUnit.SECONDS);
-        } else {
-            return CommandResult.DEVELOPERS_ONLY;
-        }
-        return CommandResult.DEVELOPERS_ONLY;
+                try {
+                    e.setHandled(execute(message, e.getArguments()));
+                } catch (Exception ex) {
+                    e.setHandled(CommandResult.PASS);
+                    e.setException(ex);
+                }
+            }
+        };
     }
-
-    /**
-     * @return
-     */
-    @Override
-    public String commandId() {
-        return "terminate";
-    }
-
-
 }

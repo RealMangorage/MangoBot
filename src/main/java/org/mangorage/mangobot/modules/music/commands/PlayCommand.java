@@ -35,10 +35,10 @@ import org.mangorage.mangobot.modules.music.MusicPlayer;
 import org.mangorage.mangobot.modules.music.MusicUtil;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.commands.ICommand;
+import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 
-public class PlayCommand implements ICommand {
+public class PlayCommand implements IBasicCommand {
     @Override
     public CommandResult execute(Message message, Arguments arg) {
         String[] args = arg.getArgs();

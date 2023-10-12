@@ -20,47 +20,33 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.music.commands;
+package org.mangorage.mangobot.modules.basic.commands;
 
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.mangorage.mangobot.modules.music.MusicPlayer;
+import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.commands.IBasicCommand;
+import org.mangorage.mangobotapi.core.commands.ISlashCommand;
 
-public class VolumeCommand implements IBasicCommand {
+import java.time.temporal.ChronoUnit;
+
+public class PingSlashCommand implements ISlashCommand {
+
     @Override
-    public CommandResult execute(Message message, Arguments args) {
-        String VOLUME = args.getOrDefault(0, "10");
-        MessageChannelUnion channel = message.getChannel();
-        Guild guild = message.getGuild();
-        CommandResult result = CommandResult.FAIL;
+    public CommandResult execute(SlashCommandInteraction interaction, Arguments args) {
 
-        try {
-            int volume = Integer.valueOf(VOLUME);
-            if (volume <= 100) {
-                MusicPlayer.getInstance(guild.getId()).setVolume(volume);
-                channel.sendMessage("Volume set to " + volume).queue();
-            } else
-                channel.sendMessage("Max Volume allowed is 30").queue();
+        interaction.reply("Ping: ...").queue(m -> {
+            m.retrieveOriginal().queue(original -> {
+                long ping = interaction.getTimeCreated().until(original.getTimeCreated(), ChronoUnit.MILLIS);
+                m.editOriginal("Ping: " + ping + "ms | Websocket: " + interaction.getJDA().getGatewayPing() + "ms").queue();
+            });
+        });
 
-            result = CommandResult.PASS;
-        } catch (NumberFormatException e) {
-            channel.sendMessage("Invalid arguments.").queue();
-        }
-
-        return result;
+        return CommandResult.PASS;
     }
 
-    /**
-     * @return
-     */
+
     @Override
     public String commandId() {
-        return "setVolume";
+        return "ping";
     }
-
-
 }

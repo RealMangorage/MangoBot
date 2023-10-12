@@ -26,11 +26,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
-import org.mangorage.mangobotapi.core.commands.ICommand;
+import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 
 import java.awt.*;
 
-public class PingCommand implements ICommand {
+public class PingCommand implements IBasicCommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         message.getChannel().sendMessageEmbeds(

@@ -26,6 +26,12 @@ import java.util.function.Function;
 
 // TODO: Make this better?
 public class Arguments {
+    private static final Arguments EMPTY = new Arguments(new String[0]);
+
+    public static Arguments empty() {
+        return EMPTY;
+    }
+
     public static Arguments of(String... args) {
         return new Arguments(args);
     }

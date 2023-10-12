@@ -24,6 +24,7 @@ package org.mangorage.mangobot.guilds.global;
 
 import org.mangorage.mangobot.core.Constants;
 import org.mangorage.mangobot.modules.basic.commands.PingCommand;
+import org.mangorage.mangobot.modules.basic.commands.PingSlashCommand;
 import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
 import org.mangorage.mangobot.modules.developer.KickBotCommand;
 import org.mangorage.mangobot.modules.developer.SpeakCommand;
@@ -41,21 +42,23 @@ import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 public class Commands {
 
     static {
-        CommandRegistry.addCommand(new TrickCommand());
-        CommandRegistry.addCommand(new ModMailCommand());
-        CommandRegistry.addCommand(new PrefixCommand());
-        CommandRegistry.addCommand(new PingCommand());
-        CommandRegistry.addCommand(new SpeakCommand());
-        CommandRegistry.addCommand(new KickBotCommand());
-        CommandRegistry.addCommand(new TerminateCommand());
+        CommandRegistry.addBasicCommand(new TrickCommand());
+        CommandRegistry.addBasicCommand(new ModMailCommand());
+        CommandRegistry.addBasicCommand(new PrefixCommand());
+        CommandRegistry.addBasicCommand(new PingCommand());
+        CommandRegistry.addBasicCommand(new SpeakCommand());
+        CommandRegistry.addBasicCommand(new KickBotCommand());
+        CommandRegistry.addBasicCommand(new TerminateCommand());
+
+        CommandRegistry.addSlashCommand(new PingSlashCommand());
 
         if (Constants.USE_MUSIC) {
-            CommandRegistry.addCommand(new PlayCommand());
-            CommandRegistry.addCommand(new StopCommand());
-            CommandRegistry.addCommand(new QueueCommand());
-            CommandRegistry.addCommand(new PauseCommand());
-            CommandRegistry.addCommand(new VolumeCommand());
-            CommandRegistry.addCommand(new PlayingCommand());
+            CommandRegistry.addBasicCommand(new PlayCommand());
+            CommandRegistry.addBasicCommand(new StopCommand());
+            CommandRegistry.addBasicCommand(new QueueCommand());
+            CommandRegistry.addBasicCommand(new PauseCommand());
+            CommandRegistry.addBasicCommand(new VolumeCommand());
+            CommandRegistry.addBasicCommand(new PlayingCommand());
         }
     }
 
