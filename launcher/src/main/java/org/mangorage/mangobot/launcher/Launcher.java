@@ -67,12 +67,14 @@ public class Launcher {
     }
 
     public static void startBot(String version) {
-        System.out.println("Starting bot now...");
+        System.out.println("Starting bot now... Version: %s".formatted(version));
 
         ProcessBuilder pb = new ProcessBuilder("java", "-jar", "mangobot.jar");
         pb.directory(new File("bot/"));
+        pb.redirectOutput(new File("botdata/bot.log"));
         try {
             Process p = pb.start();
+            System.out.println("Bot Started! PID: %s".formatted(p.pid()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

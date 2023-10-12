@@ -39,6 +39,8 @@ test {
 }
 
 jar {
+    dependsOn(shadowJar)
+
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
