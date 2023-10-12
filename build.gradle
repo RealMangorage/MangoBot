@@ -13,12 +13,19 @@ buildscript {
     }
 }
 
+
+def getVersionCode = {
+    def proc = 'git rev-list --count master'.execute()
+    proc.waitFor()
+    return proc.text.trim()
+}
+
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
-
+apply plugin: 'maven-publish'
 
 group 'org.mangorage'
-version "${BOT_VERSION}"
+version "${BOT_VERSION}-c" + getVersionCode()
 
 java {
     toolchain {
@@ -46,6 +53,8 @@ sourceSets {
         }
     }
 }
+
+print(getVersionCode() + " version")
 
 dependencies {
     // Libs for Bot
@@ -109,5 +118,41 @@ jar {
 
     manifest {
         attributes 'Main-Class': 'org.mangorage.mangobot.Main'
+    }
+}
+
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact shadowJar
+            pom {
+                name = 'MangoBot'
+                description = 'A discord bot used for many servers'
+                url = 'https://github.com/RealMangorage/MangoBot/'
+                issueManagement {
+                    system = 'github'
+                    url = 'https://github.com/RealMangorage/MangoBot/issues'
+                }
+                developers {
+                    developer {
+                        id = 'mangorage'
+                        name = 'MangoRage'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/releases/io/github/realmangorage/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/io/github/realmangorage/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = findProperty("mango.maven.username")
+                password = findProperty("mango.maven.password")
+            }
+        }
     }
 }

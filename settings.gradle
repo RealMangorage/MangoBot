@@ -1,4 +1,5 @@
 rootProject.name = 'mangobot'
 include 'mangobotapi'
 include 'mboteventbus'
+include 'launcher'
 
