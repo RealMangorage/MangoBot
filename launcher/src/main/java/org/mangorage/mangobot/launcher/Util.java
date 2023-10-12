@@ -24,64 +24,16 @@ package org.mangorage.mangobot.launcher;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Util {
-    private static final String BOT_URL = "https://s01.oss.sonatype.org/content/repositories/releases/io/github/realmangorage/mangobot/{VERSION}/mangobot-{VERSION}-all.jar";
-    private static final String BOT_DIR = "bot/";
     private static final String DATA_DIR = "botdata/";
-
     private static final Gson GSON = new GsonBuilder().create();
 
-    public static String text(String url) {
-        try {
-            BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
-            return IOUtils.toString(new InputStreamReader(in));
-        } catch (IOException e) {
-            // handle exception
-        }
-        return null;
-    }
-
-    public static void downloadBot(String version) {
-        String URL = BOT_URL.replace("{VERSION}", version);
-        System.out.println(URL);
-        createDirs();
-
-        try {
-            FileUtils.copyURLToFile(new URL(URL), new File("%s/mangobot.jar".formatted(BOT_DIR)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-
-    }
-
-    public static boolean createDirs() {
-        File file = new File(BOT_DIR);
-        if (!file.exists())
-            return file.mkdirs();
-        return false;
-    }
-
-    public static boolean deleteOldBot() {
-        File file = new File(BOT_DIR);
-        if (file.exists()) {
-            File bot = new File("%s/mangobot.jar".formatted(BOT_DIR));
-            if (bot.exists())
-                return bot.delete();
-        }
-        return false;
-    }
 
     public static void saveVersion(String version) {
         saveObjectToFile(GSON, new Version(version), DATA_DIR, "version.json");
@@ -95,7 +47,6 @@ public class Util {
             return null;
         return loadJsonToObject(new Gson(), "%s/version.json".formatted(DATA_DIR), Version.class);
     }
-
 
     public static void saveObjectToFile(Gson gson, Object object, String directory, String fileName) {
         try {

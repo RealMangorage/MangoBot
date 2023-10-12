@@ -22,6 +22,8 @@
 
 package org.mangorage.mangobotapi.core.registry;
 
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.commands.ISlashCommand;
 import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
@@ -51,6 +53,10 @@ public class CommandRegistry {
     }
 
     public static void addSlashCommand(ISlashCommand command) {
+        var updateAction = MangoBotAPI.getInstance().getJDA().updateCommands();
+        var commandData = Commands.slash(command.commandId(), command.getDescription());
+        command.registerSubCommands(commandData);
+        updateAction.addCommands(commandData).queue();
         SLASH_COMMAND_EVENT.addListener(command.getListener());
     }
 

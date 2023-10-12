@@ -31,9 +31,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.mangobot.guilds.forge.ForgePermissions;
-import org.mangorage.mangobot.guilds.global.Commands;
+import org.mangorage.mangobot.guilds.global.BotCommands;
 import org.mangorage.mangobot.guilds.global.GlobalPermissions;
-import org.mangorage.mangobot.guilds.global.GlobalSlashCommands;
 import org.mangorage.mangobot.modules.modmail.ModMailHandler;
 import org.mangorage.mangobot.modules.requestpaste.PasteRequestModule;
 import org.mangorage.mangobotapi.MangoBotAPI;
@@ -174,7 +173,6 @@ public class Bot {
 
                 ModMailHandler.register(bus);
                 PasteRequestModule.register(bus);
-                GlobalSlashCommands.init();
             });
         }
 
@@ -184,7 +182,7 @@ public class Bot {
     public void onStartup(StartupEvent event) {
         switch (event.phase()) {
             case STARTUP -> {
-                Commands.init();
+                BotCommands.init();
 
                 GlobalPermissions.init();
                 ForgePermissions.init();

@@ -26,43 +26,50 @@ import java.io.File;
 import java.io.IOException;
 
 public class Launcher {
-    public static final String METADATA = "https://s01.oss.sonatype.org/content/repositories/releases/io/github/realmangorage/mangobot/maven-metadata.xml";
-
+    public static final Maven MAVEN = new Maven(
+            "https://s01.oss.sonatype.org/content/repositories/releases",
+            "io.github.realmangorage",
+            "mangobot"
+    );
 
     public static void main(String[] args) {
         System.out.println("Checking for Updates...");
-        String[] metadata = Util.text(METADATA).split("/n");
 
-        String version = null;
-        for (String line : metadata) {
-            if (line.contains("<version>")) {
-                version = line.substring(line.indexOf("<version>") + 9, line.indexOf("</version>"));
-                break;
-            }
+        File dest = new File("bot/mangobot.jar");
+        File parent = dest.getParentFile();
+        if (!parent.exists() && !parent.mkdirs()) {
+            System.out.println("Unable to create directories for bot jar...");
+            return;
         }
 
-        if (version != null) {
-            System.out.println("Found latest Version: " + version);
-            // Handle check for updates...
-            Version currentVersion = Util.getVersion();
-            if (currentVersion == null) {
-                System.out.println("No current version found, downloading latest version...");
-                Util.downloadBot(version);
-                Util.saveVersion(version);
-                startBot(version);
-            } else {
-                if (currentVersion.verison().equals(version)) {
-                    System.out.println("No updates found, starting bot...");
-                    startBot(version);
-                } else {
-                    System.out.println("Found new version, downloading...");
-                    Util.downloadBot(version);
+        String metadata = MAVEN.downloadMetadata();
+        if (metadata != null) {
+            String version = Maven.parseVersion(metadata);
+
+            if (version != null) {
+                System.out.println("Found latest Version: " + version);
+                // Handle check for updates...
+                Version currentVersion = Util.getVersion();
+                if (currentVersion == null) {
+                    System.out.println("No current version found, downloading latest version...");
+                    MAVEN.downloadTo(version, dest);
                     Util.saveVersion(version);
-                    startBot(version);
+                } else {
+                    if (currentVersion.verison().equals(version)) {
+                        System.out.println("No updates found, starting bot...");
+                    } else {
+                        System.out.println("Found new version, downloading...");
+                        MAVEN.downloadTo(version, dest);
+                        Util.saveVersion(version);
+                    }
                 }
             }
+        }
+        var version = Util.getVersion();
+        if (version != null) {
+            startBot(version.verison());
         } else {
-            System.out.println("Unable to start Bot. No Version Found...");
+            System.out.println("Unable to find Bot jar...");
         }
     }
 

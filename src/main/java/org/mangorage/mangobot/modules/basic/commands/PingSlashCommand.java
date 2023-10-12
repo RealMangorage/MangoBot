@@ -49,4 +49,9 @@ public class PingSlashCommand implements ISlashCommand {
     public String commandId() {
         return "ping";
     }
+
+    @Override
+    public String getDescription() {
+        return "Pings the bot!";
+    }
 }

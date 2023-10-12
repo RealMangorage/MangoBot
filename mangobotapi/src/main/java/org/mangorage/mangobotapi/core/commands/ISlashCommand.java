@@ -23,6 +23,7 @@
 package org.mangorage.mangobotapi.core.commands;
 
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.mangorage.mangobotapi.core.events.SlashCommandEvent;
 import org.mangorage.mboteventbus.impl.IEvent;
 
@@ -47,4 +48,11 @@ public interface ISlashCommand extends ICommand<SlashCommandInteraction, SlashCo
             }
         };
     }
+
+    String getDescription();
+
+    default void registerSubCommands(SlashCommandData command) {
+    }
+
+    ;
 }

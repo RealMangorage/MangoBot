@@ -39,7 +39,7 @@ import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
-public class Commands {
+public class BotCommands {
 
     static {
         CommandRegistry.addBasicCommand(new TrickCommand());

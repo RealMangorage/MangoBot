@@ -33,7 +33,7 @@ public class Test {
         var fileNameNoExt = fileName.substring(0, fileName.length() - ext.length());
         System.out.println(fileNameNoExt);
 
-        int pointsPerDay = 46;
+        int pointsPerDay = 200;
         int pointsPerDollar = 100 / 5;
         int days = 30;
 
