@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.mangorage.mangobot.core.Bot;
 
 import java.awt.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ModMailInstance {
@@ -209,6 +210,9 @@ public class ModMailInstance {
                     message.addReaction(Emoji.fromUnicode("U+2705")).queue();
                 });
 
+            if (!message.getAttachments().isEmpty() && PRIVATE_CHANNEL != null)
+                sendAttachments(PRIVATE_CHANNEL, message.getAttachments());
+
         });
     }
 
@@ -233,6 +237,29 @@ public class ModMailInstance {
 
         messageData.queue(after -> {
             message.addReaction(Emoji.fromUnicode("U+2705")).queue();
+        });
+
+        if (!message.getAttachments().isEmpty())
+            sendAttachments(channel, message.getAttachments());
+    }
+
+    public void sendAttachments(TextChannel channel, List<Message.Attachment> attachmentList) {
+        attachmentList.forEach(attachment -> {
+            if (attachment.isImage()) {
+                channel.sendMessage(attachment.getUrl()).queue();
+            } else {
+                channel.sendMessage("Attachment: %s".formatted(attachment.getFileName())).queue();
+            }
+        });
+    }
+
+    public void sendAttachments(PrivateChannel channel, List<Message.Attachment> attachmentList) {
+        attachmentList.forEach(attachment -> {
+            if (attachment.isImage()) {
+                channel.sendMessage(attachment.getUrl()).queue();
+            } else {
+                channel.sendMessage("Attachment: %s".formatted(attachment.getFileName())).queue();
+            }
         });
     }
 
