@@ -45,6 +45,7 @@ import java.time.temporal.TemporalAccessor;
 
 public class Util {
 
+    private static final boolean verbose = false;
     private static final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public static TemporalAccessor getTimestamp(ISnowflake iSnowflake) {
@@ -79,7 +80,7 @@ public class Util {
                         """.formatted(commandEvent.getException().getMessage()))).queue();
             } else if (commandEvent.isHandled()) {
                 commandEvent.getCommandResult().accept(message);
-            } else {
+            } else if (verbose) {
                 Bot.DEFAULT_SETTINGS.apply(message.reply("Invalid Command")).queue();
             }
 
