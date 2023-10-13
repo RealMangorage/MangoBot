@@ -53,6 +53,4 @@ public interface ISlashCommand extends ICommand<SlashCommandInteraction, SlashCo
 
     default void registerSubCommands(SlashCommandData command) {
     }
-
-    ;
 }

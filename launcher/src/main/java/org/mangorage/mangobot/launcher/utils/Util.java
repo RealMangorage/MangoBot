@@ -20,10 +20,11 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.launcher;
+package org.mangorage.mangobot.launcher.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.mangorage.mangobot.launcher.data.Version;
 
 import java.io.File;
 import java.io.IOException;

@@ -27,6 +27,7 @@ import org.mangorage.mangobot.core.BotSettings;
 import org.mangorage.mangobotapi.core.util.APIUtil;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.Console;
 
 
@@ -55,6 +56,12 @@ public class Main {
             message = "Re-Enter your Bot Token";
         } else {
             System.out.println("Please enter your Discord Bot's Token:");
+        }
+
+        if (GraphicsEnvironment.isHeadless()) {
+            BotSettings.BOT_TOKEN.set("empty");
+            System.out.println("Manually set the token under botresources/.env");
+            System.exit(0);
         }
 
 

@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.launcher;
+package org.mangorage.mangobot.launcher.data;
 
-public record Version(String verison) {
+public record FTPSettings(String host, int port, String username, String password) {
 }

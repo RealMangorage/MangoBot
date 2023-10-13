@@ -22,6 +22,10 @@
 
 package org.mangorage.mangobot.launcher;
 
+import org.mangorage.mangobot.launcher.data.Maven;
+import org.mangorage.mangobot.launcher.data.Version;
+import org.mangorage.mangobot.launcher.utils.Util;
+
 import java.io.File;
 import java.io.IOException;
 

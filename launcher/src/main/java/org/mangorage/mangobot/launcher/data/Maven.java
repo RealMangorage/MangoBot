@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.launcher;
+package org.mangorage.mangobot.launcher.data;
 
 
 import org.apache.commons.io.FileUtils;
