@@ -29,9 +29,10 @@ dependencies {
 
     implementation("commons-io:commons-io:2.14.0")
     implementation("com.google.code.gson:gson:$GSON_VERSION")
-    implementation 'com.github.mwiede:jsch:0.2.0'
+
     implementation 'commons-net:commons-net:3.10.0'
 
+    shadow('commons-net:commons-net:3.10.0')
     shadow("commons-io:commons-io:2.14.0")
     shadow("com.google.code.gson:gson:$GSON_VERSION")
 }
