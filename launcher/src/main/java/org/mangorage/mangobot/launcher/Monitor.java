@@ -20,21 +20,23 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.developer;
+package org.mangorage.mangobot.launcher;
 
-import org.mangorage.mangobot.modules.basic.commands.ReplyCommand;
+import java.io.IOException;
 
-public class SpeakCommand extends ReplyCommand {
+public class Monitor implements Runnable {
+    private final Process process;
 
-    public SpeakCommand() {
-        super("I have Spoken! Which means I am working as intended.");
+    public Monitor(ProcessBuilder pb) {
+        try {
+            this.process = pb.start();
+            this.run();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    /**
-     * @return
-     */
     @Override
-    public String commandId() {
-        return "speak";
+    public void run() {
     }
 }

@@ -40,10 +40,10 @@ public class TerminateCommand implements IBasicCommand {
             TaskScheduler.getExecutor().schedule(() -> {
                 System.exit(0);
             }, 5, TimeUnit.SECONDS);
+            return CommandResult.PASS;
         } else {
             return CommandResult.DEVELOPERS_ONLY;
         }
-        return CommandResult.DEVELOPERS_ONLY;
     }
 
     /**

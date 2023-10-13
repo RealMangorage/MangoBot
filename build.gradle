@@ -24,7 +24,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
-group 'org.mangorage'
+group 'org.mangorage-c' + getVersionCode()
 version "${BOT_VERSION}"
 
 java {

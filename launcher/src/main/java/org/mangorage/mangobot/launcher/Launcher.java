@@ -27,7 +27,6 @@ import org.mangorage.mangobot.launcher.data.Version;
 import org.mangorage.mangobot.launcher.utils.Util;
 
 import java.io.File;
-import java.io.IOException;
 
 public class Launcher {
     public static final Maven MAVEN = new Maven(
@@ -69,9 +68,10 @@ public class Launcher {
                 }
             }
         }
+
         var version = Util.getVersion();
         if (version != null) {
-            startBot(version.verison());
+            // startBot(version.verison());
         } else {
             System.out.println("Unable to find Bot jar...");
         }
@@ -83,11 +83,7 @@ public class Launcher {
         ProcessBuilder pb = new ProcessBuilder("java", "-jar", "mangobot.jar");
         pb.directory(new File("bot/"));
         pb.redirectOutput(new File("botdata/bot.log"));
-        try {
-            Process p = pb.start();
-            System.out.println("Bot Started! PID: %s".formatted(p.pid()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        new Monitor(pb);
     }
+
 }
