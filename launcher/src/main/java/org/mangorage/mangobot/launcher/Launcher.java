@@ -71,7 +71,7 @@ public class Launcher {
 
         var version = Util.getVersion();
         if (version != null) {
-            // startBot(version.verison());
+            //startBot(version.verison());
         } else {
             System.out.println("Unable to find Bot jar...");
         }

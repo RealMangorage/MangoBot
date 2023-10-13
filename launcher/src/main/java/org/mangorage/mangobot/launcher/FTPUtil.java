@@ -33,7 +33,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class DownloadFromPebble {
+public class FTPUtil {
     private static final Gson GSON = new GsonBuilder().create();
     private static final String DATA_FOLDER = "/data";
     private static final String RESOURCES_FOLDER = "/botresources";

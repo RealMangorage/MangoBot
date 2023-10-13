@@ -23,14 +23,18 @@
 package org.mangorage.mangobot.launcher;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
-public class Monitor implements Runnable {
+public class Monitor extends Thread {
     private final Process process;
 
     public Monitor(ProcessBuilder pb) {
         try {
             this.process = pb.start();
-            this.run();
+            var os = process.getOutputStream();
+            System.setOut(new PrintStream(os, true, StandardCharsets.UTF_8));
+            this.start();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -38,5 +42,13 @@ public class Monitor implements Runnable {
 
     @Override
     public void run() {
+        while (process.isAlive()) {
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        System.out.println("Process has ended!");
     }
 }
