@@ -61,11 +61,11 @@ public record Maven(String repository, String groupId, String artifactId) {
         return null;
     }
 
-    public static String parseVersion(String metadata) {
+    public static String parseLatestVersion(String metadata) {
         String[] lines = metadata.split("\n");
         for (String line : lines) {
-            if (line.contains("<version>")) {
-                return line.substring(line.indexOf("<version>") + 9, line.indexOf("</version>"));
+            if (line.contains("<latest>")) {
+                return line.substring(line.indexOf("<latest>") + 8, line.indexOf("</latest>"));
             }
         }
         return null;

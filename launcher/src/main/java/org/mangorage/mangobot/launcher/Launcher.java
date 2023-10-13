@@ -47,7 +47,7 @@ public class Launcher {
 
         String metadata = MAVEN.downloadMetadata();
         if (metadata != null) {
-            String version = Maven.parseVersion(metadata);
+            String version = Maven.parseLatestVersion(metadata);
 
             if (version != null) {
                 System.out.println("Found latest Version: " + version);
