@@ -24,46 +24,44 @@ package org.mangorage.mangobot.modules.developer;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
-import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
+import org.mangorage.mangobotapi.core.util.TaskScheduler;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-public class KickBotCommand implements IBasicCommand {
+// TODO: Make it so that it restarts in 60 second intervals, cooldown of 60 seconds from last restart is needed.
+// TODO: To prevent the server from thinking the bot cant be restarted. When it can indeed be restarted.
+public class RestartCommand implements IBasicCommand {
     private static final List<String> USERS = List.of("194596094200643584");
 
 
-    /**
-     * @param message
-     * @param args
-     * @return
-     */
     @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
-        var guildID = args.get(0);
-        if (guildID.isBlank()) {
-            message.reply("Usage: !kickBot <guildID>").queue();
-            return CommandResult.PASS;
-        }
-
-        var guild = Bot.getJDAInstance().getGuildById(guildID);
-        if (guild == null) {
-            message.reply("Guild not found").queue();
-            return CommandResult.PASS;
-        }
-        message.reply("Kicked myself from guild: " + guild.getName()).queue();
-        guild.leave().queue();
+        message.reply("Restarting...").queue(after -> {
+            message.getChannel().sendMessage("Terminating Bot in 5 seconds...").queue();
+            TaskScheduler.getExecutor().schedule(() -> {
+                System.exit(0);
+            }, 5, TimeUnit.SECONDS);
+        });
         return CommandResult.PASS;
     }
 
 
     @Override
     public String commandId() {
-        return "kickBot";
+        return "restart";
     }
+
+
+    @Override
+    public String description() {
+        return "Restarts the bot";
+    }
+
 
     @Override
     public List<String> allowedUsers() {

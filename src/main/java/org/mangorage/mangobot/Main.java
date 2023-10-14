@@ -23,7 +23,7 @@
 package org.mangorage.mangobot;
 
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.core.BotSettings;
+import org.mangorage.mangobot.core.util.BotSettings;
 import org.mangorage.mangobotapi.core.util.APIUtil;
 
 import javax.swing.*;

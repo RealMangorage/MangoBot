@@ -29,10 +29,11 @@ import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.util.TaskScheduler;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class TerminateCommand implements IBasicCommand {
-
+    private static final List<String> USERS = List.of("194596094200643584");
 
     @NotNull
     @Override
@@ -48,13 +49,15 @@ public class TerminateCommand implements IBasicCommand {
         }
     }
 
-    /**
-     * @return
-     */
+
     @Override
     public String commandId() {
         return "terminate";
     }
 
 
+    @Override
+    public List<String> allowedUsers() {
+        return USERS;
+    }
 }

@@ -33,7 +33,7 @@ import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 
 import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
-import static org.mangorage.mangobot.guilds.global.GlobalPermissions.PREFIX_ADMIN;
+import static org.mangorage.mangobot.core.config.GlobalPermissions.PREFIX_ADMIN;
 
 public class PrefixCommand implements IBasicCommand {
     @NotNull

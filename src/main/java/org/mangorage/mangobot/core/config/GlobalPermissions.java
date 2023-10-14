@@ -20,9 +20,28 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.core;
+package org.mangorage.mangobot.core.config;
 
-public class Constants {
-    public static final String STARTUP_MESSAGE = "Starting up bot!";
-    public static final boolean USE_MUSIC = true;
+import net.dv8tion.jda.api.Permission;
+import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
+import org.mangorage.mangobotapi.core.registry.UserPermission;
+
+public class GlobalPermissions {
+    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.global();
+
+    public static final UserPermission.Node PLAYING = UserPermission.Node.of("playing");
+    public static final UserPermission.Node TRICK_ADMIN = UserPermission.Node.of("trickadmin");
+    public static final UserPermission.Node PREFIX_ADMIN = UserPermission.Node.of("prefix");
+    public static final UserPermission.Node MOD_MAIL = UserPermission.Node.of("mod_mail");
+
+
+    static {
+        PERMISSIONS.register(PLAYING, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(TRICK_ADMIN, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(PREFIX_ADMIN, Permission.ADMINISTRATOR);
+        PERMISSIONS.register(MOD_MAIL, Permission.ADMINISTRATOR);
+    }
+
+    public static void init() {
+    }
 }

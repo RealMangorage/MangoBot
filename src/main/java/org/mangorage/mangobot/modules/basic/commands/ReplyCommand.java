@@ -32,22 +32,12 @@ import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
 
 public abstract class ReplyCommand implements IBasicCommand {
     private final String MESSAGE_RESPONSE;
-    private final boolean supress;
-    private boolean notifications;
 
-    public ReplyCommand(String message, boolean supress) {
-        this.MESSAGE_RESPONSE = message;
-        this.supress = supress;
-    }
 
     public ReplyCommand(String message) {
-        this(message, true);
+        this.MESSAGE_RESPONSE = message;
     }
 
-    public ReplyCommand notifications(boolean value) {
-        this.notifications = !value;
-        return this;
-    }
 
     public String getMessage() {
         return MESSAGE_RESPONSE;

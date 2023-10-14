@@ -20,9 +20,9 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.guilds.global;
+package org.mangorage.mangobot.core.config;
 
-import org.mangorage.mangobot.core.Constants;
+import org.mangorage.mangobot.core.util.Constants;
 import org.mangorage.mangobot.modules.basic.commands.HelpCommand;
 import org.mangorage.mangobot.modules.basic.commands.InfoCommand;
 import org.mangorage.mangobot.modules.basic.commands.PingCommand;
@@ -30,6 +30,7 @@ import org.mangorage.mangobot.modules.basic.commands.PingSlashCommand;
 import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
 import org.mangorage.mangobot.modules.basic.commands.VersionCommand;
 import org.mangorage.mangobot.modules.developer.KickBotCommand;
+import org.mangorage.mangobot.modules.developer.RestartCommand;
 import org.mangorage.mangobot.modules.developer.SpeakCommand;
 import org.mangorage.mangobot.modules.developer.TerminateCommand;
 import org.mangorage.mangobot.modules.modmail.commands.ModMailCommand;
@@ -45,15 +46,19 @@ import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 public class BotCommands {
 
     static {
+        // Commands for the bot for general use
         CommandRegistry.addBasicCommand(new HelpCommand());
         CommandRegistry.addBasicCommand(new InfoCommand());
         CommandRegistry.addBasicCommand(new VersionCommand());
 
+        // Developer commands, speak is public.
         CommandRegistry.addBasicCommand(new SpeakCommand());
         CommandRegistry.addBasicCommand(new KickBotCommand());
         CommandRegistry.addBasicCommand(new TerminateCommand());
-        CommandRegistry.addSlashCommand(new PingSlashCommand());
+        CommandRegistry.addBasicCommand(new RestartCommand());
 
+        // Commands for modules
+        CommandRegistry.addSlashCommand(new PingSlashCommand());
         CommandRegistry.addBasicCommand(new TrickCommand());
         CommandRegistry.addBasicCommand(new ModMailCommand());
         CommandRegistry.addBasicCommand(new PrefixCommand());

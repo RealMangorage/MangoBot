@@ -28,7 +28,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobot.core.Bot;
-import org.mangorage.mangobot.guilds.global.GlobalPermissions;
+import org.mangorage.mangobot.core.config.GlobalPermissions;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;

@@ -30,9 +30,9 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.mangorage.mangobot.guilds.forge.ForgePermissions;
-import org.mangorage.mangobot.guilds.global.BotCommands;
-import org.mangorage.mangobot.guilds.global.GlobalPermissions;
+import org.mangorage.mangobot.core.config.BotCommands;
+import org.mangorage.mangobot.core.config.ForgePermissions;
+import org.mangorage.mangobot.core.config.GlobalPermissions;
 import org.mangorage.mangobot.modules.modmail.ModMailHandler;
 import org.mangorage.mangobot.modules.requestpaste.PasteRequestModule;
 import org.mangorage.mangobotapi.MangoBotAPI;
@@ -47,7 +47,7 @@ import org.mangorage.mboteventbus.EventBus;
 import java.util.EnumSet;
 import java.util.function.Consumer;
 
-import static org.mangorage.mangobot.core.Constants.STARTUP_MESSAGE;
+import static org.mangorage.mangobot.core.util.Constants.STARTUP_MESSAGE;
 
 public class Bot {
     private static final LockableReference<Bot> BOT_INSTANCE = new LockableReference<>();

@@ -20,25 +20,14 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.guilds.forge;
+package org.mangorage.mangobot.core.util;
 
-import org.mangorage.mangobot.guilds.global.GlobalPermissions;
-import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
-import org.mangorage.mangobotapi.core.registry.UserPermission;
+import org.mangorage.mangobotapi.core.config.Config;
+import org.mangorage.mangobotapi.core.config.ConfigSetting;
+import org.mangorage.mangobotapi.core.config.ISetting;
 
-public class ForgePermissions {
-    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.guild("1129059589325852724");
-
-
-    static {
-        // Admin Role
-        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1129067881842360381"));
-        // Moderators Role
-        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1129070272302022656"));
-        // Mango Bot Tester Role
-        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1150880910745538631"));
-    }
-
-    public static void init() {
-    }
+public class BotSettings {
+    private final static Config CONFIG = new Config("botresources/", ".env");
+    public static final ISetting<String> BOT_TOKEN = ConfigSetting.create(CONFIG, "BOT_TOKEN", "empty");
+    public static final ISetting<String> PASTE_TOKEN = ConfigSetting.create(CONFIG, "PASTE_TOKEN", "empty");
 }

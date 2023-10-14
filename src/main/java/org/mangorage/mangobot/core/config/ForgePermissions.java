@@ -20,26 +20,22 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.guilds.global;
+package org.mangorage.mangobot.core.config;
 
-import net.dv8tion.jda.api.Permission;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.registry.UserPermission;
 
-public class GlobalPermissions {
-    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.global();
-
-    public static final UserPermission.Node PLAYING = UserPermission.Node.of("playing");
-    public static final UserPermission.Node TRICK_ADMIN = UserPermission.Node.of("trickadmin");
-    public static final UserPermission.Node PREFIX_ADMIN = UserPermission.Node.of("prefix");
-    public static final UserPermission.Node MOD_MAIL = UserPermission.Node.of("mod_mail");
+public class ForgePermissions {
+    public static final PermissionRegistry PERMISSIONS = PermissionRegistry.guild("1129059589325852724");
 
 
     static {
-        PERMISSIONS.register(PLAYING, Permission.ADMINISTRATOR);
-        PERMISSIONS.register(TRICK_ADMIN, Permission.ADMINISTRATOR);
-        PERMISSIONS.register(PREFIX_ADMIN, Permission.ADMINISTRATOR);
-        PERMISSIONS.register(MOD_MAIL, Permission.ADMINISTRATOR);
+        // Admin Role
+        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1129067881842360381"));
+        // Moderators Role
+        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1129070272302022656"));
+        // Mango Bot Tester Role
+        PERMISSIONS.register(GlobalPermissions.TRICK_ADMIN, UserPermission.of("1150880910745538631"));
     }
 
     public static void init() {

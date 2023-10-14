@@ -30,9 +30,7 @@ public class SpeakCommand extends ReplyCommand {
         super("I have Spoken! Which means I am working as intended.");
     }
 
-    /**
-     * @return
-     */
+
     @Override
     public String commandId() {
         return "speak";
