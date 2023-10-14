@@ -28,6 +28,7 @@ import org.mangorage.mangobot.modules.basic.commands.InfoCommand;
 import org.mangorage.mangobot.modules.basic.commands.PingCommand;
 import org.mangorage.mangobot.modules.basic.commands.PingSlashCommand;
 import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
+import org.mangorage.mangobot.modules.basic.commands.VersionCommand;
 import org.mangorage.mangobot.modules.developer.KickBotCommand;
 import org.mangorage.mangobot.modules.developer.SpeakCommand;
 import org.mangorage.mangobot.modules.developer.TerminateCommand;
@@ -46,15 +47,18 @@ public class BotCommands {
     static {
         CommandRegistry.addBasicCommand(new HelpCommand());
         CommandRegistry.addBasicCommand(new InfoCommand());
+        CommandRegistry.addBasicCommand(new VersionCommand());
+
+        CommandRegistry.addBasicCommand(new SpeakCommand());
+        CommandRegistry.addBasicCommand(new KickBotCommand());
+        CommandRegistry.addBasicCommand(new TerminateCommand());
+        CommandRegistry.addSlashCommand(new PingSlashCommand());
+
         CommandRegistry.addBasicCommand(new TrickCommand());
         CommandRegistry.addBasicCommand(new ModMailCommand());
         CommandRegistry.addBasicCommand(new PrefixCommand());
         CommandRegistry.addBasicCommand(new PingCommand());
-        CommandRegistry.addBasicCommand(new SpeakCommand());
-        CommandRegistry.addBasicCommand(new KickBotCommand());
-        CommandRegistry.addBasicCommand(new TerminateCommand());
 
-        CommandRegistry.addSlashCommand(new PingSlashCommand());
 
         if (Constants.USE_MUSIC) {
             CommandRegistry.addBasicCommand(new PlayCommand());

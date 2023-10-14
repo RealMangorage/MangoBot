@@ -58,7 +58,7 @@ public class Launcher {
                     MAVEN.downloadTo(version, dest);
                     Util.saveVersion(version);
                 } else {
-                    if (currentVersion.verison().equals(version)) {
+                    if (currentVersion.version().equals(version)) {
                         System.out.println("No updates found, starting bot...");
                     } else {
                         System.out.println("Found new version, downloading...");
@@ -71,7 +71,7 @@ public class Launcher {
 
         var version = Util.getVersion();
         if (version != null) {
-            //startBot(version.verison());
+            //startBot(version.version());
         } else {
             System.out.println("Unable to find Bot jar...");
         }

@@ -22,48 +22,56 @@
 
 package org.mangorage.mangobot.modules.basic.commands;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
+import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
+import org.mangorage.mangobotapi.core.data.DataHandler;
 
-import java.awt.*;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class PingCommand implements IBasicCommand {
+public class VersionCommand implements IBasicCommand {
+    public record Version(String version) {
+    }
+
+    private static final AtomicReference<Version> VERSION = new AtomicReference<>();
+    private static final DataHandler<Version> VERSION_DATA_HANDLER = DataHandler.create(
+            VERSION::set,
+            Version.class,
+            "botdata/",
+            DataHandler.Properties.create()
+                    .setFileName("version.json")
+                    .useDefaultFileNamePredicate()
+    );
+
+    static {
+        VERSION_DATA_HANDLER.loadAll();
+    }
+
+
     @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
-        message.getChannel().sendMessageEmbeds(
-                new EmbedBuilder()
-                        .setTitle("Please disable pings when replying to others")
-                        .setImage("https://images-ext-2.discordapp.net/external/nUYuix4co3xyLw0ZFtBh5r2uxogGjmgr-4OTPW4cl8I/https/i.imgur.com/7YCb3AN.png")
-                        .setColor(Color.WHITE)
-                        .setDescription("""
-                                So you don't accidentally break a rule or annoy others, make sure to turn off pings when replying to others. Discord currently turns this on every time you start a reply, so please be vigilant. Thank you.
-                                                                
-                                Go vote on [Discord Feedback](https://support.discord.com/hc/en-us/community/posts/360052518273-Replies-remember-setting) so they make changes.
-                                """)
-                        .build()).queue();
-
+        var settings = Bot.DEFAULT_SETTINGS;
+        settings.apply(message.reply("Bot is running on Version: " + VERSION.get().version())).queue();
         return CommandResult.PASS;
     }
 
-
+    /**
+     * @return
+     */
     @Override
     public String commandId() {
-        return "ping";
+        return "version";
     }
 
-
-    @Override
-    public String usage() {
-        return "!ping";
-    }
-
+    /**
+     * @return
+     */
     @Override
     public String description() {
-        return "Message about how to disable pings when replying to others";
+        return "Tells you what version the bot is running on.";
     }
 }

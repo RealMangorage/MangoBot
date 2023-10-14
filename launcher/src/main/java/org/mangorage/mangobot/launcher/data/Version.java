@@ -22,5 +22,5 @@
 
 package org.mangorage.mangobot.launcher.data;
 
-public record Version(String verison) {
+public record Version(String version) {
 }
