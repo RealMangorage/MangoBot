@@ -23,6 +23,7 @@
 package org.mangorage.mangobot.modules.developer;
 
 import net.dv8tion.jda.api.entities.Message;
+import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
@@ -34,6 +35,7 @@ public class KickBotCommand implements IBasicCommand {
      * @param args
      * @return
      */
+    @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
         if (message.getAuthor().getId().equals("194596094200643584")) {

@@ -32,8 +32,11 @@ import org.mangorage.mangobotapi.core.events.SlashCommandEvent;
 import org.mangorage.mboteventbus.base.EventHolder;
 import org.mangorage.mboteventbus.impl.IEventListener;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class CommandRegistry {
     private static final EventHolder<BasicCommandEvent> BASIC_COMMAND_EVENT = EventHolder.create(
             BasicCommandEvent.class,
@@ -75,12 +78,23 @@ public class CommandRegistry {
         SLASH_COMMAND_EVENT.post(event);
     }
 
-    public static String getUsage(String commandId) {
+    public static ICommand getCommand(String commandId) {
         for (ICommand<?, ?> command : COMMANDS) {
-            if (command.commandId().equals(commandId)) {
-                return command.usage();
+            if (command.isValidCommand(commandId)) {
+                return command;
             }
         }
-        return "";
+        return null;
+    }
+
+    public static String getUsage(String commandId) {
+        var cmd = getCommand(commandId);
+        return cmd != null ? cmd.usage() : null;
+    }
+
+
+    public static List<String> getAliases(String commandId) {
+        var cmd = getCommand(commandId);
+        return cmd != null ? cmd.commandAliases() : List.of();
     }
 }

@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.guilds.global.GlobalPermissions;
 import org.mangorage.mangobotapi.core.commands.Arguments;
@@ -107,6 +108,7 @@ public class TrickCommand implements IBasicCommand {
     }
 
 
+    @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
         MessageSettings dMessage = Bot.DEFAULT_SETTINGS;
@@ -216,7 +218,7 @@ public class TrickCommand implements IBasicCommand {
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
                 Data data = CONTENT.get(guildID).get(id);
                 StringJoiner builder = new StringJoiner("\n");
-                builder.add("Trick Info:");
+                builder.add("Trick InfoCommand:");
                 builder.add("-----------");
                 builder.add("Owner: <@%s>".formatted(data.ownerID()));
                 builder.add("TrickType: %s".formatted(data.trickType()));

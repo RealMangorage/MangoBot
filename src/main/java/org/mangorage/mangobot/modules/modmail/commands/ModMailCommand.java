@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobot.core.Bot;
 import org.mangorage.mangobot.guilds.global.GlobalPermissions;
 import org.mangorage.mangobot.modules.modmail.ModMailHandler;
@@ -36,6 +37,7 @@ import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 public class ModMailCommand implements IBasicCommand {
+    @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
         MessageSettings messageSettings = Bot.DEFAULT_SETTINGS;

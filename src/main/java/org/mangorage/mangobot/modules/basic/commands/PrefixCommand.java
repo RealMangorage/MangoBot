@@ -25,6 +25,7 @@ package org.mangorage.mangobot.modules.basic.commands;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
@@ -35,6 +36,7 @@ import static org.mangorage.mangobot.core.Bot.DEFAULT_SETTINGS;
 import static org.mangorage.mangobot.guilds.global.GlobalPermissions.PREFIX_ADMIN;
 
 public class PrefixCommand implements IBasicCommand {
+    @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
         String prefix = args.getOrDefault(0, "");

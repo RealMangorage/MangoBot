@@ -30,10 +30,12 @@ import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 
-public class HelpCommand implements IBasicCommand {
+import java.util.List;
 
+public class InfoCommand implements IBasicCommand {
 
     @NotNull
+    @SuppressWarnings("unchecked")
     @Override
     public CommandResult execute(Message message, Arguments args) {
         var settings = Bot.DEFAULT_SETTINGS;
@@ -49,18 +51,58 @@ public class HelpCommand implements IBasicCommand {
             return CommandResult.PASS;
         }
 
-        settings.apply(message.reply(command.usage())).queue();
+        StringBuilder result = new StringBuilder();
+
+        List<String> aliases = command.commandAliases();
+        var description = command.description();
+        var usage = command.usage();
+        var isGuildOnly = command.isGuildOnly();
+        var ignoreCase = command.ignoreCase();
+        List<String> allowedGuilds = command.allowedGuilds();
+        List<String> allowedUsers = command.allowedUsers();
+
+        if (!aliases.isEmpty()) {
+            result.append("Aliases: ").append("/n");
+            for (String alias : aliases) {
+                result.append(" -> ").append(alias).append("/n");
+            }
+        }
+
+        if (!description.isEmpty()) {
+            result.append("Description: ").append("/n").append(" -> ").append(description).append("/n");
+        }
+
+        if (!usage.isEmpty()) {
+            result.append("Usage: ").append("/n").append(" -> ").append(usage).append("/n");
+        }
+
+        if (!allowedGuilds.isEmpty()) {
+            result.append("Allowed Guilds: ").append("/n");
+            for (String guild : allowedGuilds) {
+                result.append(" -> ").append(guild).append("/n");
+            }
+        }
+
+        if (!allowedUsers.isEmpty()) {
+            result.append("Allowed Users: ").append("/n");
+            for (String user : allowedUsers) {
+                result.append(" -> ").append(user).append("/n");
+            }
+        }
+
+        result.append("Guild Only: ").append(" -> ").append(isGuildOnly).append("/n");
+        result.append("Ignore Case: ").append(" -> ").append(ignoreCase).append("/n");
+
+        settings.apply(message.reply(result.toString())).queue();
 
         return CommandResult.PASS;
     }
 
+    /**
+     * @return
+     */
     @Override
     public String commandId() {
-        return "help";
-    }
-
-    @Override
-    public String usage() {
-        return "!help <command>";
+        return "info";
     }
 }

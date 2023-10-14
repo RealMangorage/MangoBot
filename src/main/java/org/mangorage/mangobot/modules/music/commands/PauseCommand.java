@@ -28,12 +28,14 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobot.modules.music.MusicPlayer;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 
 public class PauseCommand implements IBasicCommand {
+    @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
         MessageChannelUnion channel = message.getChannel();

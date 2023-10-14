@@ -23,6 +23,7 @@
 package org.mangorage.mangobot.modules.basic.commands;
 
 import net.dv8tion.jda.api.entities.Message;
+import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
@@ -52,6 +53,7 @@ public abstract class ReplyCommand implements IBasicCommand {
         return MESSAGE_RESPONSE;
     }
 
+    @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
         DEFAULT_SETTINGS.apply(message.getChannel().sendMessage(MESSAGE_RESPONSE)).queue();

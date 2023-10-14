@@ -23,6 +23,7 @@
 package org.mangorage.mangobot.modules.basic.commands;
 
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.ISlashCommand;
@@ -31,6 +32,7 @@ import java.time.temporal.ChronoUnit;
 
 public class PingSlashCommand implements ISlashCommand {
 
+    @NotNull
     @Override
     public CommandResult execute(SlashCommandInteraction interaction, Arguments args) {
 

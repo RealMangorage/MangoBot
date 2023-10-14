@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobot.guilds.global.GlobalPermissions;
 import org.mangorage.mangobot.modules.music.MusicPlayer;
 import org.mangorage.mangobot.modules.music.MusicUtil;
@@ -39,6 +40,7 @@ import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.registry.PermissionRegistry;
 
 public class PlayCommand implements IBasicCommand {
+    @NotNull
     @Override
     public CommandResult execute(Message message, Arguments arg) {
         String[] args = arg.getArgs();
