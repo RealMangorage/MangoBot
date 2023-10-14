@@ -105,4 +105,20 @@ public class InfoCommand implements IBasicCommand {
     public String commandId() {
         return "info";
     }
+
+    /**
+     * @return
+     */
+    @Override
+    public String usage() {
+        return "!info <commandId>";
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public String description() {
+        return "Gets info about a command";
+    }
 }
