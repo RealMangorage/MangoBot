@@ -61,6 +61,8 @@ public class InfoCommand implements IBasicCommand {
         List<String> allowedGuilds = command.allowedGuilds();
         List<String> allowedUsers = command.allowedUsers();
 
+        result.append("CommandId: ").append(" -> ").append(command.commandId()).append("\n");
+
         if (!aliases.isEmpty()) {
             result.append("Aliases: ").append("\n");
             for (String alias : aliases) {
