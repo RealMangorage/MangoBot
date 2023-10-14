@@ -62,36 +62,36 @@ public class InfoCommand implements IBasicCommand {
         List<String> allowedUsers = command.allowedUsers();
 
         if (!aliases.isEmpty()) {
-            result.append("Aliases: ").append("/n");
+            result.append("Aliases: ").append("\n");
             for (String alias : aliases) {
-                result.append(" -> ").append(alias).append("/n");
+                result.append(" -> ").append(alias).append("\n");
             }
         }
 
         if (!description.isEmpty()) {
-            result.append("Description: ").append("/n").append(" -> ").append(description).append("/n");
+            result.append("Description: ").append("\n").append(" -> ").append(description).append("\n");
         }
 
         if (!usage.isEmpty()) {
-            result.append("Usage: ").append("/n").append(" -> ").append(usage).append("/n");
+            result.append("Usage: ").append("\n").append(" -> ").append(usage).append("\n");
         }
 
         if (!allowedGuilds.isEmpty()) {
-            result.append("Allowed Guilds: ").append("/n");
+            result.append("Allowed Guilds: ").append("\n");
             for (String guild : allowedGuilds) {
-                result.append(" -> ").append(guild).append("/n");
+                result.append(" -> ").append(guild).append("\n");
             }
         }
 
         if (!allowedUsers.isEmpty()) {
-            result.append("Allowed Users: ").append("/n");
+            result.append("Allowed Users: ").append("\n");
             for (String user : allowedUsers) {
-                result.append(" -> ").append(user).append("/n");
+                result.append(" -> ").append(user).append("\n");
             }
         }
 
-        result.append("Guild Only: ").append(" -> ").append(isGuildOnly).append("/n");
-        result.append("Ignore Case: ").append(" -> ").append(ignoreCase).append("/n");
+        result.append("Guild Only: ").append(" -> ").append(isGuildOnly).append("\n");
+        result.append("Ignore Case: ").append(" -> ").append(ignoreCase).append("\n");
 
         settings.apply(message.reply(result.toString())).queue();
 
