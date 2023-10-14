@@ -67,7 +67,8 @@ public class CommandRegistry {
         command.registerSubCommands(commandData);
         updateAction.addCommands(commandData).queue();
         SLASH_COMMAND_EVENT.addListener(command.getListener());
-        COMMANDS.add(command);
+
+        // COMMANDS.add(command); // Implement this later..., for now just add the basic commands...
     }
 
     public static void postBasicCommand(BasicCommandEvent event) {
