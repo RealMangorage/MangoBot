@@ -49,7 +49,7 @@ public interface ISlashCommand extends ICommand<SlashCommandInteraction, SlashCo
         };
     }
 
-    String getDescription();
+    String description();
 
     default void registerSubCommands(SlashCommandData command) {
     }

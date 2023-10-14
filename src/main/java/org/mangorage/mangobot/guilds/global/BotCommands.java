@@ -23,6 +23,7 @@
 package org.mangorage.mangobot.guilds.global;
 
 import org.mangorage.mangobot.core.Constants;
+import org.mangorage.mangobot.modules.basic.commands.HelpCommand;
 import org.mangorage.mangobot.modules.basic.commands.PingCommand;
 import org.mangorage.mangobot.modules.basic.commands.PingSlashCommand;
 import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
@@ -42,6 +43,7 @@ import org.mangorage.mangobotapi.core.registry.CommandRegistry;
 public class BotCommands {
 
     static {
+        CommandRegistry.addBasicCommand(new HelpCommand());
         CommandRegistry.addBasicCommand(new TrickCommand());
         CommandRegistry.addBasicCommand(new ModMailCommand());
         CommandRegistry.addBasicCommand(new PrefixCommand());

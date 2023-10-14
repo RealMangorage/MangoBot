@@ -25,11 +25,14 @@ package org.mangorage.mangobotapi.core.registry;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.mangorage.mangobotapi.MangoBotAPI;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
+import org.mangorage.mangobotapi.core.commands.ICommand;
 import org.mangorage.mangobotapi.core.commands.ISlashCommand;
 import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
 import org.mangorage.mangobotapi.core.events.SlashCommandEvent;
 import org.mangorage.mboteventbus.base.EventHolder;
 import org.mangorage.mboteventbus.impl.IEventListener;
+
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CommandRegistry {
     private static final EventHolder<BasicCommandEvent> BASIC_COMMAND_EVENT = EventHolder.create(
@@ -48,16 +51,20 @@ public class CommandRegistry {
                 }
             });
 
+    private static final CopyOnWriteArrayList<ICommand<?, ?>> COMMANDS = new CopyOnWriteArrayList<>();
+
     public static void addBasicCommand(IBasicCommand command) {
         BASIC_COMMAND_EVENT.addListener(command.getListener());
+        COMMANDS.add(command);
     }
 
     public static void addSlashCommand(ISlashCommand command) {
         var updateAction = MangoBotAPI.getInstance().getJDA().updateCommands();
-        var commandData = Commands.slash(command.commandId(), command.getDescription());
+        var commandData = Commands.slash(command.commandId(), command.description());
         command.registerSubCommands(commandData);
         updateAction.addCommands(commandData).queue();
         SLASH_COMMAND_EVENT.addListener(command.getListener());
+        COMMANDS.add(command);
     }
 
     public static void postBasicCommand(BasicCommandEvent event) {
@@ -66,5 +73,14 @@ public class CommandRegistry {
 
     public static void postSlashCommand(SlashCommandEvent event) {
         SLASH_COMMAND_EVENT.post(event);
+    }
+
+    public static String getUsage(String commandId) {
+        for (ICommand<?, ?> command : COMMANDS) {
+            if (command.commandId().equals(commandId)) {
+                return command.usage();
+            }
+        }
+        return "";
     }
 }

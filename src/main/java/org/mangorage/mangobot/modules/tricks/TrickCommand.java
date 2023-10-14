@@ -47,10 +47,9 @@ import org.mangorage.mangobotapi.core.util.misc.RunnableTask;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import java.io.File;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +64,7 @@ public class TrickCommand implements IBasicCommand {
         ALIAS
     }
 
-    private static final String SAVE_PATH = "data/tricks/%s/";
+    private static final List<String> ALIASES = List.of("trick", "tk");
 
     private final HashMap<String, HashMap<String, Data>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
     private final ConcurrentHashMap<String, PagedList<String>> PAGES = new ConcurrentHashMap<>();
@@ -177,7 +176,7 @@ public class TrickCommand implements IBasicCommand {
                 return CommandResult.NO_PERMISSION;
 
             if (CONTENT.containsKey(guildID) && CONTENT.get(guildID).containsKey(id)) {
-                CONTENT.get(guildID).get(id).delete();
+                CONTENT.get(guildID).get(id).delete(TRICK_DATA_HANDLER);
                 CONTENT.get(guildID).remove(id);
                 dMessage.apply(message.reply("Removed trick '%s'".formatted(id))).queue();
             } else {
@@ -242,6 +241,13 @@ public class TrickCommand implements IBasicCommand {
         return "tricks";
     }
 
+    /**
+     * @return
+     */
+    @Override
+    public List<String> commandAliases() {
+        return ALIASES;
+    }
 
     private Type getTrickType(Arguments args) {
         if (args.hasArg("-code"))
@@ -406,10 +412,8 @@ public class TrickCommand implements IBasicCommand {
             dataHandler.save("%s.json".formatted(trickID()), this, guildID());
         }
 
-        public void delete() {
-            File file = Path.of((SAVE_PATH + "%s.json").formatted(guildID, trickID)).toFile();
-            if (file.exists())
-                file.delete();
+        public void delete(DataHandler<Data> dataHandler) {
+            dataHandler.deleteFile("%s.json".formatted(trickID()), guildID());
         }
 
         public Data withSettings(TrickConfig settings) {

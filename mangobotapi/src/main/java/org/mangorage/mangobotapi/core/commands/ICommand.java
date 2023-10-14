@@ -22,11 +22,13 @@
 
 package org.mangorage.mangobotapi.core.commands;
 
+import org.jetbrains.annotations.NotNull;
 import org.mangorage.mboteventbus.impl.IEvent;
 
 import java.util.List;
 
 public interface ICommand<Type, EventClass> {
+    @NotNull
     CommandResult execute(Type message, Arguments args);
 
     IEvent<EventClass> getListener();
@@ -40,6 +42,14 @@ public interface ICommand<Type, EventClass> {
 
     default List<String> commandAliases() {
         return List.of();
+    }
+
+    default String description() {
+        return "";
+    }
+
+    default String usage() {
+        return "";
     }
 
     default boolean ignoreCase() {
